@@ -32,7 +32,7 @@ endif
 #définition des fichiers et dossiers
 LIBNAME  = GL4Dummies
 PROGNAME = GL4DSample
-PACKAGE=$(PROGNAME)
+PACKAGE=$(LIBNAME)
 VERSION = 0.1.0
 distdir = $(PACKAGE)-$(VERSION)
 HEADERS = GL4D/aes.h GL4D/gl4du.h GL4D/gl4dummies.h GL4D/gl4wdummies.h GL4D/gl4dm.h GL4D/bin_tree.h
