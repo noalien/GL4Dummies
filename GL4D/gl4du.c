@@ -1119,6 +1119,80 @@ void gl4duScaled(GLdouble sx, GLdouble sy, GLdouble sz) {
   gl4duMultMatrixd(mat);
 }
 
+/*!\brief Définie des transformations pour simuler un point de vue
+ * avec direction de regard et orientation.
+ *
+ * Version \a GL4Dummies de la fonction gluLookAt pour les types
+ * GLfloat (les matrices GL_FLOAT). Pour la version gérant les double
+ * voir \see gl4duLookAtd.
+ *
+ * \param eyeX abcsisse de l'oeil.
+ * \param eyeY ordonnée de l'oeil.
+ * \param eyeZ cote de l'oeil.
+ * \param centerX abcsisse du point observé.
+ * \param centerY ordonnée du point observé.
+ * \param centerZ cote du point observé.
+ * \param upX X du vecteur décrivant l'orientation de la "tete" de l'observateur (vecteur haut)
+ * \param upY Y du vecteur décrivant l'orientation de la "tete" de l'observateur (vecteur haut)
+ * \param upZ Y du vecteur décrivant l'orientation de la "tete" de l'observateur (vecteur haut)
+ */
+void gl4duLookAtf(GLfloat eyeX,  GLfloat eyeY,  GLfloat eyeZ,  GLfloat centerX,  GLfloat centerY,  GLfloat centerZ,  GLfloat upX,  GLfloat upY,  GLfloat upZ) {
+  GLfloat haut[3] = { upX, upY, upZ }, dirVue[] = { centerX - eyeX, centerY - eyeY, centerZ - eyeZ };
+  GLfloat mat[] = {
+    0.0f,       0.0f,       0.0f,       0.0f, 
+    0.0f,       0.0f,       0.0f,       0.0f, 
+    -dirVue[0], -dirVue[1], -dirVue[2], 0.0f, 
+    0.0f,       0.0f,       0.0f,       1.0f, 
+  };
+  MVEC3NORMALIZE(dirVue);
+  /* Première version
+     GLfloat cote[3];
+     MVEC3CROSS(cote, dirVue, haut); // j'ai envie de faire haut x dirVue
+     MVEC3NORMALIZE(cote);
+     mat[0] = cote[0]; mat[1] = cote[1]; mat[2] = cote[2]; 
+     //\todo dire pourquoi (lié à la normalisation de cote) 
+     MVEC3CROSS(haut, cote, dirVue); // j'ai envie de faire dirVue x coté
+     mat[4] = haut[0]; mat[5] = haut[1]; mat[6] = haut[2]; */
+  MVEC3CROSS(mat, dirVue, haut);
+  MVEC3NORMALIZE(mat);
+  MVEC3CROSS(&mat[4], mat, dirVue);
+  gl4duMultMatrixf(mat);
+  gl4duTranslatef(-eyeX, -eyeY, -eyeZ);
+}
+
+/*!\brief Définie des transformations pour simuler un point de vue
+ * avec direction de regard et orientation.
+ *
+ * Version \a GL4Dummies de la fonction gluLookAt pour les types
+ * GLdouble (les matrices GL_DOUBLE). Pour la version gérant les
+ * double voir \see gl4duLookAtf.
+ *
+ * \param eyeX abcsisse de l'oeil.
+ * \param eyeY ordonnée de l'oeil.
+ * \param eyeZ cote de l'oeil.
+ * \param centerX abcsisse du point observé.
+ * \param centerY ordonnée du point observé.
+ * \param centerZ cote du point observé.
+ * \param upX X du vecteur décrivant l'orientation de la "tete" de l'observateur (vecteur haut)
+ * \param upY Y du vecteur décrivant l'orientation de la "tete" de l'observateur (vecteur haut)
+ * \param upZ Y du vecteur décrivant l'orientation de la "tete" de l'observateur (vecteur haut)
+ */
+void gl4duLookAtd(GLdouble eyeX,  GLdouble eyeY,  GLdouble eyeZ,  GLdouble centerX,  GLdouble centerY,  GLdouble centerZ,  GLdouble upX,  GLdouble upY,  GLdouble upZ) {
+  GLdouble haut[3] = { upX, upY, upZ }, dirVue[] = { centerX - eyeX, centerY - eyeY, centerZ - eyeZ };
+  GLdouble mat[] = {
+    0.0f,       0.0f,       0.0f,       0.0f, 
+    0.0f,       0.0f,       0.0f,       0.0f, 
+    -dirVue[0], -dirVue[1], -dirVue[2], 0.0f, 
+    0.0f,       0.0f,       0.0f,       1.0f, 
+  };
+  MVEC3NORMALIZE(dirVue);
+  MVEC3CROSS(mat, dirVue, haut);
+  MVEC3NORMALIZE(mat);
+  MVEC3CROSS(&mat[4], mat, dirVue);
+  gl4duMultMatrixd(mat);
+  gl4duTranslated(-eyeX, -eyeY, -eyeZ);
+}
+
 /*!\brief retourne le pointeur vers les données de la matrice (pile de "une matrice 4x4") courante.
  *
  * En pratique, prend la donnée en haut de la pile. Le type de retour

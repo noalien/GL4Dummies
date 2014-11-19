@@ -64,6 +64,8 @@ extern "C" {
   GL4DAPI void      GL4DAPIENTRY gl4duTranslated(GLdouble tx, GLdouble ty, GLdouble tz);
   GL4DAPI void      GL4DAPIENTRY gl4duScalef(GLfloat sx, GLfloat sy, GLfloat sz);
   GL4DAPI void      GL4DAPIENTRY gl4duScaled(GLdouble sx, GLdouble sy, GLdouble sz);
+  GL4DAPI void      GL4DAPIENTRY gl4duLookAtf(GLfloat eyeX, GLfloat eyeY, GLfloat eyeZ, GLfloat centerX, GLfloat centerY, GLfloat centerZ, GLfloat upX, GLfloat upY, GLfloat upZ);
+  GL4DAPI void      GL4DAPIENTRY gl4duLookAtd(GLdouble eyeX, GLdouble eyeY, GLdouble eyeZ, GLdouble centerX, GLdouble centerY, GLdouble centerZ, GLdouble upX, GLdouble upY, GLdouble upZ);
   GL4DAPI void *    GL4DAPIENTRY gl4duGetMatrixData(void);
   GL4DAPI GLboolean GL4DAPIENTRY gl4duGetIntegerv(GL4DUenum pname, GLint * params);
   

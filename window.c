@@ -338,8 +338,11 @@ static void draw(GLfloat a0) {
 
   gl4duBindMatrix("modelViewMatrix");
   gl4duLoadIdentityf();
-  gl4duRotatef(-_cam.theta * 180.0f / M_PI, 0.0, 1.0, 0.0);
-  gl4duTranslatef(-_cam.x, -1.0, -_cam.z);
+  /* Avec des rotate et translate faire :
+     gl4duRotatef(-_cam.theta * 180.0f / M_PI, 0.0, 1.0, 0.0);
+     gl4duTranslatef(-_cam.x, -1.0, -_cam.z);
+     A la place du LookAt */
+  gl4duLookAtf(_cam.x, 1.0, _cam.z, _cam.x - sin(_cam.theta), 1.0, _cam.z - cos(_cam.theta), 0.0, 1.0, 0.0);
 
   mv = gl4duGetMatrixData();
   MMAT4XVEC4(lumpos, mv, temp);
