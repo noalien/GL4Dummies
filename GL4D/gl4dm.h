@@ -5,7 +5,10 @@
  *
  * \author Farès BELHADJ amsi@ai.univ-paris8.fr
  * \date November 12, 2014
-*/
+ *
+ * \todo voir ce qui est fait avec les w des vec4 et corriger toutes
+ * les macros si nécessaire.
+ */
 
 #ifndef _GL4DM_H
 #define _GL4DM_H
@@ -83,6 +86,15 @@
     MVEC3CROSS(r, u, v);			\
     (r)[3] = 1.0;				\
   } while(0)
+
+/*!\brief Renvoie le produit scalaire entre deux vecteurs 2D entre \a u et \a v. */
+#define MVEC2DOT(u, v) ((u)[0] * (v)[0] + (u)[1] * (v)[1])
+
+/*!\brief Renvoie le produit scalaire entre deux vecteurs 3D entre \a u et \a v. */
+#define MVEC3DOT(u, v) ((u)[0] * (v)[0] + (u)[1] * (v)[1] + (u)[2] * (v)[2])
+
+/*!\brief Renvoie le produit scalaire entre deux vecteurs 4D entre \a u et \a v. */
+#define MVEC4DOT(u, v) ((u)[0] * (v)[0] + (u)[1] * (v)[1] + (u)[2] * (v)[2] + (u)[3] * (v)[3])
 
 /*!\brief Normalise le vecteur 4D \a v. */
 #define MVEC4NORMALIZE(v) do {						\
