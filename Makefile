@@ -17,7 +17,7 @@ PG_FLAGS =
 SDL_CFLAGS = $(shell sdl2-config --cflags)
 SDL_LDFLAGS = $(shell sdl2-config --libs)
 CPPFLAGS = -I. -IGL4D $(SDL_CFLAGS)
-CFLAGS = -Wall -O3
+CFLAGS = -std=c99 -D_GNU_SOURCE -Wall -O3
 LDFLAGS = -lm $(SDL_LDFLAGS)
 
 UNAME := $(shell uname)

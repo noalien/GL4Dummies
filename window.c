@@ -218,7 +218,7 @@ static void resizeGL(SDL_Window * win) {
  * attaché le contexte OpenGL.
  */
 static void loop(SDL_Window * win) {
-  GLfloat a = 0.0, dt = 0.0, dtheta = M_PI, pas = 5.0;
+  GLfloat a = 0.0, dt = 0.0, dtheta = GL4DM_PI, pas = 5.0;
   Uint32 t0 = SDL_GetTicks(), t;
   SDL_GL_SetSwapInterval(1);
   for(;;) {
@@ -248,7 +248,7 @@ static void loop(SDL_Window * win) {
     SDL_GL_SwapWindow(win);
     gl4duUpdateShaders();
     if(!_pause)
-      a += 0.1 * 2.0 * M_PI * dt;
+      a += 0.1 * 2.0 * GL4DM_PI * dt;
   }
 }
 
@@ -339,7 +339,7 @@ static void draw(GLfloat a0) {
   gl4duBindMatrix("modelViewMatrix");
   gl4duLoadIdentityf();
   /* Avec des rotate et translate faire :
-     gl4duRotatef(-_cam.theta * 180.0f / M_PI, 0.0, 1.0, 0.0);
+     gl4duRotatef(-_cam.theta * 180.0f / GL4DM_PI, 0.0, 1.0, 0.0);
      gl4duTranslatef(-_cam.x, -1.0, -_cam.z);
      A la place du LookAt */
   gl4duLookAtf(_cam.x, 1.0, _cam.z, _cam.x - sin(_cam.theta), 1.0, _cam.z - cos(_cam.theta), 0.0, 1.0, 0.0);

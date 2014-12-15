@@ -17,6 +17,9 @@
 
 /* MACROS DIVERS */
 
+#ifdef GL4DM_PI
+#  undef GL4DM_PI
+#endif
 #ifdef MIN
 #  undef MIN
 #endif
@@ -26,9 +29,22 @@
 #ifdef SIGN
 #  undef SIGN
 #endif
+#ifdef SQUARE
+#  undef SQUARE
+#endif
+#ifdef COTANGENT
+#  undef COTANGENT
+#endif
+#ifdef RADIAN
+#  undef RADIAN
+#endif
+#define GL4DM_PI 3.14159265358979323846
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define SIGN(i) ((i) > 0 ? 1 : -1)
+#define SQUARE(X) ((X)*(X))
+#define COTANGENT(X) (cos(X)/sin(X))
+#define RADIAN(X) (GL4DM_PI * (X) / 180)
 
 /* MACROS LIEES AUX CALCULS VECTORIELS ET/OU MATRICIELS */
 
@@ -168,6 +184,23 @@ GL4DAPI double    GL4DAPIENTRY gu_rand(void);
 
 #ifdef __cplusplus
 }
+#endif
+
+/*!\brief Méthodes alternative utilisant des fonctions inline 
+ * (compatible seulement a partir de la norme c99)*/
+
+#if __STDC_VERSION__ >= 199901L
+typedef struct
+{
+  float x, y, z, w;
+} GL4DMVector;
+
+typedef struct
+{
+  GL4DMVector r[4];
+} GL4DMMatrix;
+
+#include "gl4dm.inl"
 #endif
 
 #endif

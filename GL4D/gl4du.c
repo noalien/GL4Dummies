@@ -996,7 +996,7 @@ void gl4duRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z) {
 		      0.0f, 0.0f, 0.0f, 0.0f,
 		      0.0f, 0.0f, 0.0f, 0.0f,
 		      0.0f, 0.0f, 0.0f, 1.0f };
-    s  = sinf ( a = (angle * M_PI / 180.0f) );
+    s  = sinf ( a = (angle * GL4DM_PI / 180.0f) );
     cc = 1.0f - (c = cosf ( a ));
     x /= n;     y /= n;     z /= n;
     x2 = x * x; y2 = y * y; z2 = z * z;
@@ -1036,7 +1036,7 @@ void gl4duRotated(GLdouble angle, GLdouble x, GLdouble y, GLdouble z) {
 		       0.0, 0.0, 0.0, 0.0,
 		       0.0, 0.0, 0.0, 0.0,
 		       0.0, 0.0, 0.0, 1.0 };
-    s  = sin ( a = (angle * M_PI / 180.0) );
+    s  = sin ( a = (angle * GL4DM_PI / 180.0) );
     cc = 1.0 - (c = cos ( a ));
     x /= n;     y /= n;     z /= n;
     x2 = x * x; y2 = y * y; z2 = z * z;
