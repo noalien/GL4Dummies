@@ -17,6 +17,20 @@
 
 /* MACROS DIVERS */
 
+#define GL4DM_E		        2.7182818284590452354
+#define GL4DM_LOG2E	        1.4426950408889634074
+#define GL4DM_LOG10E	        0.43429448190325182765
+#define GL4DM_LN2		0.69314718055994530942
+#define GL4DM_LN10		2.30258509299404568402
+#define GL4DM_PI		3.14159265358979323846
+#define GL4DM_PI_2		1.57079632679489661923
+#define GL4DM_PI_4		0.78539816339744830962
+#define GL4DM_1_PI		0.31830988618379067154
+#define GL4DM_2_PI		0.63661977236758134308
+#define GL4DM_2_SQRTPI	        1.12837916709551257390
+#define GL4DM_SQRT2	        1.41421356237309504880
+#define GL4DM_SQRT1_2	        0.70710678118654752440
+
 #ifdef MIN
 #  undef MIN
 #endif
@@ -26,9 +40,21 @@
 #ifdef SIGN
 #  undef SIGN
 #endif
+#ifdef SQUARE
+#  undef SQUARE
+#endif
+#ifdef COTANGENT
+#  undef COTANGENT
+#endif
+#ifdef RADIAN
+#  undef RADIAN
+#endif
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define SIGN(i) ((i) > 0 ? 1 : -1)
+#define SQUARE(X) ((X)*(X))
+#define COTANGENT(X) (cos(X)/sin(X))
+#define RADIAN(X) (GL4DM_PI * (X) / 180)
 
 /* MACROS LIEES AUX CALCULS VECTORIELS ET/OU MATRICIELS */
 
@@ -167,6 +193,23 @@ GL4DAPI double    GL4DAPIENTRY gl4dmGURand(void);
 
 #ifdef __cplusplus
 }
+#endif
+
+/*!\brief Méthodes alternative utilisant des fonctions inline 
+ * (compatible seulement a partir de la norme c99)*/
+
+#if __STDC_VERSION__ >= 199901L || defined __cplus_cplus
+typedef struct
+{
+  float x, y, z, w;
+} GL4DMVector;
+
+typedef struct
+{
+  GL4DMVector r[4];
+} GL4DMMatrix;
+
+#include "gl4dm.inl"
 #endif
 
 #endif
