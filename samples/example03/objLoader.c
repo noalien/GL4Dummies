@@ -58,7 +58,7 @@ struct cam_t {
   GLfloat theta;
 };
 
-static cam_t _cam = {0, 15, 0};
+static cam_t _cam = {0, 50, 0};
 
 /*!\brief La fonction principale initialise la bibliothèque SDL2,
  * demande la création de la fenêtre SDL et du contexte OpenGL par
@@ -75,6 +75,7 @@ int main(int argc, char ** argv) {
     initGL(_win);
     _pId = gl4duCreateProgram("<vs>../shaders/basic.vs", "<fs>../shaders/basic.fs", NULL);
     _pId2 = gl4duCreateProgram("<vs>../shaders/basic.vs", "<fs>../shaders/sobel.fs", NULL);
+    _model = glmReadOBJ("obama.obj");
     initData();
     loop(_win);
   } else 
@@ -160,24 +161,59 @@ static void initGL(SDL_Window * win) {
   resizeGL(win);
 }
 
+/*\todo utiliser les groups des modèles pour affecter des materiaux */
 static void initData(void) {
-  GLfloat s = 1.0, data[] = { 
+  int i;
+  GLfloat s = 1.0, data[] = {
     /* 4 coordonnées de sommets */
     -s, -s, 0.0f,
     s , -s, 0.0f,
     -s,  s, 0.0f,
     s ,  s, 0.0f,
     /* 4 normales */
-    0.0f, 0.0f, 1.0f, 
+    0.0f, 0.0f, 1.0f,
     0.0f, 0.0f, 1.0f,
     0.0f, 0.0f, 1.0f,
     0.0f, 0.0f, 1.0f,
     /* 4 coordonnées de texture, une par sommet */
-    0.0f, 0.0f, 
+    0.0f, 0.0f,
     1.0f, 0.0f,
     0.0f, 1.0f,
     1.0f, 1.0f
   };
+
+  if(!_objVao)
+    glGenVertexArrays(1, &_objVao);
+  glBindVertexArray(_objVao);
+  glEnableVertexAttribArray(0);
+  glDisableVertexAttribArray(1);
+  glDisableVertexAttribArray(2);
+  if(!_objBD)
+    glGenBuffers(1, &_objBD);
+  if(!_objBI)
+    glGenBuffers(1, &_objBI);
+  glBindBuffer(GL_ARRAY_BUFFER, _objBD);
+  glBufferData(GL_ARRAY_BUFFER,
+  	       3 * _model->numvertices * sizeof *_model->vertices, _model->vertices, GL_STATIC_DRAW);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _objBI);
+
+  GLuint * ti = malloc(_model->numtriangles * 3 * sizeof *ti);
+  assert(ti);
+  for(i = 0; i < _model->numtriangles; i++) {
+    GLMtriangle * triangle = &(_model->triangles[i]);
+    memcpy(&ti[3 * i], triangle->vindices, 3 * sizeof *ti);
+    ti[3 * i] = triangle->vindices[0];
+    ti[3 * i + 1] = triangle->vindices[1];
+    ti[3 * i + 2] = triangle->vindices[2];
+  }
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+  	       _model->numtriangles * 3 * sizeof *ti, ti, GL_STATIC_DRAW);
+  glBindVertexArray(0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  free(ti);
+
   glGenVertexArrays(1, &_vao);
   glBindVertexArray(_vao);
 
@@ -193,36 +229,6 @@ static void initData(void) {
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (const void *)(4 * 6 * sizeof *data));
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
-
-  _model = glmReadOBJ("alfa/alfa.obj");
-  if(!_objVao)
-    glGenVertexArrays(1, &_objVao);
-  glBindVertexArray(_objVao);
-  glEnableVertexAttribArray(0);
-  if(!_objBD)
-    glGenBuffers(1, &_objBD);
-  if(!_objBI)
-    glGenBuffers(1, &_objBI);
-  glBindBuffer(GL_ARRAY_BUFFER, _objBD);
-  int i;
-/*   for(i = 0; i < _model->numvertices; i++) { */
-/*     fprintf(stderr, "%d: %f %f %f\n", i, _model->vertices[3 * i], _model->vertices[3 * i + 1], _model->vertices[3 * i + 2]); */
-/*   } */
-  glBufferData(GL_ARRAY_BUFFER, 
-	       3 * _model->numvertices * sizeof *_model->vertices, &(_model->vertices[0]), GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);  
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _objBI);
-  GLuint * ti = malloc(_model->numtriangles * 3 * sizeof *ti);
-  assert(ti);
-  for(i = 0; i < _model->numtriangles; i++) {
-    memcpy(&ti[3 * i], _model->triangles[i].vindices, 3 * sizeof *ti);
-/*     fprintf(stderr, "%d %d %d\n", ti[3 * i], ti[3 * i + 1], ti[3 * i + 2]); */
-  }
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 
-	       _model->numtriangles * 3 * sizeof *ti, ti, GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
-  free(ti);
 }
 
 /*!\brief Cette fonction paramétrela vue (viewPort) OpenGL en fonction
@@ -374,7 +380,7 @@ static void draw(GLfloat a0) {
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex,  0);
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+  glEnable(GL_DEPTH_TEST);
   glUseProgram(_pId);
   gl4duBindMatrix("modelViewMatrix");
   gl4duLoadIdentityf();
@@ -386,7 +392,9 @@ static void draw(GLfloat a0) {
 
   gl4duSendMatrices();
   glBindVertexArray(_objVao);
-  glDrawElements(GL_POINTS, 3 * _model->numtriangles, GL_UNSIGNED_INT, 0);
+  //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  glDrawElements(GL_TRIANGLES, 3 * _model->numtriangles, GL_UNSIGNED_INT, 0);
+  //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   glBindVertexArray(0);
 
   glUseProgram(0);
@@ -413,7 +421,5 @@ static void draw(GLfloat a0) {
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   glBindVertexArray(0);
   gl4duPopMatrix();
-
-
 }
 

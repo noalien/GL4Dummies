@@ -15,7 +15,7 @@ CP = cp
 #declaration des options du compilateur
 PG_FLAGS =
 CPPFLAGS = -I. -I/usr/X11R6/include -DHAVE_LIBJPEG  -DHAVE_LIBPNG -DMATERIAL_BY_FACE
-CFLAGS = -Wall -O2 $(PG_FLAGS)
+CFLAGS = -Wall -Wno-unused-result -O3 $(PG_FLAGS)
 LDFLAGS = 
 #definition des fichiers et dossiers
 PROGNAME = libglm.a

@@ -17,6 +17,10 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+#ifndef MATERIAL_BY_FACE
+#  define MATERIAL_BY_FACE
+#endif
+
 #define GLM_MAX_SHININESS 100.0 /* for Poser */
 #define GLM_MAX_TEXTURE_SIZE 0 /* must be a power of 2 (i.e. 1024).
 				  0 means no limit. */
