@@ -21,8 +21,8 @@ void main(void) {
   vec3 color = vec3(0);
   vec3 lum = normalize(vsoModPosition.xyz - lumpos.xyz);
   il = dot(normalize(vsoNormal), -lum);
-  //color = vec3(1) * il;
-  for(int i = 0; i < colors.length; i++) {
+  color = vec3(1) * il;
+  for(int i = 0; i < colors.length(); i++) {
     if(il < colors[i].a) {
       color = colors[i].rgb;
       break;

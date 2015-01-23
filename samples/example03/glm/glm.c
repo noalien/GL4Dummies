@@ -1268,8 +1268,8 @@ glmVertexNormals(GLMmodel* model, GLfloat angle, GLboolean keep_existing)
 	for (j = 0; j<3; j++) {
 	  assert(T(node->index).vindices[j] <= model->numvertices);
 	  if (T(node->index).vindices[j] == i) {
-	    if(T(node->index).nindices[j] > numnormals);
-	    assert(T(node->index).nindices[j] == -1 || T(node->index).nindices[j] <= model->numnormals);
+	    if(T(node->index).nindices[j] > numnormals)
+	      assert(T(node->index).nindices[j] == -1 || T(node->index).nindices[j] <= model->numnormals);
 	    if (!keep_existing || T(node->index).nindices[j] == -1) {
 	      if (avg_index == -1) {
 		while (model->numnormals < numnormals) {
