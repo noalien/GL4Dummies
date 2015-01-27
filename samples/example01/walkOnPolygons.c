@@ -69,7 +69,7 @@ int main(int argc, char ** argv) {
   atexit(SDL_Quit);
   if((_win = initWindow(_windowWidth, _windowHeight, &_oglContext))) {
     initGL(_win);
-    _pId = gl4duCreateProgram("<vs>../shaders/basic.vs", "<fs>../shaders/basic.fs", NULL);
+    _pId = gl4duCreateProgram("<vs>../shaders/basic.vs", "<fs>../shaders/toon.fs", NULL);
     initData();
     loop(_win);
   } else 

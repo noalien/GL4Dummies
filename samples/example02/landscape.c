@@ -55,7 +55,7 @@ struct cam_t {
   GLfloat theta;
 };
 
-static cam_t _cam = {0, 0, 0};
+static cam_t _cam = {0, 30, 0};
 
 static void triangle_edge(Uint8 *im, int x, int y, int w, int h, int width) {
   int v;
@@ -188,24 +188,6 @@ static void initGL(SDL_Window * win) {
   resizeGL(win);
 }
 
-/* static void normale_old(GLfloat * triangle) {
-  GLfloat u[3] = {triangle[0], triangle[1], triangle[2]};
-  GLfloat v[3] = {triangle[8], triangle[9], triangle[10]};
-  GLfloat w[3] = {triangle[16], triangle[17], triangle[18]};
-  GLfloat uv[3] = {v[0] - u[0], v[1] - u[1], v[2] - u[2]}, vw[3] = {w[0] - v[0], w[1] - v[1], w[2] - v[2]}, n[3]; 
-  MVEC3CROSS(n, uv, vw);
-  MVEC3NORMALIZE(n);
-  triangle[3]  = n[0];
-  triangle[4]  = n[1];
-  triangle[5]  = n[2];
-  triangle[11] = n[0];
-  triangle[12] = n[1];
-  triangle[13] = n[2];
-  triangle[19] = n[0];
-  triangle[20] = n[1];
-  triangle[21] = n[2];
-  }*/
-
 static void tnormale(GLfloat * triangle, GLfloat * n) {
   GLfloat * u = triangle;
   GLfloat * v = &triangle[3];
@@ -220,8 +202,9 @@ static GLfloat hauteur(Uint8 * pixels, int i) {
   return s2 * pixels[i] / 255.0;
 }
 
+static GLfloat _scote = 10.0f;
 static GLfloat cote(int i, int w) {
-  GLfloat s = 10.0f, a;
+  GLfloat s = _scote, a;
   a = s * (2.0 * (i / (GLfloat)w) - 1.0);
   return a;
 }
@@ -292,42 +275,42 @@ static void initData(void) {
       data[k++] = z;
       normale(pixels, j, i, &data[k], w, h);
       k += 3;
-      data[k++] = x; data[k++] = z;
+      data[k++] = 0.5 + x / (2.0f * _scote); data[k++] = 0.5 + z / (2.0f * _scote);
       //1
       data[k++] = xp1;
       data[k++] = hauteur(pixels, c + w + 1);
       data[k++] = zp1;
       normale(pixels, j + 1, i + 1, &data[k], w, h);
       k += 3;
-      data[k++] = xp1; data[k++] = zp1;
+      data[k++] = 0.5 + xp1 / (2.0f * _scote); data[k++] = 0.5 + zp1 / (2.0f * _scote);
       //2
       data[k++] = xp1;
       data[k++] = hauteur(pixels, c + 1);
       data[k++] = z;
       normale(pixels, j + 1, i, &data[k], w, h);
       k += 3;
-      data[k++] = xp1; data[k++] = z;
+      data[k++] = 0.5 + xp1 / (2.0f * _scote); data[k++] = 0.5 + z / (2.0f * _scote);
       //0
       data[k++] = x;
       data[k++] = hauteur(pixels, c);
       data[k++] = z;
       normale(pixels, j, i, &data[k], w, h);
       k += 3;
-      data[k++] = x; data[k++] = z;
+      data[k++] = 0.5 + x / (2.0f * _scote); data[k++] = 0.5 + z / (2.0f * _scote);
       //4
       data[k++] = x;
       data[k++] = hauteur(pixels, c + w);
       data[k++] = zp1;
       normale(pixels, j, i + 1, &data[k], w, h);
       k += 3;
-      data[k++] = x; data[k++] = zp1;
+      data[k++] = 0.5 + x / (2.0f * _scote); data[k++] = 0.5 + zp1 / (2.0f * _scote);
       //5
       data[k++] = xp1;
       data[k++] = hauteur(pixels, c + w + 1);
       data[k++] = zp1;
       normale(pixels, j + 1, i + 1, &data[k], w, h);
       k += 3;
-      data[k++] = xp1; data[k++] = zp1;
+      data[k++] = 0.5 + xp1 / (2.0f * _scote); data[k++] = 0.5 + zp1 / (2.0f * _scote);
     }
   }
   //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -486,7 +469,7 @@ static void manageEvents(SDL_Window * win) {
 /*!\brief Cette fonction dessine dans le contexte OpenGL actif.
  */
 static void draw(GLfloat a0) {
-  GLfloat * mv, temp[4] = {5 * sin(a0), 0.5, -5, 1.0}, lumpos[4];
+  GLfloat * mv, temp[4] = {5 * sin(a0), 10.5, -5, 1.0}, lumpos[4];
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -494,15 +477,11 @@ static void draw(GLfloat a0) {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, _tId);
   glUniform1i(glGetUniformLocation(_pId, "myTexture"), 0);
-  glUniform1i(glGetUniformLocation(_pId, "heightMap"), 0);
+  glUniform1i(glGetUniformLocation(_pId, "heightMap"), 1);
 
   gl4duBindMatrix("modelViewMatrix");
   gl4duLoadIdentityf();
-  /* Avec des rotate et translate faire :
-     gl4duRotatef(-_cam.theta * 180.0f / GL4DM_PI, 0.0, 1.0, 0.0);
-     gl4duTranslatef(-_cam.x, -1.0, -_cam.z);
-     A la place du LookAt */
-  gl4duLookAtf(_cam.x, 1.0, _cam.z, _cam.x - sin(_cam.theta), 1.0, _cam.z - cos(_cam.theta), 0.0, 1.0, 0.0);
+  gl4duLookAtf(_cam.x, 4.0, _cam.z, _cam.x - sin(_cam.theta), 4.0, _cam.z - cos(_cam.theta), 0.0, 1.0, 0.0);
 
   mv = gl4duGetMatrixData();
   MMAT4XVEC4(lumpos, mv, temp);
