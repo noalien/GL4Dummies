@@ -57,7 +57,7 @@ int gl4dutStream2texGrab(GLuint texId) {
     IplImage *img = cvCreateImage(cvGetSize(_s2tImg), IPL_DEPTH_8U, 1);
     cvCvtColor(_s2tImg, img, CV_RGB2GRAY);
     cvSmooth(img, img, CV_GAUSSIAN, 5, 5, 0, 0);
-    CvSeq * res = cvHoughCircles(img, memSto, CV_HOUGH_GRADIENT, 2, _s2tImg->width / 10, 100, 100, 20, 100);//, double param1=100, double param2=100, int min_radius=0, int max_radius=0 );
+    CvSeq * res = cvHoughCircles(img, memSto, CV_HOUGH_GRADIENT, 2, _s2tImg->width / 8, 128, 96, 10, 100);//, double param1=100, double param2=100, int min_radius=0, int max_radius=0 );
     cvReleaseImage(&img);
     //CvSeq* cvHoughCircles(CvArr* image, void* circle_storage, int method, double dp, double min_dist, double param1=100, double param2=100, int min_radius=0, int max_radius=0 );
     for(i = 0; i < res->total; i++) {
