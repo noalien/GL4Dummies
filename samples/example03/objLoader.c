@@ -163,7 +163,7 @@ static void initGL(SDL_Window * win) {
 
 /*\todo utiliser les groups des modèles pour affecter des materiaux */
 static void initData(void) {
-  int i;
+  int i, j;
   GLfloat s = 1.0, data[] = {
     /* 4 coordonnées de sommets */
     -s, -s, 0.0f,
@@ -181,12 +181,22 @@ static void initData(void) {
     0.0f, 1.0f,
     1.0f, 1.0f
   };
-
+  GLfloat * all = NULL;
+  glmVertexNormals(_model, 0, GL_FALSE);
+  all = malloc(3 * (2 * _model->numvertices) * sizeof *all);
+  assert(all);
+  memcpy(all, _model->vertices, 3 * _model->numvertices * sizeof *all);
+  for(i = 0; i < _model->numtriangles; i++) {
+    GLMtriangle * triangle = &(_model->triangles[i]);
+    float d[3] = {0, 0, 1};
+    for(j = 0; j < 3; j++)
+      memcpy(&all[3 * _model->numvertices + 3 * triangle->vindices[j]], &_model->normals[3 * triangle->nindices[j]], 3 * sizeof *all);
+  }
   if(!_objVao)
     glGenVertexArrays(1, &_objVao);
   glBindVertexArray(_objVao);
   glEnableVertexAttribArray(0);
-  glDisableVertexAttribArray(1);
+  glEnableVertexAttribArray(1);
   glDisableVertexAttribArray(2);
   if(!_objBD)
     glGenBuffers(1, &_objBD);
@@ -194,8 +204,12 @@ static void initData(void) {
     glGenBuffers(1, &_objBI);
   glBindBuffer(GL_ARRAY_BUFFER, _objBD);
   glBufferData(GL_ARRAY_BUFFER,
-  	       3 * _model->numvertices * sizeof *_model->vertices, _model->vertices, GL_STATIC_DRAW);
+  	       3 * (2 * _model->numvertices) * sizeof *all, all, GL_STATIC_DRAW);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);
+  glVertexAttribPointer(1, 3, GL_FLOAT,  GL_TRUE, 0, (const void *)(3 * _model->numvertices * sizeof *all));
+
+  free(all);
+
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _objBI);
 
   GLuint * ti = malloc(_model->numtriangles * 3 * sizeof *ti);
@@ -294,6 +308,7 @@ static void loop(SDL_Window * win) {
  * attaché le contexte OpenGL.
  */
 static void manageEvents(SDL_Window * win) {
+  GLint v[2];
   SDL_Event event;
   while(SDL_PollEvent(&event)) 
     switch (event.type) {
@@ -317,6 +332,13 @@ static void manageEvents(SDL_Window * win) {
       case ' ':
       case 'p':
 	_pause = !_pause;
+	break;
+      case 'w':
+	glGetIntegerv(GL_POLYGON_MODE, v);
+	if(v[0] == GL_FILL)
+	  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	else
+	  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	break;
       default:
 	fprintf(stderr, "La touche %s a ete pressee\n",
@@ -374,7 +396,7 @@ static void draw(GLfloat a0) {
     glGenFramebuffers(1, &fbo);
     ft = 0;
   }
-  GLfloat * mv, temp[4] = {5 * sin(a0), 0.5, -5, 1.0}, lumpos[4];
+  GLfloat * mv, temp[4] = {50 * sin(a0), 100.5, 50, 1.0}, lumpos[4];
 
   glBindFramebuffer(GL_FRAMEBUFFER, fbo);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex,  0);
@@ -392,9 +414,7 @@ static void draw(GLfloat a0) {
 
   gl4duSendMatrices();
   glBindVertexArray(_objVao);
-  //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   glDrawElements(GL_TRIANGLES, 3 * _model->numtriangles, GL_UNSIGNED_INT, 0);
-  //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   glBindVertexArray(0);
 
   glUseProgram(0);
@@ -404,6 +424,9 @@ static void draw(GLfloat a0) {
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  GLint v[2];
+  glGetIntegerv(GL_POLYGON_MODE, v);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   glUseProgram(_pId2);
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, tex);
@@ -421,5 +444,6 @@ static void draw(GLfloat a0) {
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   glBindVertexArray(0);
   gl4duPopMatrix();
+  glPolygonMode(GL_FRONT_AND_BACK, v[0]);
 }
 

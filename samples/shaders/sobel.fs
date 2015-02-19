@@ -20,5 +20,5 @@ float sobel(void) {
 }
 
 void main(void) {
-  fragColor = vec4(vec3(sobel()), 1.0);
+  fragColor = mix(vec4(vec3(sobel()), 1.0), texture(myTexture, vsoTexCoord.st), 0.5);
 }

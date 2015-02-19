@@ -12,8 +12,8 @@ newmtl 03___Default
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka C:\Users\suarez\Desktop\VCS_NEW\Data\FBX\obama\OBAMA_EY.JPG
-	map_Kd C:\Users\suarez\Desktop\VCS_NEW\Data\FBX\obama\OBAMA_EY.JPG
+	map_Ka OBAMA_EY.JPG
+	map_Kd OBAMA_EY.JPG
 
 newmtl 02___Default
 	Ns 10.0000
@@ -26,8 +26,8 @@ newmtl 02___Default
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka C:\Users\suarez\Desktop\VCS_NEW\Data\FBX\obama\OBAMA_E1.JPG
-	map_Kd C:\Users\suarez\Desktop\VCS_NEW\Data\FBX\obama\OBAMA_E1.JPG
+	map_Ka OBAMA_E1.JPG
+	map_Kd OBAMA_E1.JPG
 
 newmtl 01___Default
 	Ns 10.0000
@@ -40,5 +40,5 @@ newmtl 01___Default
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka C:\Users\suarez\Desktop\VCS_NEW\Data\FBX\obama\OBAMA_SK.JPG
-	map_Kd C:\Users\suarez\Desktop\VCS_NEW\Data\FBX\obama\OBAMA_SK.JPG
+	map_Ka OBAMA_SK.JPG
+	map_Kd OBAMA_SK.JPG

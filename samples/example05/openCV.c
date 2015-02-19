@@ -14,11 +14,11 @@
 #include <gl4du.h>
 
 
-#include <opencv/highgui.h>
+#include <opencv2/highgui/highgui_c.h>
 #include <opencv2/imgproc/imgproc_c.h>
 
 static CvSize _s2tSize = {1, 1};
-static IplImage * _s2tImg = NULL;
+static IplImage * _s2tImg = NULL,  * _s2tUDimg = NULL;
 static CvCapture * _s2tCapture = NULL;
 
 static void stream2texFree(void) {
@@ -28,6 +28,8 @@ static void stream2texFree(void) {
    * if(_s2tImg)
    *   cvReleaseImage(&_s2tImg); 
    */
+  if(_s2tUDimg)
+    cvReleaseImage(&_s2tUDimg); 
   if(_s2tCapture) {
     cvReleaseCapture(&_s2tCapture);
     _s2tCapture = NULL;
@@ -52,9 +54,24 @@ int gl4dutStream2texGrab(GLuint texId) {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texId);
   if((_s2tImg = cvQueryFrame(_s2tCapture))) {
-    int i;
+    int i, j, i1 , i2;
     CvMemStorage * memSto = cvCreateMemStorage(0);
     IplImage *img = cvCreateImage(cvGetSize(_s2tImg), IPL_DEPTH_8U, 1);
+    unsigned char * dd = (unsigned char *)_s2tImg->imageData, * nd;
+    if(_s2tUDimg == NULL)
+      _s2tUDimg = cvCreateImage(cvGetSize(_s2tImg), _s2tImg->depth, 4);
+    assert(_s2tUDimg);
+    nd = (unsigned char *)_s2tUDimg->imageData;
+    for(i = 0; i < _s2tImg->height; i++) {
+      i1 = _s2tUDimg->widthStep * (i/*_s2tUDimg->height - i - 1*/);//4 * (_s2tImg->height - i - 1) * _s2tImg->width;
+      i2 = _s2tImg->widthStep * i;//_s2tImg->nChannels * i * _s2tImg->width;
+      for(j = 0; j < _s2tImg->width; j++) {
+	nd[i1 + _s2tUDimg->nChannels * j] = dd[i2 + _s2tImg->nChannels * j];
+	nd[i1 + _s2tUDimg->nChannels * j + 1] = dd[i2 + _s2tImg->nChannels * j + 1];
+	nd[i1 + _s2tUDimg->nChannels * j + 2] = dd[i2 + _s2tImg->nChannels * j + 2];
+	nd[i1 + _s2tUDimg->nChannels * j + 3] = _s2tImg->nChannels == 4 ? dd[i2 + _s2tImg->nChannels * j + 3] : 255;
+      }
+    }
     cvCvtColor(_s2tImg, img, CV_RGB2GRAY);
     cvSmooth(img, img, CV_GAUSSIAN, 5, 5, 0, 0);
     CvSeq * res = cvHoughCircles(img, memSto, CV_HOUGH_GRADIENT, 2, _s2tImg->width / 8, 128, 96, 10, 100);//, double param1=100, double param2=100, int min_radius=0, int max_radius=0 );
@@ -63,9 +80,9 @@ int gl4dutStream2texGrab(GLuint texId) {
     for(i = 0; i < res->total; i++) {
       float * p = (float *)cvGetSeqElem(res, i);
       CvPoint pt = cvPoint(cvRound(p[0]), cvRound(p[1]));
-      cvCircle(_s2tImg, pt, cvRound(p[2]), CV_RGB(0xff, 0, 0), 1, 8, 0);
+      cvCircle(_s2tUDimg, pt, cvRound(p[2]), CV_RGB(0xff, 0, 0), 1, 8, 0);
     }
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _s2tImg->width, _s2tImg->height, 0, GL_BGR, GL_UNSIGNED_BYTE, _s2tImg->imageData);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _s2tUDimg->width, _s2tUDimg->height, 0, GL_BGRA, GL_UNSIGNED_BYTE, _s2tUDimg->imageData);
     return 1;
   }
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, d);

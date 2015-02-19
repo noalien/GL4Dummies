@@ -16,5 +16,5 @@ void main(void) {
   if(heightMap == 1)
     fragColor = il * vec4(texture(myTexture, vsoTexCoord).r);
   else
-    fragColor = mix(vec4(texture(myTexture, vsoTexCoord).rgb, 1.0), vec4(il), 0.3);
+    fragColor = vec4(il);//mix(vec4(texture(myTexture, vsoTexCoord).rgb, 1.0), vec4(il), 0.3);
 }

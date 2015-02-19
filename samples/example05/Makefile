@@ -23,7 +23,7 @@ LDFLAGS = -lm $(SDL_LDFLAGS) -lpng -ljpeg -lopencv_highgui -lopencv_imgproc -lop
 UNAME := $(shell uname)
 ifeq ($(UNAME),Darwin)
 	MACOSX_DEPLOYMENT_TARGET = 10.8
-        CFLAGS += -I/usr/X11R6/include -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
+        CFLAGS += -I/usr/X11R6/include -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET) -I/opt/local/include/ -Wno-unused-function
         LDFLAGS += -framework OpenGL -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 else
         LDFLAGS +=  -L/usr/lib -L/usr/X11R6/lib -lGL -lGLU
