@@ -385,7 +385,8 @@ static void manageEvents(SDL_Window * win) {
 static void draw(GLfloat a0) {
   static int ft = 1;
   static GLuint fbo, tex;
-  if(ft) {
+  GLint v[2];
+  /*if(ft) {
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -395,12 +396,12 @@ static void draw(GLfloat a0) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _windowWidth, _windowHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glGenFramebuffers(1, &fbo);
     ft = 0;
-  }
+    }*/
   GLfloat * mv, temp[4] = {50 * sin(a0), 100.5, 50, 1.0}, lumpos[4];
 
-  glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+  /*glBindFramebuffer(GL_FRAMEBUFFER, fbo);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex,  0);
-
+  */
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glEnable(GL_DEPTH_TEST);
   glUseProgram(_pId);
@@ -417,14 +418,13 @@ static void draw(GLfloat a0) {
   glDrawElements(GL_TRIANGLES, 3 * _model->numtriangles, GL_UNSIGNED_INT, 0);
   glBindVertexArray(0);
 
-  glUseProgram(0);
+  /*glUseProgram(0);
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
   glBlitFramebuffer(0, 0, _windowWidth, _windowHeight, 0, 0, _windowWidth, _windowHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  GLint v[2];
   glGetIntegerv(GL_POLYGON_MODE, v);
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   glUseProgram(_pId2);
@@ -444,6 +444,6 @@ static void draw(GLfloat a0) {
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   glBindVertexArray(0);
   gl4duPopMatrix();
-  glPolygonMode(GL_FRONT_AND_BACK, v[0]);
+  glPolygonMode(GL_FRONT_AND_BACK, v[0]);*/
 }
 
