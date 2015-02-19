@@ -17,7 +17,7 @@ PG_FLAGS =
 SDL_CFLAGS = $(shell sdl2-config --cflags)
 SDL_LDFLAGS = $(shell sdl2-config --libs)
 CPPFLAGS = -I. -I../../lib_src/GL4D $(SDL_CFLAGS)
-CFLAGS = -Wall -g
+CFLAGS = -Wall -O3
 LDFLAGS = -lm $(SDL_LDFLAGS) -lpng -ljpeg
 
 UNAME := $(shell uname)

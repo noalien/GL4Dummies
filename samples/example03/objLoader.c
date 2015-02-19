@@ -183,12 +183,11 @@ static void initData(void) {
   };
   GLfloat * all = NULL;
   glmVertexNormals(_model, 90, GL_FALSE);
-  all = malloc(3 * (2 * _model->numvertices) * sizeof *all);
+  all = malloc(3 * 2 * (_model->numvertices + 1) * sizeof *all);
   assert(all);
   memcpy(all, _model->vertices, 3 * _model->numvertices * sizeof *all);
   for(i = 0; i < _model->numtriangles; i++) {
     GLMtriangle * triangle = &(_model->triangles[i]);
-    float d[3] = {0, 0, 1};
     for(j = 0; j < 3; j++)
       memcpy(&all[3 * _model->numvertices + 3 * triangle->vindices[j]], &_model->normals[3 * triangle->nindices[j]], 3 * sizeof *all);
   }
@@ -384,9 +383,9 @@ static void manageEvents(SDL_Window * win) {
  */
 static void draw(GLfloat a0) {
   static int ft = 1;
-  static GLuint fbo, tex;
+  static GLuint fbo, tex, depthTex;
   GLint v[2];
-  /*if(ft) {
+  if(ft) {
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -394,14 +393,22 @@ static void draw(GLfloat a0) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _windowWidth, _windowHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glGenTextures(1, &depthTex);
+    glBindTexture(GL_TEXTURE_2D, depthTex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, _windowWidth, _windowHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
     glGenFramebuffers(1, &fbo);
     ft = 0;
-    }*/
+  }
   GLfloat * mv, temp[4] = {50 * sin(a0), 100.5, 50, 1.0}, lumpos[4];
 
-  /*glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+  glBindFramebuffer(GL_FRAMEBUFFER, fbo);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex,  0);
-  */
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTex, 0);
+  
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glEnable(GL_DEPTH_TEST);
   glUseProgram(_pId);
@@ -418,7 +425,7 @@ static void draw(GLfloat a0) {
   glDrawElements(GL_TRIANGLES, 3 * _model->numtriangles, GL_UNSIGNED_INT, 0);
   glBindVertexArray(0);
 
-  /*glUseProgram(0);
+  glUseProgram(0);
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
   glBlitFramebuffer(0, 0, _windowWidth, _windowHeight, 0, 0, _windowWidth, _windowHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -444,6 +451,6 @@ static void draw(GLfloat a0) {
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   glBindVertexArray(0);
   gl4duPopMatrix();
-  glPolygonMode(GL_FRONT_AND_BACK, v[0]);*/
+  glPolygonMode(GL_FRONT_AND_BACK, v[0]);
 }
 
