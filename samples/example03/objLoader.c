@@ -182,7 +182,7 @@ static void initData(void) {
     1.0f, 1.0f
   };
   GLfloat * all = NULL;
-  glmVertexNormals(_model, 0, GL_FALSE);
+  glmVertexNormals(_model, 90, GL_FALSE);
   all = malloc(3 * (2 * _model->numvertices) * sizeof *all);
   assert(all);
   memcpy(all, _model->vertices, 3 * _model->numvertices * sizeof *all);
