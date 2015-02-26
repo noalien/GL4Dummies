@@ -1,5 +1,5 @@
 AM_CPPFLAGS = -I../../lib_src/GL4D
-AM_LDFLAGS  = -lGL -L$(top_builddir) -lGL4Dummies
+AM_LDFLAGS  = -L$(top_builddir) -lGL4Dummies
 
 bin_PROGRAMS = $(top_builddir)/gl4dWalkOnPolygons
 
