@@ -29,6 +29,8 @@ extern "C" {
   };
   typedef enum GL4DUenum GL4DUenum;
   
+  GL4DAPI void      GL4DAPIENTRY gl4duInit(int argc, char ** argv);
+  GL4DAPI void      GL4DAPIENTRY gl4duMakeBinRelativePath(char * dst, size_t dst_size, const char * filename);
   GL4DAPI void      GL4DAPIENTRY gl4duPrintShaderInfoLog(GLuint object, FILE * f);
   GL4DAPI void      GL4DAPIENTRY gl4duPrintProgramInfoLog(GLuint object, FILE * f);
   GL4DAPI void      GL4DAPIENTRY gl4duPrintFPS(FILE * fp);

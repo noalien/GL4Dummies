@@ -299,7 +299,7 @@ int mv(const char * src, const char * dst) {
 
 /*!\brief Renvoie le chemin vers le dossier contenant le fichier passé en argument.
  *
- * Fabrique la chaîne allant jusqu'à  la dernière occurence du
+ * Fabrique la chaîne allant jusqu'à la dernière occurence du
  * '/'. Cette chaîne doit être libérée avec free après usage.
  *
  * \param path le chemin vers le fichier/dossier

@@ -150,7 +150,7 @@ int main(int argc, char ** argv) {
   if((_win = initWindow(_windowWidth, _windowHeight, &_oglContext))) {
     initGL(_win);
     gl4dutStream2texInit(NULL);
-    _pId = gl4duCreateProgram("<vs>../shaders/basic.vs", "<fs>../shaders/basic.fs", NULL);
+    _pId = gl4duCreateProgram("<vs>../share/GL4Dummies/shaders/basic.vs", "<fs>../share/GL4Dummies/shaders/basic.fs", NULL);
     initData();
     loop(_win);
   } else 

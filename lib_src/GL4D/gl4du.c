@@ -88,6 +88,83 @@ static inline int matrixCmpFunc(const void * m1, const void * m2);
 static inline bin_tree_t ** findMatrix(const char * name);
 static inline void * matrixData(_GL4DUMatrix * matrix);
 
+/*!\brief stocke le chemin relatif à partir duquel le binaire a été exécuté. Est initialisée dans 
+ *  \a gl4dInit.
+ *
+ * \see gl4dInit
+ */
+static char _pathOfMe[BUFSIZ] = {0};
+
+#if defined(_WIN32)
+#  include <windows.h>
+#elif defined(__FreeBSD__)
+#  include <sys/types.h>
+#  include <libutil.h>
+#  include <unistd.h>
+#elif defined(__MACOSX__)
+#  include <sys/types.h>
+#  include <unistd.h>
+#else /* autres unices */
+#  include <unistd.h>
+#endif
+
+static void findPathOfMe(const char * argv0) {
+  char buf[BUFSIZ] = {0};
+#if defined(_WIN32)
+  /* tous les compilateurs sous windows ? */
+  GetModuleFileNameA(NULL, buf, sizeof buf);
+#elif defined(__FreeBSD__)
+  struct kinfo_proc *proc = kinfo_getproc(getpid());
+  if(proc) {
+    strncpy(buf, proc->ki_comm, sizeof buf);
+    free(proc);
+  } else {
+    fprintf(stderr, "%s (%s:%d) - error while kinfo_getproc(getpid()), trying with readlink\n", 
+	    __func__, __FILE__, __LINE__);
+    if(readlink("/proc/curproc/file", buf, sizeof buf) <= 0) {
+      fprintf(stderr, "%s (%s:%d) - finding exec path failed with readlink\n", 
+	      __func__, __FILE__, __LINE__);
+      /* sinon essayer sysctl CTL_KERN KERN_PROC KERN_PROC_PATHNAME -1 ??? */
+    }
+  }
+#elif defined(__MACOSX__)
+  pid_t pid = getpid();
+  if(proc_pidpath(pid, buf, sizeof buf) <= 0) {
+    fprintf(stderr, "%s (%s:%d) - proc_pidpath(%d ...) error: %s\n", 
+	    __func__, __FILE__, __LINE__, pid, strerror(errno));
+    /* essayer _NSGetExecutablePath() (man 3 dyld) ??? */
+  }
+#else /* autres unices */
+  if(readlink("/proc/self/exe", buf, sizeof buf) <= 0 &&       /*  (Linux)  */
+     readlink("/proc/curproc/file", buf, sizeof buf) <= 0 &&    /* (BSD ?) */
+     readlink("/proc/curproc/exe", buf, sizeof buf) <= 0 &&    /* (NetBSD) */
+     readlink("/proc/self/path/a.out", buf, sizeof buf) <= 0  /* (Solaris) sinon strncpy(buf, getexecname(), sizeof buf) ?? */)
+    fprintf(stderr, "%s (%s:%d) - finding exec path failed with readlink\n", 
+	    __func__, __FILE__, __LINE__);
+#endif
+  strncpy(_pathOfMe, pathOf(strlen(buf) > 0 ? buf : argv0), sizeof _pathOfMe);
+}
+
+/*!\brief Initialise la bibliothèque.
+ *
+ * récupère le chemin relatif à partir duquel le binaire a été exécuté
+ * et le stocke dans \a _pathOfMe.
+ * \see _pathOfMe
+ */
+void gl4duInit(int argc, char ** argv) {
+  findPathOfMe(argc > 0 ? argv[0] : "");
+  fprintf(stderr, "Binary Path : %s\n", _pathOfMe);
+}
+
+/*!\brief Ajoute \a _pathOfMe au chemin \a filename passé en argument
+ * et stocke l'ensemble dans \a dst.
+ *
+ * \see _pathOfMe
+ */
+void gl4duMakeBinRelativePath(char * dst, size_t dst_size, const char * filename) {
+  snprintf(dst, dst_size, "%s/%s", _pathOfMe, filename);
+}
+
 /*!\brief imprime s'il existe l'infoLog de la compilation du Shader
  * \a object dans \a fp.
  */
@@ -151,15 +228,23 @@ void gl4duPrintFPS(FILE * fp) {
  * \return l'identifiant du shader décrit dans \a filename.
  */
 GLuint gl4duCreateShader(GLenum shadertype, const char * filename) {
+  char temp[BUFSIZ << 1];
   shader_t ** sh = findfnInShadersList(filename);
   if(*sh) return (*sh)->id;
+  gl4duMakeBinRelativePath(temp, sizeof temp, filename);
+  // la ligne précédente fait ça snprintf(temp, sizeof temp, "%s/%s", _pathOfMe, filename);
+  sh = findfnInShadersList(temp);
+  if(*sh) return (*sh)->id;
   sh = addInShadersList(shadertype, filename);
+  if(!sh)
+    sh = addInShadersList(shadertype, temp);
   return (sh) ? (*sh)->id : 0;
 }
 
 /*!\brief retourne l'identifiant du shader décrit dans \a filename.
  * Version FED de la précédente
  * \todo commenter
+ * \todo ajouter la gestion des chemins relatifs à l'emplacement du binaire comme pour \a gl4duCreateShader.
  */
 GLuint gl4duCreateShaderFED(const char * decData, GLenum shadertype, const char * filename) {
   shader_t ** sh = findfnInShadersList(filename);

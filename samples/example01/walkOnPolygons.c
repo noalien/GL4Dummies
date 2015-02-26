@@ -67,9 +67,10 @@ int main(int argc, char ** argv) {
     return -1;
   }
   atexit(SDL_Quit);
+  gl4duInit(argc, argv);
   if((_win = initWindow(_windowWidth, _windowHeight, &_oglContext))) {
     initGL(_win);
-    _pId = gl4duCreateProgram("<vs>../shaders/basic.vs", "<fs>../shaders/toon.fs", NULL);
+    _pId = gl4duCreateProgram("<vs>../share/GL4Dummies/shaders/basic.vs", "<fs>../share/GL4Dummies/shaders/toon.fs", NULL);
     initData();
     loop(_win);
   } else 
@@ -148,6 +149,7 @@ static void initGL(SDL_Window * win) {
 }
 
 static void initData(void) {
+  char temp[BUFSIZ], * fn = "../share/GL4Dummies/images/repere.bmp";
   SDL_Surface * texSurface;
   GLfloat s = 10.0, data[] = { 
     /* 4 coordonnées de sommets */
@@ -188,8 +190,9 @@ static void initData(void) {
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-  if( (texSurface = SDL_LoadBMP("images/repere.bmp")) == NULL ) {
-    fprintf(stderr, "Impossible d'ouvrir le fichier : %s\n", SDL_GetError());
+  gl4duMakeBinRelativePath(temp, sizeof temp, fn);
+  if( (texSurface = SDL_LoadBMP(fn)) == NULL && (texSurface = SDL_LoadBMP(temp)) == NULL) {
+    fprintf(stderr, "Impossible d'ouvrir le fichier %s : %s\n", fn, SDL_GetError());
     exit(1);
   }
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texSurface->w, texSurface->h, 0, GL_BGR, GL_UNSIGNED_BYTE, texSurface->pixels);
