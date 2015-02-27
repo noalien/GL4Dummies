@@ -45,11 +45,7 @@ AC_SUBST(VERSION_INFO)
 
 LT_INIT
 
-SDL_CFLAGS=`sdl2-config --cflags`
-SDL_LDFLAGS=`sdl2-config --libs`
-CPPFLAGS="-I. $SDL_CFLAGS"
 CFLAGS="-Wall -O3"
-LDFLAGS="-lm $SDL_LDFLAGS -lpng -ljpeg"
 
 echo "	***	Configuring for ... $host	***"
 
@@ -70,17 +66,18 @@ dnl FREEBSD
 dnl CYGWIN
 *-*-cygwin*)
         AC_DEFINE_UNQUOTED(CYGWIN,1, [If we are on cygwin plateform.])
-        LDFLAGS="$LDFLAGS -lopengl32 -lmingw32 -lSDL2main -lSDL2"
+        LDFLAGS="$LDFLAGS -lopengl32 -lmingw32"
+	dnl AM_CONDITIONAL([WINDOWS], [true])
 ;;
 dnl MINGW32
 *-*-mingw32)
         AC_DEFINE_UNQUOTED(MINGW32,1, [If we are on mingw32 plateform.])
-        LDFLAGS="$LDFLAGS -lopengl32 -lmingw32 -lSDL2main -lSDL2"
+        LDFLAGS="$LDFLAGS -lopengl32 -lmingw32"
 ;;
 dnl Cross-compiling MINGW32
 i386-pc-mingw32msvc)
         AC_DEFINE_UNQUOTED(MINGW32,1, [If we are on mingw32 plateform.])
-        LDFLAGS="$LDFLAGS -lopengl32 -lmingw32 -lSDL2main -lSDL2"
+        LDFLAGS="$LDFLAGS -lopengl32 -lmingw32"
 ;;
 dnl OTHER SYSTEMS
 *)

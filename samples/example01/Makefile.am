@@ -1,5 +1,5 @@
-AM_CPPFLAGS = -I../../lib_src/GL4D
-AM_LDFLAGS  = -L$(top_builddir) -lGL4Dummies
+AM_CPPFLAGS = -I../../lib_src/GL4D `sdl2-config --cflags`
+AM_LDFLAGS  = -L$(top_builddir) -lGL4Dummies `sdl2-config --libs` $(AM_ADDITIONAL)
 
 bin_PROGRAMS = $(top_builddir)/gl4dWalkOnPolygons
 

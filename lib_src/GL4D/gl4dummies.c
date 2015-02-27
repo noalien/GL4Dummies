@@ -146,12 +146,11 @@ static int kmpSearch(const char * p, const char * t) {
 }
 
 /****************************************************/
-/********* Version windows de gettimeofday **********/
+/****** Version windows/mingw de gettimeofday *******/
 /****************************************************/
 #if defined(_WIN32)
 #  include <windows.h>
-#  if defined(_MSC_VER)
-#    include <winsock2.h>
+#  include <winsock2.h>
     static int gettimeofday(struct timeval* p, void* tz) {
         ULARGE_INTEGER ul; // As specified on MSDN.
         FILETIME ft;
@@ -171,10 +170,6 @@ static int kmpSearch(const char * p, const char * t) {
         p->tv_sec = (long) (ul.QuadPart / 1000000LL);
         return 0;
     }
-#  endif
-#  if defined(__MINGW32__)
-#    include <sys/time.h>
-#  endif
 #else
 #  include <sys/time.h>
 #endif

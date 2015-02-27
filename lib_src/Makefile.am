@@ -1,4 +1,5 @@
-AM_CPPFLAGS = -IGL4D
+AM_CPPFLAGS = -IGL4D -I. `sdl2-config --cflags`
+
 lib_LTLIBRARIES = $(top_builddir)/libGL4Dummies.la
 
 libGL4Dummiesincludedir = $(includedir)/GL4D
