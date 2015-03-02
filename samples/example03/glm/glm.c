@@ -1541,8 +1541,10 @@ glmReadOBJ(char* filename)
   /* open the file */
   file = fopen(filename, "r");
   if (!file) {
-    __glmFatalError( "glmReadOBJ() failed: can't open data file \"%s\".",
+    /* __glmFatalError( "glmReadOBJ() failed: can't open data file \"%s\".", filename); */
+    __glmWarning( "glmReadOBJ() failed: can't open data file \"%s\".",
 		     filename);
+    return NULL;
   }
 
   /* allocate a new model */

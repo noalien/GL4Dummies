@@ -66,16 +66,22 @@ static cam_t _cam = {0, 50, 0};
  * lance la boucle (infinie) principale.
  */
 int main(int argc, char ** argv) {
+  char temp[BUFSIZ], * fn = "../share/GL4Dummies/data/obama.obj";
   if(SDL_Init(SDL_INIT_VIDEO) < 0) {
     fprintf(stderr, "Erreur lors de l'initialisation de SDL :  %s", SDL_GetError());
     return -1;
   }
   atexit(SDL_Quit);
+  gl4duInit(argc, argv);
   if((_win = initWindow(_windowWidth, _windowHeight, &_oglContext))) {
     initGL(_win);
     _pId = gl4duCreateProgram("<vs>../share/GL4Dummies/shaders/basic.vs", "<fs>../share/GL4Dummies/shaders/basic.fs", NULL);
     _pId2 = gl4duCreateProgram("<vs>../share/GL4Dummies/shaders/basic.vs", "<fs>../share/GL4Dummies/shaders/sobel.fs", NULL);
-    _model = glmReadOBJ("obama.obj");
+    gl4duMakeBinRelativePath(temp, sizeof temp, fn);
+    if( (_model = glmReadOBJ(fn)) == NULL && (_model = glmReadOBJ(temp)) == NULL) {
+      fprintf(stderr, "Impossible d'ouvrir le fichier %s\n", fn);
+      return -2;
+    }
     initData();
     loop(_win);
   } else 

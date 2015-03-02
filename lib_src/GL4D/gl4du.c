@@ -94,6 +94,7 @@ static inline void * matrixData(_GL4DUMatrix * matrix);
  * \see gl4dInit
  */
 static char _pathOfMe[BUFSIZ] = {0};
+static int  _pathOfMeInit = 0;
 
 #if defined(_WIN32)
 #  include <windows.h>
@@ -104,6 +105,7 @@ static char _pathOfMe[BUFSIZ] = {0};
 #elif defined(__MACOSX__)
 #  include <sys/types.h>
 #  include <unistd.h>
+#  include <libproc.h>
 #else /* autres unices */
 #  include <unistd.h>
 #endif
@@ -143,6 +145,7 @@ static void findPathOfMe(const char * argv0) {
 	    __func__, __FILE__, __LINE__);
 #endif
   strncpy(_pathOfMe, pathOf(strlen(buf) > 0 ? buf : argv0), sizeof _pathOfMe);
+  _pathOfMeInit = 1;
 }
 
 /*!\brief Initialise la bibliothèque.
@@ -153,7 +156,6 @@ static void findPathOfMe(const char * argv0) {
  */
 void gl4duInit(int argc, char ** argv) {
   findPathOfMe(argc > 0 ? argv[0] : "");
-  fprintf(stderr, "Binary Path : %s\n", _pathOfMe);
 }
 
 /*!\brief Ajoute \a _pathOfMe au chemin \a filename passé en argument
@@ -163,6 +165,7 @@ void gl4duInit(int argc, char ** argv) {
  */
 void gl4duMakeBinRelativePath(char * dst, size_t dst_size, const char * filename) {
   snprintf(dst, dst_size, "%s/%s", _pathOfMe, filename);
+  if(!_pathOfMeInit) fprintf(stderr, "Binary path unknown, you should call gl4duInit(argc, argv) at program init\n");
 }
 
 /*!\brief imprime s'il existe l'infoLog de la compilation du Shader
@@ -236,8 +239,10 @@ GLuint gl4duCreateShader(GLenum shadertype, const char * filename) {
   sh = findfnInShadersList(temp);
   if(*sh) return (*sh)->id;
   sh = addInShadersList(shadertype, filename);
-  if(!sh)
+  if(!sh) {
+    fprintf(stderr, "trying with another path (%s)\n", temp);
     sh = addInShadersList(shadertype, temp);
+  }
   return (sh) ? (*sh)->id : 0;
 }
 

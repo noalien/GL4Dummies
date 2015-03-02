@@ -108,6 +108,7 @@ int main(int argc, char ** argv) {
     return -1;
   }
   atexit(SDL_Quit);
+  gl4duInit(argc, argv);
   if((_win = initWindow(_windowWidth, _windowHeight, &_oglContext))) {
     initGL(_win);
     _pId = gl4duCreateProgram("<vs>../share/GL4Dummies/shaders/basic.vs", "<fs>../share/GL4Dummies/shaders/basic.fs", NULL);

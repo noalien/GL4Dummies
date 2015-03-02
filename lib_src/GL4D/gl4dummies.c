@@ -67,14 +67,14 @@ char * gl4dReadTextFile(const char * filename) {
   FILE * f;
   struct stat buf;
   if(stat(filename, &buf) != 0) {
-    fprintf(stderr, "%s:%d:In %s: erreur %d: %s (%s)\n",
+    fprintf(stderr, "%s:%d:In %s: error %d: %s (%s)\n",
 	    __FILE__, __LINE__, __func__, errno, strerror(errno), filename);
     return NULL;
   }
   data = malloc( (buf.st_size + 1) * sizeof * data );
   assert(data);
   if( (f = fopen(filename, "rb")) == NULL ) {
-    fprintf(stderr, "%s:%d:In %s: erreur %d: %s (%s)\n",
+    fprintf(stderr, "%s:%d:In %s: error %d: %s (%s)\n",
 	    __FILE__, __LINE__, __func__, errno, strerror(errno), filename);
     free(data);
     return NULL;
