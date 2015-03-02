@@ -1,0 +1,10 @@
+Put Windows versions of libraries in this directory, example :
+libSDL2.a
+libSDL2.dll.a
+libSDL2.la
+libSDL2_image.a
+libSDL2_image.dll.a
+libSDL2_image.la
+libSDL2_test.a
+libSDL2main.a
+SDL2.dll

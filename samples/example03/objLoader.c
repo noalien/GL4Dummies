@@ -1,8 +1,8 @@
 /*!\file sample01.c
  *
  * \brief Sample d'utilisation de la bibliothèque GL4Dummies avec SDL2
- * et en OpenGL 3.3+ 
- * 
+ * et en OpenGL 3.3+
+ *
  * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
  *
  * \date October 30 2014
@@ -13,7 +13,7 @@
 #include <assert.h>
 
 #include <gl4du.h>
-#include <glm/glm.h>
+#include "glm/glm.h"
 
 /*
  * Prototypes des fonctions statiques contenues dans ce fichier C
@@ -84,7 +84,7 @@ int main(int argc, char ** argv) {
     }
     initData();
     loop(_win);
-  } else 
+  } else
     fprintf(stderr, "Erreur lors de la creation de la fenetre\n");
   return 0;
 }
@@ -140,8 +140,8 @@ static SDL_Window * initWindow(int w, int h, SDL_GLContext * poglContext) {
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-  if( (win = SDL_CreateWindow("Fenetre GL", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
-			      w, h, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | 
+  if( (win = SDL_CreateWindow("Fenetre GL", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+			      w, h, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE |
 			      SDL_WINDOW_SHOWN)) == NULL )
     return NULL;
   if( (*poglContext = SDL_GL_CreateContext(win)) == NULL ) {
@@ -149,7 +149,7 @@ static SDL_Window * initWindow(int w, int h, SDL_GLContext * poglContext) {
     return NULL;
   }
   fprintf(stderr, "Version d'OpenGL : %s\n", glGetString(GL_VERSION));
-  fprintf(stderr, "Version de shaders supportes : %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));  
+  fprintf(stderr, "Version de shaders supportes : %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
   atexit(quit);
   return win;
 }
@@ -243,7 +243,7 @@ static void initData(void) {
   glGenBuffers(1, &_buffer);
   glBindBuffer(GL_ARRAY_BUFFER, _buffer);
   glBufferData(GL_ARRAY_BUFFER, sizeof data, data, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);  
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE,  0, (const void *)(4 * 3 * sizeof *data));
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (const void *)(4 * 6 * sizeof *data));
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -315,7 +315,7 @@ static void loop(SDL_Window * win) {
 static void manageEvents(SDL_Window * win) {
   GLint v[2];
   SDL_Event event;
-  while(SDL_PollEvent(&event)) 
+  while(SDL_PollEvent(&event))
     switch (event.type) {
     case SDL_KEYDOWN:
       switch(event.key.keysym.sym) {
@@ -414,7 +414,7 @@ static void draw(GLfloat a0) {
   glBindFramebuffer(GL_FRAMEBUFFER, fbo);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex,  0);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTex, 0);
-  
+
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glEnable(GL_DEPTH_TEST);
   glUseProgram(_pId);

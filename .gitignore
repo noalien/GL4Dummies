@@ -1,3 +1,5 @@
 *.o
 *.a
 *~
+/Windows/GL4Dummies.depend
+/Windows/*.depend

@@ -7,17 +7,22 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="default">
-				<Option output="GL4Dummies" prefix_auto="1" extension_auto="1" />
-				<Option type="0" />
+				<Option output="../bin/mingw32/GL4Dummies" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
+				<Option type="3" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
 					<Add directory="." />
-					<Add directory="GL4D" />
-					<Add directory="../../win32_libs/include/SDL2" />
+					<Add directory="../lib_src/GL4D" />
+					<Add directory="dependencies/include/SDL2" />
 				</Compiler>
 				<Linker>
-					<Add directory="../../win32_libs/lib" />
+					<Add option="-mwindows" />
+					<Add library="mingw32" />
+					<Add library="SDL2main" />
+					<Add library="SDL2" />
+					<Add library="OpenGL32" />
+					<Add directory="dependencies/lib" />
 				</Linker>
 			</Target>
 		</Build>
@@ -31,6 +36,27 @@
 			<Add library="SDL2" />
 			<Add library="OpenGL32" />
 		</Linker>
+		<Unit filename="../lib_src/GL4D/aes.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lib_src/GL4D/aes.h" />
+		<Unit filename="../lib_src/GL4D/bin_tree.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lib_src/GL4D/bin_tree.h" />
+		<Unit filename="../lib_src/GL4D/gl4dm.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lib_src/GL4D/gl4dm.h" />
+		<Unit filename="../lib_src/GL4D/gl4du.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lib_src/GL4D/gl4du.h" />
+		<Unit filename="../lib_src/GL4D/gl4dummies.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lib_src/GL4D/gl4dummies.h" />
+		<Unit filename="../lib_src/GL4D/gl4wdummies.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
