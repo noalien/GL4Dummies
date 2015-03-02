@@ -1,6 +1,9 @@
 SUBDIRS=lib_src lib_src/documentation samples samples/example01 samples/example02 samples/example03 samples/example05
 
-EXTRA_DIST = bin/share
+EXTRA_DIST = bin/share bin/mingw32/README Windows/GL4Dummies.cbp	\
+Windows/GL4Dummies.layout Windows/gl4dLandscape.cbp			\
+Windows/gl4dObjLoader.cbp Windows/gl4dWalkOnPolygons.cbp		\
+Windows/dependencies/include/README Windows/dependencies/lib/README
 
 doc:
 	@make -C lib_src/documentation doc
