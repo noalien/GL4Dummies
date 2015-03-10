@@ -14,7 +14,7 @@
  */
 
 
-#include <gl4du.h>
+#include <GL4D/gl4du.h>
 
 #ifndef MATERIAL_BY_FACE
 #  define MATERIAL_BY_FACE

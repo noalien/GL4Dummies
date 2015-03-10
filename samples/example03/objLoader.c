@@ -1,7 +1,8 @@
-/*!\file sample01.c
+/*!\file objLoader.c
  *
  * \brief Sample d'utilisation de la bibliothèque GL4Dummies avec SDL2
- * et en OpenGL 3.3+
+ * et en OpenGL 3.3+, lecture et utilisation d'un obj (wavefront) avec
+ * utilisation de la bibliothèque glm de Nate Robins
  *
  * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
  *
@@ -12,7 +13,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include <gl4du.h>
+#include <GL4D/gl4du.h>
 #include "glm/glm.h"
 
 /*

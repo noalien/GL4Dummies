@@ -7,7 +7,7 @@
  * \date November 12, 2014
 */
 
-#include <gl4dm.h>
+#include "gl4dm.h"
 #include <stdlib.h>
 
 /*!\brief Retourne un nombre pseudo-aleatoire dans l'intervalle [0,

@@ -9,12 +9,12 @@
  * la errno ...
  */
 
-#include <gl4du.h>
-#include <bin_tree.h>
+#include "gl4du.h"
+#include "bin_tree.h"
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <aes.h>
+#include "aes.h"
 #if !defined(_MSC_VER)
 #  include <errno.h>
 #  include <limits.h>

@@ -13,7 +13,7 @@
 #ifndef _GL4DM_H
 #define _GL4DM_H
 
-#include <gl4dummies.h>
+#include "gl4dummies.h"
 
 /* MACROS DIVERS */
 

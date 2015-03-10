@@ -1,4 +1,4 @@
-SUBDIRS=lib_src lib_src/documentation samples samples/example01 samples/example02 samples/example03 samples/example05
+SUBDIRS=lib_src lib_src/documentation samples samples/example01 samples/example02 samples/example03
 
 EXTRA_DIST = bin/share bin/mingw32/README Windows/GL4Dummies.cbp	\
 Windows/GL4Dummies.layout Windows/gl4dLandscape.cbp			\
