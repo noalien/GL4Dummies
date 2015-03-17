@@ -221,11 +221,11 @@ static void resizeGL(SDL_Window * win) {
  * attaché le contexte OpenGL.
  */
 static void loop(SDL_Window * win) {
-  GLfloat a = 0.0, dt = 0.0, dtheta = GL4DM_PI, pas = 5.0;
+  GLfloat a = 0.0f, dt = 0.0f, dtheta = (GLfloat)GL4DM_PI, pas = 5.0f;
   Uint32 t0 = SDL_GetTicks(), t;
   SDL_GL_SetSwapInterval(1);
   for(;;) {
-    dt = ((t = SDL_GetTicks()) - t0) / 1000.0;
+    dt = ((t = SDL_GetTicks()) - t0) / 1000.0f;
     t0 = t;
     manageEvents(win);
 
@@ -363,7 +363,7 @@ static void draw(GLfloat a0) {
   gl4duTranslatef(2, 1, -7);
   gl4duRotatef(90, 1.0, 0.0, 0.0);
   gl4duRotatef(-100.0f * a0, 0.0, 0.0, 1.0);
-  gl4duScalef(0.1, 0.1, 0.1);
+  gl4duScalef(0.1f, 0.1f, 0.1f);
 
   gl4duSendMatrix();
   glBindVertexArray(_vao);
@@ -375,7 +375,7 @@ static void draw(GLfloat a0) {
   gl4duTranslatef(-2, 2, -8);
   gl4duRotatef(70, 1.0, 0.0, 0.0);
   gl4duRotatef(20.0f * a0, 0.0, 0.0, 1.0);
-  gl4duScalef(0.1, 0.1, 0.2);
+  gl4duScalef(0.1f, 0.1f, 0.2f);
   glUniformMatrix4fv(glGetUniformLocation(_pId, "modelViewMatrix"), 1, GL_TRUE, gl4duGetMatrixData());
   glBindVertexArray(_vao);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

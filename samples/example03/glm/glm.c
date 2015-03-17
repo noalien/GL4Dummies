@@ -336,19 +336,19 @@ glmReadMTL(GLMmodel* model, char* name)
   /* set the default material */
   for (i = 0; i < nummaterials; i++) {
     model->materials[i].name = NULL;
-    model->materials[i].shininess = 65.0;
-    model->materials[i].diffuse[0] = 0.8;
-    model->materials[i].diffuse[1] = 0.8;
-    model->materials[i].diffuse[2] = 0.8;
-    model->materials[i].diffuse[3] = 1.0;
-    model->materials[i].ambient[0] = 0.2;
-    model->materials[i].ambient[1] = 0.2;
-    model->materials[i].ambient[2] = 0.2;
-    model->materials[i].ambient[3] = 1.0;
-    model->materials[i].specular[0] = 0.0;
-    model->materials[i].specular[1] = 0.0;
-    model->materials[i].specular[2] = 0.0;
-    model->materials[i].specular[3] = 1.0;
+    model->materials[i].shininess = 65.0f;
+    model->materials[i].diffuse[0] = 0.8f;
+    model->materials[i].diffuse[1] = 0.8f;
+    model->materials[i].diffuse[2] = 0.8f;
+    model->materials[i].diffuse[3] = 1.0f;
+    model->materials[i].ambient[0] = 0.2f;
+    model->materials[i].ambient[1] = 0.2f;
+    model->materials[i].ambient[2] = 0.2f;
+    model->materials[i].ambient[3] = 1.0f;
+    model->materials[i].specular[0] = 0.0f;
+    model->materials[i].specular[1] = 0.0f;
+    model->materials[i].specular[2] = 0.0f;
+    model->materials[i].specular[3] = 1.0f;
     model->materials[i].map_diffuse = -1;
   }
   model->materials[0].name = __glmStrdup("default");
@@ -1230,6 +1230,7 @@ glmVertexNormals(GLMmodel* model, GLfloat angle, GLboolean keep_existing)
     
   /* calculate the average normal for each vertex */
   for (i = 1; i <= model->numvertices; i++) {
+	int avg_index;
     /* calculate an average normal for this vertex by averaging the
        facet normal of every triangle this vertex is in */
     node = members[i];
@@ -1258,7 +1259,7 @@ glmVertexNormals(GLMmodel* model, GLfloat angle, GLboolean keep_existing)
     }
         
     /* set the normal of this vertex in each triangle it is in */
-    int avg_index = -1;
+    avg_index = -1;
     node = members[i];
     while (node) {
       int j;

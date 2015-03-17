@@ -1,0 +1,54 @@
+# Project: gl4dObjLoader
+# Makefile created by Dev-C++ 4.9.9.2
+
+CPP  = g++.exe
+CC   = gcc.exe
+WINDRES = windres.exe
+RES  = 
+OBJ  = ../samples/example03/objLoader.o ../samples/example03/glm/glmimg_sim.o ../samples/example03/glm/glm.o ../samples/example03/glm/glm_util.o ../samples/example03/glm/glmimg.o ../samples/example03/glm/glmimg_devil.o ../samples/example03/glm/glmimg_jpg.o ../samples/example03/glm/glmimg_png.o ../samples/example03/glm/glmimg_sdl.o $(RES)
+LINKOBJ  = ../samples/example03/objLoader.o ../samples/example03/glm/glmimg_sim.o ../samples/example03/glm/glm.o ../samples/example03/glm/glm_util.o ../samples/example03/glm/glmimg.o ../samples/example03/glm/glmimg_devil.o ../samples/example03/glm/glmimg_jpg.o ../samples/example03/glm/glmimg_png.o ../samples/example03/glm/glmimg_sdl.o $(RES)
+LIBS =  -L"C:/Dev-Cpp/lib" -L"C:/LIB/SDL2/i686-w64-mingw32/lib" -L"../bin/mingw32" -L"./dependencies/lib" -mwindows -lmingw32 -lSDL2main -lSDL2 -mwindows -lGL4Dummies -lOpenGL32 -lGLU32  
+INCS =  -I"C:/Dev-Cpp/include"  -I"C:/LIB/SDL2/i686-w64-mingw32/include/SDL2"  -I"./dependencies/include/SDL2"  -I"../lib_src" 
+CXXINCS =  -I"C:/Dev-Cpp/lib/gcc/mingw32/3.4.2/include"  -I"C:/Dev-Cpp/include/c++/3.4.2/backward"  -I"C:/Dev-Cpp/include/c++/3.4.2/mingw32"  -I"C:/Dev-Cpp/include/c++/3.4.2"  -I"C:/Dev-Cpp/include"  -I"./dependencies/include/SDL2"  -I"../lib_src" 
+BIN  = ../bin/mingw32/gl4dObjLoader.exe
+CXXFLAGS = $(CXXINCS)  
+CFLAGS = $(INCS)  
+RM = rm -f
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before ../bin/mingw32/gl4dObjLoader.exe all-after
+
+
+clean: clean-custom
+	${RM} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CC) $(LINKOBJ) -o "..\bin\mingw32\gl4dObjLoader.exe" $(LIBS)
+
+../samples/example03/objLoader.o: ../samples/example03/objLoader.c
+	$(CC) -c ../samples/example03/objLoader.c -o ../samples/example03/objLoader.o $(CFLAGS)
+
+../samples/example03/glm/glmimg_sim.o: ../samples/example03/glm/glmimg_sim.c
+	$(CC) -c ../samples/example03/glm/glmimg_sim.c -o ../samples/example03/glm/glmimg_sim.o $(CFLAGS)
+
+../samples/example03/glm/glm.o: ../samples/example03/glm/glm.c
+	$(CC) -c ../samples/example03/glm/glm.c -o ../samples/example03/glm/glm.o $(CFLAGS)
+
+../samples/example03/glm/glm_util.o: ../samples/example03/glm/glm_util.c
+	$(CC) -c ../samples/example03/glm/glm_util.c -o ../samples/example03/glm/glm_util.o $(CFLAGS)
+
+../samples/example03/glm/glmimg.o: ../samples/example03/glm/glmimg.c
+	$(CC) -c ../samples/example03/glm/glmimg.c -o ../samples/example03/glm/glmimg.o $(CFLAGS)
+
+../samples/example03/glm/glmimg_devil.o: ../samples/example03/glm/glmimg_devil.c
+	$(CC) -c ../samples/example03/glm/glmimg_devil.c -o ../samples/example03/glm/glmimg_devil.o $(CFLAGS)
+
+../samples/example03/glm/glmimg_jpg.o: ../samples/example03/glm/glmimg_jpg.c
+	$(CC) -c ../samples/example03/glm/glmimg_jpg.c -o ../samples/example03/glm/glmimg_jpg.o $(CFLAGS)
+
+../samples/example03/glm/glmimg_png.o: ../samples/example03/glm/glmimg_png.c
+	$(CC) -c ../samples/example03/glm/glmimg_png.c -o ../samples/example03/glm/glmimg_png.o $(CFLAGS)
+
+../samples/example03/glm/glmimg_sdl.o: ../samples/example03/glm/glmimg_sdl.c
+	$(CC) -c ../samples/example03/glm/glmimg_sdl.c -o ../samples/example03/glm/glmimg_sdl.o $(CFLAGS)
