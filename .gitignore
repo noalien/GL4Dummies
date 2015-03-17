@@ -1,5 +1,9 @@
 *.o
 *.a
+*.in
 *~
 /Windows/GL4Dummies.depend
 /Windows/*.depend
+.deps
+.dirstamp
+Makefile
