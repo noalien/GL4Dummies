@@ -9,6 +9,7 @@
 
 #include "gl4dm.h"
 #include <stdlib.h>
+#include <math.h>
 
 /*!\brief Retourne un nombre pseudo-aleatoire dans l'intervalle [0,
  * 1[. Ici la distribution est uniforme.

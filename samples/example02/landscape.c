@@ -255,9 +255,10 @@ static void normale(Uint8 * pixels, int x, int z, GLfloat * n, int w, int h) {
 static void initData(void) {
   const int w = 256, h = 256;
   int i, j, k, c;
-  Uint8 pixels[w * h];
+  Uint8 * pixels;
   GLfloat * data;
-
+  pixels = malloc(w * h * sizeof *pixels);
+  assert(pixels);
   memset(pixels, 0, w * h * sizeof *pixels);
   pixels[0] = 255;         pixels[w - 1] = 1;
   pixels[(h - 1) * w] = 1; pixels[(h - 1) * w + w - 1] = 1;
@@ -338,6 +339,7 @@ static void initData(void) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, w, h, 0, GL_RED, GL_UNSIGNED_BYTE, pixels);
+  free(pixels);
 }
 
 /*!\brief Cette fonction paramétrela vue (viewPort) OpenGL en fonction
@@ -361,7 +363,7 @@ static void resizeGL(SDL_Window * win) {
  * attaché le contexte OpenGL.
  */
 static void loop(SDL_Window * win) {
-  GLfloat a = 0.0, dt = 0.0, dtheta = GL4DM_PI, pas = 5.0;
+  GLfloat a = 0.0f, dt = 0.0f, dtheta = (GLfloat)GL4DM_PI, pas = 5.0f;
   Uint32 t0 = SDL_GetTicks(), t;
   SDL_GL_SetSwapInterval(1);
   for(;;) {

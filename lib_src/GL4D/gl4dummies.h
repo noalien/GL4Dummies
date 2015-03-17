@@ -47,6 +47,7 @@
 /**** Gestion des AUTRES spécificité MS_VStudio *****/
 /****************************************************/
 #if defined(_MSC_VER)
+#pragma warning(disable:4244)
 #  ifndef _CRT_SECURE_NO_WARNINGS
 #    define _CRT_SECURE_NO_WARNINGS
 #  endif

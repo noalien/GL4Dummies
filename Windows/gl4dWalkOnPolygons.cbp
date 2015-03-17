@@ -12,7 +12,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
-					<Add directory="../lib_src/GL4D" />
+					<Add directory="../lib_src/" />
 					<Add directory="dependencies/include/SDL2" />
 				</Compiler>
 				<Linker>
@@ -30,7 +30,7 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
-			<Add directory="../lib_src/GL4D" />
+			<Add directory="../lib_src/" />
 			<Add directory="dependencies/include/SDL2" />
 		</Compiler>
 		<Linker>
