@@ -1,3 +1,10 @@
+/*!\file gl4dm.c
+ * \brief Fonctions de gestion de matrix (inline).
+ * \author Kevin HAVRANEK mzartek@hotmail.fr
+ * \date Mars 21, 2015
+ *
+*/
+
 inline GL4DMMatrix gl4dmMatrixXMatrix (GL4DMMatrix mat1, GL4DMMatrix mat2) {
   GL4DMMatrix res;
   

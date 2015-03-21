@@ -1,6 +1,6 @@
 /*!\file vector.h
  * \brief Fonctions de gestion de vecteur.
- * \author Fares BELHADJ amsi@ai.univ-paris8.fr
+ * \author Kevin HAVRANEK mzartek@hotmail.fr
  * \date Mars 17, 2015
  *
 */
