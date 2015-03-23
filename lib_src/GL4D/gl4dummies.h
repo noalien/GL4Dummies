@@ -36,10 +36,12 @@
 /****************************************************/
 /********* Gestion des modes import/(export) ********/
 /****************************************************/
+#ifdef DLLSPEC
+#   undef DLLSPEC
+#endif
 #ifndef GL4dummies_EXPORTS
 #   define DLLSPEC dllimport
 #else
-#   undef DLLSPEC
 #   define DLLSPEC dllexport
 #endif
 
