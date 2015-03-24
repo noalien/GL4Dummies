@@ -36,13 +36,10 @@
 /****************************************************/
 /********* Gestion des modes import/(export) ********/
 /****************************************************/
-#ifdef DLLSPEC
-#   undef DLLSPEC
-#endif
-#ifndef GL4dummies_EXPORTS
-#   define DLLSPEC dllimport
+#if !defined(DLLSPEC) && !defined(GL4dummies_EXPORTS)
+#   define _DLLSPEC dllimport
 #else
-#   define DLLSPEC dllexport
+#   define _DLLSPEC dllexport
 #endif
 
 /****************************************************/
@@ -66,7 +63,7 @@
 #    define snprintf sprintf_s
 #  endif
 #  ifndef ALL_IN_ONE
-#    define GL4DAPI extern __declspec(DLLSPEC)
+#    define GL4DAPI extern __declspec(_DLLSPEC)
 #    define GL4DAPIENTRY __cdecl
 #  else
 #    define GL4DAPI
