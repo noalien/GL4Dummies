@@ -3,13 +3,20 @@ AM_CPPFLAGS = -IGL4D -I. $(SDL_CFLAGS)
 lib_LTLIBRARIES = $(top_builddir)/bin/libGL4Dummies.la
 
 __top_builddir__bin_libGL4Dummiesincludedir = $(includedir)/GL4D
-__top_builddir__bin_libGL4Dummiesinclude_HEADERS = GL4D/aes.h	\
-GL4D/gl4dm.h GL4D/gl4du.h GL4D/gl4dummies.h GL4D/gl4wdummies.h	\
-GL4D/vector.h
+__top_builddir__bin_libGL4Dummiesinclude_HEADERS = \
+	GL4D/aes.h GL4D/bin_tree.h		\
+	GL4D/gl4dm.h GL4D/gl4du.h		\
+	GL4D/gl4dummies.h GL4D/gl4wdummies.h	\
+	GL4D/list.h GL4D/vector.h
 
-__top_builddir__bin_libGL4Dummies_la_SOURCES = GL4D/aes.c GL4D/aes.h	\
-	GL4D/bin_tree.c GL4D/bin_tree.h GL4D/gl4dm.c GL4D/gl4dm.inl	\
-	GL4D/gl4du.c GL4D/gl4dummies.c GL4D/vector.c
+__top_builddir__bin_libGL4Dummies_la_SOURCES = \
+	GL4D/aes.c GL4D/aes.h					\
+	GL4D/bin_tree.c GL4D/bin_tree.h				\
+	GL4D/gl4dm.c GL4D/gl4dm.h				\
+	GL4D/gl4du.c GL4D/gl4du.h				\
+	GL4D/gl4dummies.c GL4D\gl4dummies.h GL4D\gl4wdummies.h	\
+	GL4D/list.c GL4D/list.h					\
+	GL4D/vector.c GL4D/vector.h
 
 if USE_VERSION_RC
 __top_builddir__bin_libGL4Dummies_la_LDFLAGS =      \

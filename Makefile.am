@@ -1,4 +1,4 @@
-SUBDIRS=lib_src lib_src/documentation samples samples/example01 samples/example02 samples/example03
+SUBDIRS=lib_src lib_src/documentation samples samples/example01 samples/example02 samples/example03 samples/example04
 
 EXTRA_DIST = bin/share bin/mingw32/README Windows/GL4D.workspace Windows/gl4dLandscape.cbp Windows/gl4dLandscape.dev Windows/gl4dLandscape.vcxproj Windows/gl4dObjLoader.cbp Windows/gl4dObjLoader.dev Windows/gl4dObjLoader.vcxproj Windows/GL4Dummies.cbp Windows/GL4Dummies.dev Windows/GL4Dummies.sln Windows/GL4Dummies.vcxproj Windows/gl4dWalkOnPolygons.cbp Windows/gl4dWalkOnPolygons.dev Windows/gl4dWalkOnPolygons.vcxproj Windows/Makefile.win Windows/dependencies/include/README Windows/dependencies/lib/README
 

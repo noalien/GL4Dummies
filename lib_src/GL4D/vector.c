@@ -31,7 +31,7 @@ void vector_insert  (vector_t *vector, void *el, size_t index) {
 
      vector->size = (index < vector->size) ? (vector->size + 1) : (index + 1);
      
-     if (vector->size >= vector->limit_size) {
+     if (vector->size > vector->limit_size) {
 	  while (vector->size >= vector->limit_size) {
 	       vector->limit_size <<= 1;
 	  }
@@ -67,8 +67,7 @@ void vector_erase (vector_t *vector, size_t index) {
      free(buffer);
 }
 
-void vector_set (vector_t vector, void *el, size_t index)
-{
+void vector_set (vector_t vector, void *el, size_t index) {
      char *data = (char *)vector.data;
      
      memcpy(&data[vector.data_size * index], el, vector.data_size);
