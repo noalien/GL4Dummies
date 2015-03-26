@@ -87,11 +87,11 @@ set_target_properties(gl4dObjLoader PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
 target_link_libraries(gl4dObjLoader GL4dummies)
 
 # Example04
-#file(GLOB_RECURSE example04_source_files 
-#  samples/example04/*.h samples/example04/*.c)
-#add_executable(example4 ${example04_source_files})
-#set_target_properties(example4 PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
-#target_link_libraries(example4 GL4dummies)
+file(GLOB_RECURSE example04_source_files 
+  samples/example04/*.h samples/example04/*.c)
+add_executable(gl4dContainer ${example04_source_files})
+set_target_properties(gl4dContainer PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE")
+target_link_libraries(gl4dContainer GL4dummies)
 
 # Example05
 #file(GLOB_RECURSE example05_source_files 
