@@ -9,12 +9,13 @@
  * la errno ...
  */
 
-#include <gl4du.h>
-#include <bin_tree.h>
+#include "gl4du.h"
+#include "bin_tree.h"
 #include <sys/stat.h>
 #include <stdlib.h>
+#include <math.h>
 #include <assert.h>
-#include <aes.h>
+#include "aes.h"
 #if !defined(_MSC_VER)
 #  include <errno.h>
 #  include <limits.h>
@@ -88,7 +89,7 @@ static inline int matrixCmpFunc(const void * m1, const void * m2);
 static inline bin_tree_t ** findMatrix(const char * name);
 static inline void * matrixData(_GL4DUMatrix * matrix);
 
-/*!\brief stocke le chemin relatif à partir duquel le binaire a été exécuté. Est initialisée dans 
+/*!\brief stocke le chemin relatif à partir duquel le binaire a été exécuté. Est initialisée dans
  *  \a gl4dInit.
  *
  * \see gl4dInit
@@ -121,10 +122,10 @@ static void findPathOfMe(const char * argv0) {
     strncpy(buf, proc->ki_comm, sizeof buf);
     free(proc);
   } else {
-    fprintf(stderr, "%s (%s:%d) - error while kinfo_getproc(getpid()), trying with readlink\n", 
+    fprintf(stderr, "%s (%s:%d) - error while kinfo_getproc(getpid()), trying with readlink\n",
 	    __func__, __FILE__, __LINE__);
     if(readlink("/proc/curproc/file", buf, sizeof buf) <= 0) {
-      fprintf(stderr, "%s (%s:%d) - finding exec path failed with readlink\n", 
+      fprintf(stderr, "%s (%s:%d) - finding exec path failed with readlink\n",
 	      __func__, __FILE__, __LINE__);
       /* sinon essayer sysctl CTL_KERN KERN_PROC KERN_PROC_PATHNAME -1 ??? */
     }
@@ -132,7 +133,7 @@ static void findPathOfMe(const char * argv0) {
 #elif defined(__MACOSX__)
   pid_t pid = getpid();
   if(proc_pidpath(pid, buf, sizeof buf) <= 0) {
-    fprintf(stderr, "%s (%s:%d) - proc_pidpath(%d ...) error: %s\n", 
+    fprintf(stderr, "%s (%s:%d) - proc_pidpath(%d ...) error: %s\n",
 	    __func__, __FILE__, __LINE__, pid, strerror(errno));
     /* essayer _NSGetExecutablePath() (man 3 dyld) ??? */
   }
@@ -141,7 +142,7 @@ static void findPathOfMe(const char * argv0) {
      readlink("/proc/curproc/file", buf, sizeof buf) <= 0 &&    /* (BSD ?) */
      readlink("/proc/curproc/exe", buf, sizeof buf) <= 0 &&    /* (NetBSD) */
      readlink("/proc/self/path/a.out", buf, sizeof buf) <= 0  /* (Solaris) sinon strncpy(buf, getexecname(), sizeof buf) ?? */)
-    fprintf(stderr, "%s (%s:%d) - finding exec path failed with readlink\n", 
+    fprintf(stderr, "%s (%s:%d) - finding exec path failed with readlink\n",
 	    __func__, __FILE__, __LINE__);
 #endif
   strncpy(_pathOfMe, pathOf(strlen(buf) > 0 ? buf : argv0), sizeof _pathOfMe);
@@ -277,7 +278,7 @@ GLuint gl4duFindShader(const char * filename) {
 void gl4duDeleteShader(GLuint id) {
   shader_t ** sh = findidInShadersList(id);
   if(*sh) {
-    if((*sh)->nprograms > 0) 
+    if((*sh)->nprograms > 0)
       (*sh)->todelete = 1;
     else
       deleteFromShadersList(sh);
@@ -335,7 +336,7 @@ GLuint gl4duCreateProgram(const char * firstone, ...) {
 }
 
 /*!\brief créé un program à partir d'une liste (variable) de nom de
- * fichiers shaders encapsulés dans un fichier crypté préalablement 
+ * fichiers shaders encapsulés dans un fichier crypté préalablement
  * décrypté en ram et renvoie l'identifiant openGL du program créé.
  *
  * \param encData fichier contenant un ensemble de shaders cryptés.
@@ -352,7 +353,7 @@ GLuint gl4duCreateProgram(const char * firstone, ...) {
  * supprimés ; un appel à \ref gl4duCleanUnattached peut s'en charger.
  */
 GLuint gl4duCreateProgramFED(const char * encData, const char * firstone, ...) {
-  static const char * prevEncData = NULL; 
+  static const char * prevEncData = NULL;
   static char * decData = NULL;
   va_list  pa;
   const char * filename;
@@ -422,7 +423,7 @@ void gl4duClean(GL4DUenum what) {
     btFree(&_gl4duMatrices, freeGL4DUMatrix);
 }
 
-/*!\brief supprime programs et/ou shaders non liés. 
+/*!\brief supprime programs et/ou shaders non liés.
  */
 void gl4duCleanUnattached(GL4DUenum what) {
   if(what & GL4DU_PROGRAM) {
@@ -552,7 +553,7 @@ static shader_t ** addInShadersList(GLenum shadertype, const char * filename) {
   struct stat buf;
   shader_t * ptr;
   if(!(id = glCreateShader(shadertype))) {
-    fprintf(stderr, "%s (%d): %s: impossible de créer le shader\nglCreateShader a retourné 0\n", 
+    fprintf(stderr, "%s (%d): %s: impossible de créer le shader\nglCreateShader a retourné 0\n",
 	    __FILE__, __LINE__, __func__);
     return NULL;
   }
@@ -596,7 +597,7 @@ static shader_t ** addInShadersListFED(const char * decData, GLenum shadertype, 
   char * txt;
   shader_t * ptr;
   if(!(id = glCreateShader(shadertype))) {
-    fprintf(stderr, "%s (%d): %s: impossible de créer le shader\nglCreateShader a retourné 0\n", 
+    fprintf(stderr, "%s (%d): %s: impossible de créer le shader\nglCreateShader a retourné 0\n",
 	    __FILE__, __LINE__, __func__);
     return NULL;
   }
@@ -725,7 +726,7 @@ static void detachShader(program_t * prg, shader_t * sh) {
 
 /*!\brief créé une nouvelle pile de "une matrice 4x4" dont le nom
  * est \a name et le type est \a type.
- * 
+ *
  * La (pile de) matrice créée n'est pas initialisée et le haut de la
  * pile pointe déjà sur une matrice.
  *
@@ -750,7 +751,7 @@ static inline _GL4DUMatrix * newGL4DUMatrix(GLenum type, const char * name) {
 }
 
 /*!\brief libère la pile de "une matrice 4x4".
- * 
+ *
  * \param matrix est la pile de "une matrice 4x4".
  */
 static inline void freeGL4DUMatrix(void * matrix) {
@@ -761,7 +762,7 @@ static inline void freeGL4DUMatrix(void * matrix) {
 
 /*!\brief fonction de comparaison de deux matrices en fonction du nom
  * pour insertion dans l'arbre binaire.
- * 
+ *
  * Cette fonction utilise strcmp.
  *
  * \param m1 première matrice (de type _GL4DUMatrix).
@@ -779,7 +780,7 @@ static inline int matrixCmpFunc(const void * m1, const void * m2) {
 /*!\brief recherche et renvoie le pointeur de pointeur vers le noeud
  * de l'arbre binaire pointant vers la matrice dont le nom est passé
  * en argument (\a name).
- * 
+ *
  * \param name le nom de la matrice recherchée.
  *
  * \return le pointeur de pointeur vers le noeud de l'arbre binaire
@@ -800,7 +801,7 @@ static inline bin_tree_t ** findMatrix(const char * name) {
 
 /*!\brief génère et gère une matrice (pile de "une matrice 4x4") liée
  * au nom \a name et de type \a type.
- * 
+ *
  * Le type peut etre GL_FLOAT ou GL_DOUBLE.
  *
  * \param type le type de la matrice à créer : GL_FLOAT ou GL_DOUBLE.
@@ -811,8 +812,9 @@ static inline bin_tree_t ** findMatrix(const char * name) {
  */
 GLboolean gl4duGenMatrix(GLenum type, const char * name) {
   _GL4DUMatrix m, * p;
+  pair_t pair;
   m.name = (char *)name;
-  pair_t pair = btFind(&_gl4duMatrices, &m, matrixCmpFunc);
+  pair = btFind(&_gl4duMatrices, &m, matrixCmpFunc);
   if(pair.compResult) {
     p = newGL4DUMatrix(type, name);
     _gl4dLastMatrixn = (bin_tree_t **)(btInsert((bin_tree_t **)(pair.ptr), p, matrixCmpFunc).ptr);
@@ -823,7 +825,7 @@ GLboolean gl4duGenMatrix(GLenum type, const char * name) {
 
 /*!\brief indique s'il existe une matrice est liée
  * au nom \a name passé en argument.
- * 
+ *
  * \param name le nom de la matrice à rechercher.
  *
  * \return GL_TRUE si la matrice existe, GL_FALSE sinon.
@@ -840,7 +842,7 @@ GLboolean gl4duIsMatrix(const char * name) {
  * Si la matrice existe l'active et renvoie GL_TRUE, sinon renvoie
  * GL_FALSE. Si le paramètre \a name est NULL, désactive toute
  * matrice.
- * 
+ *
  * \param name le nom de la matrice à rechercher pour activer. Si NULL
  * désactive (dé-bind) tout.
  *
@@ -866,7 +868,7 @@ GLboolean gl4duBindMatrix(const char * name) {
  * Si la matrice existe la supprime et renvoie GL_TRUE, sinon renvoie
  * GL_FALSE. Si la matrice supprimée est la meme que la matrice
  * courante (active), la matrice courante passe à NULL.
- * 
+ *
  * \param name le nom de la matrice à rechercher pour suppression.
  *
  * \return GL_TRUE si la matrice existe et est supprimée, GL_FALSE
@@ -896,8 +898,8 @@ void gl4duPushMatrix(void) {
     _gl4dCurMatrix->data  = realloc(_gl4dCurMatrix->data, _gl4dCurMatrix->size * (_gl4dCurMatrix->nmemb <<= 1));
     assert(_gl4dCurMatrix->data);
   }
-  memcpy(&(((GLubyte *)_gl4dCurMatrix->data)[_gl4dCurMatrix->top * _gl4dCurMatrix->size]), 
-	 &(((GLubyte *)_gl4dCurMatrix->data)[(_gl4dCurMatrix->top - 1) * _gl4dCurMatrix->size]), 
+  memcpy(&(((GLubyte *)_gl4dCurMatrix->data)[_gl4dCurMatrix->top * _gl4dCurMatrix->size]),
+	 &(((GLubyte *)_gl4dCurMatrix->data)[(_gl4dCurMatrix->top - 1) * _gl4dCurMatrix->size]),
 	 _gl4dCurMatrix->size);
 }
 
@@ -1082,11 +1084,11 @@ void gl4duRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z) {
   GLfloat n = sqrtf(x * x + y * y + z * z);
   if ( n > 0.0f ) {
     GLfloat a, s, c, cc, x2, y2, z2, xy, yz, zx, xs, ys, zs;
-    GLfloat mat[] = { 0.0f, 0.0f, 0.0f, 0.0f, 
+    GLfloat mat[] = { 0.0f, 0.0f, 0.0f, 0.0f,
 		      0.0f, 0.0f, 0.0f, 0.0f,
 		      0.0f, 0.0f, 0.0f, 0.0f,
 		      0.0f, 0.0f, 0.0f, 1.0f };
-    s  = sinf ( a = (angle * GL4DM_PI / 180.0f) );
+    s  = sinf ( a = (angle * (GLfloat)GL4DM_PI / 180.0f) );
     cc = 1.0f - (c = cosf ( a ));
     x /= n;     y /= n;     z /= n;
     x2 = x * x; y2 = y * y; z2 = z * z;
@@ -1157,7 +1159,7 @@ void gl4duRotated(GLdouble angle, GLdouble x, GLdouble y, GLdouble z) {
  * \param tz cote de la translation.
  */
 void gl4duTranslatef(GLfloat tx, GLfloat ty, GLfloat tz) {
-  GLfloat mat[] = { 1.0f, 0.0f, 0.0f, tx, 
+  GLfloat mat[] = { 1.0f, 0.0f, 0.0f, tx,
 		    0.0f, 1.0f, 0.0f, ty,
 		    0.0f, 0.0f, 1.0f, tz,
 		    0.0f, 0.0f, 0.0f, 1.0f };
@@ -1172,7 +1174,7 @@ void gl4duTranslatef(GLfloat tx, GLfloat ty, GLfloat tz) {
  * \param tz cote de la translation.
  */
 void gl4duTranslated(GLdouble tx, GLdouble ty, GLdouble tz) {
-  GLdouble mat[] = { 1.0, 0.0, 0.0, tx, 
+  GLdouble mat[] = { 1.0, 0.0, 0.0, tx,
 		     0.0, 1.0, 0.0, ty,
 		     0.0, 0.0, 1.0, tz,
 		     0.0, 0.0, 0.0, 1.0 };
@@ -1187,7 +1189,7 @@ void gl4duTranslated(GLdouble tx, GLdouble ty, GLdouble tz) {
  * \param sz cote de l'homothétie.
  */
 void gl4duScalef(GLfloat sx, GLfloat sy, GLfloat sz) {
-  GLfloat mat[] = { sx  , 0.0f, 0.0f, 0.0f, 
+  GLfloat mat[] = { sx  , 0.0f, 0.0f, 0.0f,
 		    0.0f,   sy, 0.0f, 0.0f,
 		    0.0f, 0.0f,   sz, 0.0f,
 		    0.0f, 0.0f, 0.0f, 1.0f };
@@ -1202,7 +1204,7 @@ void gl4duScalef(GLfloat sx, GLfloat sy, GLfloat sz) {
  * \param sz cote de l'homothétie.
  */
 void gl4duScaled(GLdouble sx, GLdouble sy, GLdouble sz) {
-  GLdouble mat[] = { sx , 0.0, 0.0, 0.0, 
+  GLdouble mat[] = { sx , 0.0, 0.0, 0.0,
 		     0.0,  sy, 0.0, 0.0,
 		     0.0, 0.0,  sz, 0.0,
 		     0.0, 0.0, 0.0, 1.0 };
@@ -1229,18 +1231,18 @@ void gl4duScaled(GLdouble sx, GLdouble sy, GLdouble sz) {
 void gl4duLookAtf(GLfloat eyeX,  GLfloat eyeY,  GLfloat eyeZ,  GLfloat centerX,  GLfloat centerY,  GLfloat centerZ,  GLfloat upX,  GLfloat upY,  GLfloat upZ) {
   GLfloat haut[3] = { upX, upY, upZ }, dirVue[] = { centerX - eyeX, centerY - eyeY, centerZ - eyeZ };
   GLfloat mat[] = {
-    0.0f,       0.0f,       0.0f,       0.0f, 
-    0.0f,       0.0f,       0.0f,       0.0f, 
-    -dirVue[0], -dirVue[1], -dirVue[2], 0.0f, 
-    0.0f,       0.0f,       0.0f,       1.0f, 
+    0.0f,       0.0f,       0.0f,       0.0f,
+    0.0f,       0.0f,       0.0f,       0.0f,
+    -dirVue[0], -dirVue[1], -dirVue[2], 0.0f,
+    0.0f,       0.0f,       0.0f,       1.0f,
   };
   MVEC3NORMALIZE(dirVue);
   /* Première version
      GLfloat cote[3];
      MVEC3CROSS(cote, dirVue, haut); // j'ai envie de faire haut x dirVue
      MVEC3NORMALIZE(cote);
-     mat[0] = cote[0]; mat[1] = cote[1]; mat[2] = cote[2]; 
-     //\todo dire pourquoi (lié à la normalisation de cote) 
+     mat[0] = cote[0]; mat[1] = cote[1]; mat[2] = cote[2];
+     //\todo dire pourquoi (lié à la normalisation de cote)
      MVEC3CROSS(haut, cote, dirVue); // j'ai envie de faire dirVue x coté
      mat[4] = haut[0]; mat[5] = haut[1]; mat[6] = haut[2]; */
   MVEC3CROSS(mat, dirVue, haut);
@@ -1270,10 +1272,10 @@ void gl4duLookAtf(GLfloat eyeX,  GLfloat eyeY,  GLfloat eyeZ,  GLfloat centerX, 
 void gl4duLookAtd(GLdouble eyeX,  GLdouble eyeY,  GLdouble eyeZ,  GLdouble centerX,  GLdouble centerY,  GLdouble centerZ,  GLdouble upX,  GLdouble upY,  GLdouble upZ) {
   GLdouble haut[3] = { upX, upY, upZ }, dirVue[] = { centerX - eyeX, centerY - eyeY, centerZ - eyeZ };
   GLdouble mat[] = {
-    0.0f,       0.0f,       0.0f,       0.0f, 
-    0.0f,       0.0f,       0.0f,       0.0f, 
-    -dirVue[0], -dirVue[1], -dirVue[2], 0.0f, 
-    0.0f,       0.0f,       0.0f,       1.0f, 
+    0.0f,       0.0f,       0.0f,       0.0f,
+    0.0f,       0.0f,       0.0f,       0.0f,
+    -dirVue[0], -dirVue[1], -dirVue[2], 0.0f,
+    0.0f,       0.0f,       0.0f,       1.0f,
   };
   MVEC3NORMALIZE(dirVue);
   MVEC3CROSS(mat, dirVue, haut);
@@ -1329,6 +1331,6 @@ GLboolean gl4duGetIntegerv(GL4DUenum pname, GLint * params) {
     return GL_TRUE;
   default:
     return GL_FALSE;
-  } 
+  }
   return GL_FALSE;
 }

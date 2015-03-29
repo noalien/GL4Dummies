@@ -17,7 +17,7 @@ AC_HEADER_STDC
 AM_CONDITIONAL(USE_VERSION_RC, false)
 
 AC_CHECK_TOOL(DOXYGEN, doxygen)
-AC_PATH_PROGS([SDL_CONFIG], [sdl2-config sdl20-config], [none], [$PATH])
+dnl AC_PATH_PROGS([SDL_CONFIG], [sdl2-config sdl20-config], [none], [$PATH])
 
 
 dnl Here are a set of rules to help you update your library version
@@ -45,7 +45,15 @@ AC_SUBST(VERSION_INFO)
 
 LT_INIT
 
+dnl Check for SDL2
+SDL_VERSION=2.0.0
+AC_SUBST(SDL_VERSION)
+AM_PATH_SDL2($SDL_VERSION, :,
+           AC_MSG_ERROR([*** SDL version $SDL_VERSION not found!])
+)
+
 CFLAGS="-Wall -O3"
+LDFLAGS="-lm"
 
 echo "	***	Configuring for ... $host	***"
 
@@ -61,7 +69,7 @@ dnl MACOS X
 dnl FREEBSD
 *-*-freebsd*)
         CPPFLAGS="$CPPFLAGS -I/usr/local/include"
-        LDFLAGS="-L/usr/local/lib $LDFLAGS"
+        LDFLAGS="-L/usr/local/lib $LDFLAGS -lGL -lGLU"
 ;;
 dnl CYGWIN
 *-*-cygwin*)
@@ -81,8 +89,8 @@ i386-pc-mingw32msvc)
 ;;
 dnl OTHER SYSTEMS
 *)
-	echo "$CPPFLAGS --- $CFLAGS --- $LDFLAGS"
+        LDFLAGS="$LDFLAGS -lGL -lGLU"
 ;;
 esac
 
-AC_OUTPUT([Makefile] [lib_src/Makefile] [lib_src/documentation/Makefile] [samples/Makefile] [samples/example01/Makefile] [samples/example02/Makefile] [samples/example03/Makefile] [samples/example05/Makefile])
+AC_OUTPUT([Makefile] [lib_src/Makefile] [lib_src/documentation/Makefile] [samples/Makefile] [samples/example01/Makefile] [samples/example02/Makefile] [samples/example03/Makefile] [samples/example04/Makefile])

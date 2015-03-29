@@ -2,7 +2,7 @@
  *
  * \brief The GL4Dummies Utilities
  *
- * \author Farès BELHADJ amsi@grafeet.fr (ou amsi@ai.univ-paris8.fr)
+ * \author Fares BELHADJ amsi@grafeet.fr (ou amsi@ai.univ-paris8.fr)
  * \date March 28, 2008
  */
 
@@ -22,10 +22,17 @@ extern "C" {
     GL4DU_GEOMETRY_SHADER = 4,
     GL4DU_MATRIX          = 1024, /* les data de la matrice */
     GL4DU_MATRIX_TYPE     = 1025,
-    GL4DU_SHADER          = ((unsigned long long)1) << 32,
+#if defined(_MSC_VER) /* ENUM n'est que 32bits sous MSC !!! */
+	GL4DU_SHADER          = 1 << 29,
+    GL4DU_PROGRAM         = 1 << 30,
+    GL4DU_MATRICES        = 1 << 31,
+    GL4DU_ALL             = 0xffffffff
+#else
+	GL4DU_SHADER          = ((unsigned long long)1) << 32,
     GL4DU_PROGRAM         = ((unsigned long long)1) << 33,
     GL4DU_MATRICES        = ((unsigned long long)1) << 34,
-    GL4DU_ALL             = (unsigned long long)0xffffffffffffffff
+    GL4DU_ALL             = (unsigned long long)0xffffffffffffffffLL
+#endif
   };
   typedef enum GL4DUenum GL4DUenum;
   

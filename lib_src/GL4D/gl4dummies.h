@@ -36,17 +36,17 @@
 /****************************************************/
 /********* Gestion des modes import/(export) ********/
 /****************************************************/
-#ifndef DLLSPEC
-#   define DLLSPEC dllimport
+#if !defined(DLLSPEC) && !defined(GL4dummies_EXPORTS)
+#   define _DLLSPEC dllimport
 #else
-#   undef DLLSPEC
-#   define DLLSPEC dllexport
+#   define _DLLSPEC dllexport
 #endif
 
 /****************************************************/
 /**** Gestion des AUTRES spécificité MS_VStudio *****/
 /****************************************************/
 #if defined(_MSC_VER)
+#pragma warning(disable:4244)
 #  ifndef _CRT_SECURE_NO_WARNINGS
 #    define _CRT_SECURE_NO_WARNINGS
 #  endif
@@ -63,7 +63,7 @@
 #    define snprintf sprintf_s
 #  endif
 #  ifndef ALL_IN_ONE
-#    define GL4DAPI extern __declspec(DLLSPEC)
+#    define GL4DAPI extern __declspec(_DLLSPEC)
 #    define GL4DAPIENTRY __cdecl
 #  else
 #    define GL4DAPI

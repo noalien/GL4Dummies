@@ -8,7 +8,7 @@
 #ifndef _BIN_TREE_H
 
 #define _BIN_TREE_H
-#include <gl4dummies.h>
+#include "gl4dummies.h"
 
 # ifdef __cplusplus
 extern "C" {

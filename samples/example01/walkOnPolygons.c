@@ -1,4 +1,4 @@
-/*!\file sample01.c
+/*!\file walkOnPolygons.c
  *
  * \brief Sample d'utilisation de la bibliothèque GL4Dummies avec SDL2
  * et en OpenGL 3.3+ 
@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <gl4du.h>
+#include <GL4D/gl4du.h>
 
 /*
  * Prototypes des fonctions statiques contenues dans ce fichier C
@@ -221,11 +221,11 @@ static void resizeGL(SDL_Window * win) {
  * attaché le contexte OpenGL.
  */
 static void loop(SDL_Window * win) {
-  GLfloat a = 0.0, dt = 0.0, dtheta = GL4DM_PI, pas = 5.0;
+  GLfloat a = 0.0f, dt = 0.0f, dtheta = (GLfloat)GL4DM_PI, pas = 5.0f;
   Uint32 t0 = SDL_GetTicks(), t;
   SDL_GL_SetSwapInterval(1);
   for(;;) {
-    dt = ((t = SDL_GetTicks()) - t0) / 1000.0;
+    dt = ((t = SDL_GetTicks()) - t0) / 1000.0f;
     t0 = t;
     manageEvents(win);
 
@@ -331,6 +331,9 @@ static void manageEvents(SDL_Window * win) {
  */
 static void draw(GLfloat a0) {
   GLfloat * mv, temp[4] = {5 * sin(a0), 0.5, -5, 1.0}, lumpos[4];
+  int xm, ym;
+  SDL_PumpEvents();
+  SDL_GetMouseState(&xm, &ym);
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -345,7 +348,7 @@ static void draw(GLfloat a0) {
      gl4duRotatef(-_cam.theta * 180.0f / GL4DM_PI, 0.0, 1.0, 0.0);
      gl4duTranslatef(-_cam.x, -1.0, -_cam.z);
      A la place du LookAt */
-  gl4duLookAtf(_cam.x, 1.0, _cam.z, _cam.x - sin(_cam.theta), 1.0, _cam.z - cos(_cam.theta), 0.0, 1.0, 0.0);
+  gl4duLookAtf(_cam.x, 1.0, _cam.z, _cam.x - sin(_cam.theta), 1.0 - (ym - (_windowHeight >> 1)) / (GLfloat)_windowHeight, _cam.z - cos(_cam.theta), 0.0, 1.0, 0.0);
 
   mv = gl4duGetMatrixData();
   MMAT4XVEC4(lumpos, mv, temp);
@@ -360,7 +363,7 @@ static void draw(GLfloat a0) {
   gl4duTranslatef(2, 1, -7);
   gl4duRotatef(90, 1.0, 0.0, 0.0);
   gl4duRotatef(-100.0f * a0, 0.0, 0.0, 1.0);
-  gl4duScalef(0.1, 0.1, 0.1);
+  gl4duScalef(0.1f, 0.1f, 0.1f);
 
   gl4duSendMatrix();
   glBindVertexArray(_vao);
@@ -372,7 +375,7 @@ static void draw(GLfloat a0) {
   gl4duTranslatef(-2, 2, -8);
   gl4duRotatef(70, 1.0, 0.0, 0.0);
   gl4duRotatef(20.0f * a0, 0.0, 0.0, 1.0);
-  gl4duScalef(0.1, 0.1, 0.2);
+  gl4duScalef(0.1f, 0.1f, 0.2f);
   glUniformMatrix4fv(glGetUniformLocation(_pId, "modelViewMatrix"), 1, GL_TRUE, gl4duGetMatrixData());
   glBindVertexArray(_vao);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

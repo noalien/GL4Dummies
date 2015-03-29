@@ -1,7 +1,8 @@
-/*!\file sample01.c
+/*!\file objLoader.c
  *
  * \brief Sample d'utilisation de la bibliothèque GL4Dummies avec SDL2
- * et en OpenGL 3.3+
+ * et en OpenGL 3.3+, lecture et utilisation d'un obj (wavefront) avec
+ * utilisation de la bibliothèque glm de Nate Robins
  *
  * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
  *
@@ -12,7 +13,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include <gl4du.h>
+#include <GL4D/gl4du.h>
 #include "glm/glm.h"
 
 /*
@@ -188,11 +189,12 @@ static void initData(void) {
     1.0f, 1.0f
   };
   GLfloat * all = NULL;
+  GLuint * ti;
   glmVertexNormals(_model, 90, GL_FALSE);
   all = malloc(3 * 2 * (_model->numvertices + 1) * sizeof *all);
   assert(all);
   memcpy(all, _model->vertices, 3 * _model->numvertices * sizeof *all);
-  for(i = 0; i < _model->numtriangles; i++) {
+  for(i = 0; i < (int)_model->numtriangles; i++) {
     GLMtriangle * triangle = &(_model->triangles[i]);
     for(j = 0; j < 3; j++)
       memcpy(&all[3 * _model->numvertices + 3 * triangle->vindices[j]], &_model->normals[3 * triangle->nindices[j]], 3 * sizeof *all);
@@ -217,9 +219,9 @@ static void initData(void) {
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _objBI);
 
-  GLuint * ti = malloc(_model->numtriangles * 3 * sizeof *ti);
+  ti = malloc(_model->numtriangles * 3 * sizeof *ti);
   assert(ti);
-  for(i = 0; i < _model->numtriangles; i++) {
+  for(i = 0; i < (int)_model->numtriangles; i++) {
     GLMtriangle * triangle = &(_model->triangles[i]);
     memcpy(&ti[3 * i], triangle->vindices, 3 * sizeof *ti);
     ti[3 * i] = triangle->vindices[0];
@@ -271,7 +273,7 @@ static void resizeGL(SDL_Window * win) {
  * attaché le contexte OpenGL.
  */
 static void loop(SDL_Window * win) {
-  GLfloat a = 0.0, dt = 0.0, dtheta = GL4DM_PI, pas = 5.0;
+  GLfloat a = 0.0f, dt = 0.0f, dtheta = (GLfloat)GL4DM_PI, pas = 5.0f;
   Uint32 t0 = SDL_GetTicks(), t;
   SDL_GL_SetSwapInterval(1);
   for(;;) {
@@ -391,6 +393,7 @@ static void draw(GLfloat a0) {
   static int ft = 1;
   static GLuint fbo, tex, depthTex;
   GLint v[2];
+  GLfloat * mv, temp[4] = {50 * sin(a0), 100.5, 50, 1.0}, lumpos[4];
   if(ft) {
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
@@ -409,7 +412,6 @@ static void draw(GLfloat a0) {
     glGenFramebuffers(1, &fbo);
     ft = 0;
   }
-  GLfloat * mv, temp[4] = {50 * sin(a0), 100.5, 50, 1.0}, lumpos[4];
 
   glBindFramebuffer(GL_FRAMEBUFFER, fbo);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex,  0);

@@ -1,0 +1,49 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C++ Express 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GL4Dummies", "GL4Dummies.vcxproj", "{F0FB8716-C25B-47F9-B741-590DEE8BEAE1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gl4dWalkOnPolygons", "gl4dWalkOnPolygons.vcxproj", "{5BAE56B8-BF23-4B19-BD01-AFD135416B04}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F0FB8716-C25B-47F9-B741-590DEE8BEAE1} = {F0FB8716-C25B-47F9-B741-590DEE8BEAE1}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gl4dLandscape", "gl4dLandscape.vcxproj", "{09538AA9-09E1-4F92-A30F-6056BA775523}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F0FB8716-C25B-47F9-B741-590DEE8BEAE1} = {F0FB8716-C25B-47F9-B741-590DEE8BEAE1}
+		{5BAE56B8-BF23-4B19-BD01-AFD135416B04} = {5BAE56B8-BF23-4B19-BD01-AFD135416B04}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gl4dObjLoader", "gl4dObjLoader.vcxproj", "{BD96D0C6-A287-4EB0-8007-3C77BB3F8430}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F0FB8716-C25B-47F9-B741-590DEE8BEAE1} = {F0FB8716-C25B-47F9-B741-590DEE8BEAE1}
+		{09538AA9-09E1-4F92-A30F-6056BA775523} = {09538AA9-09E1-4F92-A30F-6056BA775523}
+		{5BAE56B8-BF23-4B19-BD01-AFD135416B04} = {5BAE56B8-BF23-4B19-BD01-AFD135416B04}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F0FB8716-C25B-47F9-B741-590DEE8BEAE1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F0FB8716-C25B-47F9-B741-590DEE8BEAE1}.Debug|Win32.Build.0 = Debug|Win32
+		{F0FB8716-C25B-47F9-B741-590DEE8BEAE1}.Release|Win32.ActiveCfg = Release|Win32
+		{F0FB8716-C25B-47F9-B741-590DEE8BEAE1}.Release|Win32.Build.0 = Release|Win32
+		{5BAE56B8-BF23-4B19-BD01-AFD135416B04}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5BAE56B8-BF23-4B19-BD01-AFD135416B04}.Debug|Win32.Build.0 = Debug|Win32
+		{5BAE56B8-BF23-4B19-BD01-AFD135416B04}.Release|Win32.ActiveCfg = Release|Win32
+		{5BAE56B8-BF23-4B19-BD01-AFD135416B04}.Release|Win32.Build.0 = Release|Win32
+		{09538AA9-09E1-4F92-A30F-6056BA775523}.Debug|Win32.ActiveCfg = Debug|Win32
+		{09538AA9-09E1-4F92-A30F-6056BA775523}.Debug|Win32.Build.0 = Debug|Win32
+		{09538AA9-09E1-4F92-A30F-6056BA775523}.Release|Win32.ActiveCfg = Release|Win32
+		{09538AA9-09E1-4F92-A30F-6056BA775523}.Release|Win32.Build.0 = Release|Win32
+		{BD96D0C6-A287-4EB0-8007-3C77BB3F8430}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BD96D0C6-A287-4EB0-8007-3C77BB3F8430}.Debug|Win32.Build.0 = Debug|Win32
+		{BD96D0C6-A287-4EB0-8007-3C77BB3F8430}.Release|Win32.ActiveCfg = Release|Win32
+		{BD96D0C6-A287-4EB0-8007-3C77BB3F8430}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,7 +1,7 @@
-/*!\file sample02.c
+/*!\file landscape.c
  *
  * \brief Sample d'utilisation de la bibliothèque GL4Dummies avec SDL2
- * et en OpenGL 3.3+ 
+ * et en OpenGL 3.3+ , génération et affichage d'un maillage de terrain.
  * 
  * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
  *
@@ -12,7 +12,7 @@
 #include <stdlib.h>
 
 #include <assert.h>
-#include <gl4du.h>
+#include <GL4D/gl4du.h>
 
 /*
  * Prototypes des fonctions statiques contenues dans ce fichier C
@@ -255,9 +255,10 @@ static void normale(Uint8 * pixels, int x, int z, GLfloat * n, int w, int h) {
 static void initData(void) {
   const int w = 256, h = 256;
   int i, j, k, c;
-  Uint8 pixels[w * h];
+  Uint8 * pixels;
   GLfloat * data;
-
+  pixels = malloc(w * h * sizeof *pixels);
+  assert(pixels);
   memset(pixels, 0, w * h * sizeof *pixels);
   pixels[0] = 255;         pixels[w - 1] = 1;
   pixels[(h - 1) * w] = 1; pixels[(h - 1) * w + w - 1] = 1;
@@ -338,6 +339,7 @@ static void initData(void) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, w, h, 0, GL_RED, GL_UNSIGNED_BYTE, pixels);
+  free(pixels);
 }
 
 /*!\brief Cette fonction paramétrela vue (viewPort) OpenGL en fonction
@@ -361,7 +363,7 @@ static void resizeGL(SDL_Window * win) {
  * attaché le contexte OpenGL.
  */
 static void loop(SDL_Window * win) {
-  GLfloat a = 0.0, dt = 0.0, dtheta = GL4DM_PI, pas = 5.0;
+  GLfloat a = 0.0f, dt = 0.0f, dtheta = (GLfloat)GL4DM_PI, pas = 5.0f;
   Uint32 t0 = SDL_GetTicks(), t;
   SDL_GL_SetSwapInterval(1);
   for(;;) {
@@ -471,6 +473,9 @@ static void manageEvents(SDL_Window * win) {
  */
 static void draw(GLfloat a0) {
   GLfloat * mv, temp[4] = {5 * sin(a0), 10.5, -5, 1.0}, lumpos[4];
+  int xm, ym;
+  SDL_PumpEvents();
+  SDL_GetMouseState(&xm, &ym);
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -482,7 +487,7 @@ static void draw(GLfloat a0) {
 
   gl4duBindMatrix("modelViewMatrix");
   gl4duLoadIdentityf();
-  gl4duLookAtf(_cam.x, 4.0, _cam.z, _cam.x - sin(_cam.theta), 4.0, _cam.z - cos(_cam.theta), 0.0, 1.0, 0.0);
+  gl4duLookAtf(_cam.x, 4.0, _cam.z, _cam.x - sin(_cam.theta), 4.0 - (ym - (_windowHeight >> 1)) / (GLfloat)_windowHeight, _cam.z - cos(_cam.theta), 0.0, 1.0, 0.0);
 
   mv = gl4duGetMatrixData();
   MMAT4XVEC4(lumpos, mv, temp);

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="Workspace">
+		<Project filename="GL4Dummies.cbp" />
+		<Project filename="gl4dLandscape.cbp" />
+		<Project filename="gl4dObjLoader.cbp" />
+		<Project filename="gl4dWalkOnPolygons.cbp" />
+	</Workspace>
+</CodeBlocks_workspace_file>

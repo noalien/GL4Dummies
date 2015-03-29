@@ -8,7 +8,7 @@
  * \date March 28, 2008 - February 07, 2014
  */
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
 #  include <unistd.h>
 #endif
 #include "gl4dummies.h"
