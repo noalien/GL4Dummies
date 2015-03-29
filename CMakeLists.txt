@@ -13,17 +13,17 @@ set(GL4DUMMIES_INCLUDE_DIRS lib_src)
 
 if(UNIX)
 
-  set(CMAKE_C_FLAGS "-std=c++11 -Wall")
+  set(CMAKE_C_FLAGS "-W -Wall")
 
 elseif(APPLE)
 
-  set(CMAKE_C_FLAGS "-std=c++11 -Wall")
+  set(CMAKE_C_FLAGS "-W -Wall")
 
 elseif(WIN32)
 
   if(MINGW)
   
-    set(CMAKE_C_FLAGS "-std=c++11 -Wall")
+    set(CMAKE_C_FLAGS "-W -Wall")
 	
   elseif(MSVC)
   
