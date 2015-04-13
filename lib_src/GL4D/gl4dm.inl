@@ -138,7 +138,7 @@ inline GL4DMVector gl4dmVector4Normalize (GL4DMVector vec) {
   return res;
 }
   
-inline GL4DMMatrix gl4dmMatrixLoadIdentity (void) {
+inline GL4DMMatrix gl4dmMatrixIdentity (void) {
   GL4DMMatrix res;
   
   memset(&res, 0, sizeof res);
@@ -152,7 +152,7 @@ inline GL4DMMatrix gl4dmMatrixLoadIdentity (void) {
 }
   
 inline GL4DMMatrix gl4dmMatrixTranslate (float x, float y, float z) {
-  GL4DMMatrix res = gl4dmMatrixLoadIdentity();
+  GL4DMMatrix res = gl4dmMatrixIdentity();
  
   res.r[0].w = x;
   res.r[1].w = y;
@@ -257,4 +257,175 @@ inline GL4DMMatrix gl4dmMatrixOrtho (float left, float right, float bottom, floa
   res.r[2].w = -((farVal + nearVal) / (farVal - nearVal));
  
   return res;
+}
+
+inline GL4DMMatrix gl4dmMatrixInverse (GL4DMMatrix mat) {
+  GL4DMMatrix res;
+
+  //0
+  res.r[0].x =
+    mat.r[1].y * mat.r[2].z * mat.r[3].w - 
+    mat.r[1].y * mat.r[3].z * mat.r[2].w - 
+    mat.r[1].z * mat.r[2].y * mat.r[3].w + 
+    mat.r[1].z * mat.r[3].y * mat.r[2].w +
+    mat.r[1].w * mat.r[2].y * mat.r[3].z - 
+    mat.r[1].w * mat.r[3].y * mat.r[2].z;
+
+  //1
+  res.r[0].y =
+   -mat.r[0].y * mat.r[2].z * mat.r[3].w + 
+    mat.r[0].y * mat.r[3].z * mat.r[2].w + 
+    mat.r[0].z * mat.r[2].y * mat.r[3].w - 
+    mat.r[0].z * mat.r[3].y * mat.r[2].w - 
+    mat.r[0].w * mat.r[2].y * mat.r[3].z + 
+    mat.r[0].w * mat.r[3].y * mat.r[2].z;
+
+  //2
+  res.r[0].z =
+    mat.r[0].y * mat.r[1].z * mat.r[3].w - 
+    mat.r[0].y * mat.r[3].z * mat.r[1].w - 
+    mat.r[0].z * mat.r[1].y * mat.r[3].w + 
+    mat.r[0].z * mat.r[3].y * mat.r[1].w + 
+    mat.r[0].w * mat.r[1].y * mat.r[3].z - 
+    mat.r[0].w * mat.r[3].y * mat.r[1].z;
+
+  //3
+  res.r[0].w =
+   -mat.r[0].y * mat.r[1].z * mat.r[2].w + 
+    mat.r[0].y * mat.r[2].z * mat.r[1].w +
+    mat.r[0].z * mat.r[1].y * mat.r[2].w - 
+    mat.r[0].z * mat.r[2].y * mat.r[1].w - 
+    mat.r[0].w * mat.r[1].y * mat.r[2].z + 
+    mat.r[0].w * mat.r[2].y * mat.r[1].z;
+
+  //4
+  res.r[1].x =
+   -mat.r[1].x * mat.r[2].z * mat.r[3].w + 
+    mat.r[1].x * mat.r[3].z * mat.r[2].w + 
+    mat.r[1].z * mat.r[2].x * mat.r[3].w - 
+    mat.r[1].z * mat.r[3].x * mat.r[2].w - 
+    mat.r[1].w * mat.r[2].x * mat.r[3].z + 
+    mat.r[1].w * mat.r[3].x * mat.r[2].z;
+
+  //5
+  res.r[1].y =
+    mat.r[0].x * mat.r[2].z * mat.r[3].w - 
+    mat.r[0].x * mat.r[3].z * mat.r[2].w - 
+    mat.r[0].z * mat.r[2].x * mat.r[3].w + 
+    mat.r[0].z * mat.r[3].x * mat.r[2].w + 
+    mat.r[0].w * mat.r[2].x * mat.r[3].z - 
+    mat.r[0].w * mat.r[3].x * mat.r[2].z;
+
+  //6
+  res.r[1].z =
+   -mat.r[0].x * mat.r[1].z * mat.r[3].w + 
+    mat.r[0].x * mat.r[3].z * mat.r[1].w + 
+    mat.r[0].z * mat.r[1].x * mat.r[3].w - 
+    mat.r[0].z * mat.r[3].x * mat.r[1].w - 
+    mat.r[0].w * mat.r[1].x * mat.r[3].z + 
+    mat.r[0].w * mat.r[3].x * mat.r[1].z;
+
+  //7
+  res.r[1].w =
+    mat.r[0].x * mat.r[1].z * mat.r[2].w - 
+    mat.r[0].x * mat.r[2].z * mat.r[1].w - 
+    mat.r[0].z * mat.r[1].x * mat.r[2].w + 
+    mat.r[0].z * mat.r[2].x * mat.r[1].w + 
+    mat.r[0].w * mat.r[1].x * mat.r[2].z - 
+    mat.r[0].w * mat.r[2].x * mat.r[1].z;
+
+  //8
+  res.r[2].x =
+    mat.r[1].x * mat.r[2].y * mat.r[3].w - 
+    mat.r[1].x * mat.r[3].y * mat.r[2].w - 
+    mat.r[1].y * mat.r[2].x * mat.r[3].w + 
+    mat.r[1].y * mat.r[3].x * mat.r[2].w + 
+    mat.r[1].w * mat.r[2].x * mat.r[3].y - 
+    mat.r[1].w * mat.r[3].x * mat.r[2].y;
+
+  //9
+  res.r[2].y =
+   -mat.r[0].x * mat.r[2].y * mat.r[3].w + 
+    mat.r[0].x * mat.r[3].y * mat.r[2].w + 
+    mat.r[0].y * mat.r[2].x * mat.r[3].w - 
+    mat.r[0].y * mat.r[3].x * mat.r[2].w - 
+    mat.r[0].w * mat.r[2].x * mat.r[3].y + 
+    mat.r[0].w * mat.r[3].x * mat.r[2].y;
+
+  //10
+  res.r[2].z =
+    mat.r[0].x * mat.r[1].y * mat.r[3].w - 
+    mat.r[0].x * mat.r[3].y * mat.r[1].w - 
+    mat.r[0].y * mat.r[1].x * mat.r[3].w + 
+    mat.r[0].y * mat.r[3].x * mat.r[1].w + 
+    mat.r[0].w * mat.r[1].x * mat.r[3].y - 
+    mat.r[0].w * mat.r[3].x * mat.r[1].y;
+
+  //11
+  res.r[2].w =
+   -mat.r[0].x * mat.r[1].y * mat.r[2].w + 
+    mat.r[0].x * mat.r[2].y * mat.r[1].w + 
+    mat.r[0].y * mat.r[1].x * mat.r[2].w - 
+    mat.r[0].y * mat.r[2].x * mat.r[1].w - 
+    mat.r[0].w * mat.r[1].x * mat.r[2].y + 
+    mat.r[0].w * mat.r[2].x * mat.r[1].y;
+
+  //12
+  res.r[3].x =
+   -mat.r[1].x * mat.r[2].y * mat.r[3].z + 
+    mat.r[1].x * mat.r[3].y * mat.r[2].z + 
+    mat.r[1].y * mat.r[2].x * mat.r[3].z - 
+    mat.r[1].y * mat.r[3].x * mat.r[2].z - 
+    mat.r[1].z * mat.r[2].x * mat.r[3].y + 
+    mat.r[1].z * mat.r[3].x * mat.r[2].y;
+
+  //13
+  res.r[3].y =
+    mat.r[0].x * mat.r[2].y * mat.r[3].z - 
+    mat.r[0].x * mat.r[3].y * mat.r[2].z - 
+    mat.r[0].y * mat.r[2].x * mat.r[3].z + 
+    mat.r[0].y * mat.r[3].x * mat.r[2].z + 
+    mat.r[0].z * mat.r[2].x * mat.r[3].y - 
+    mat.r[0].z * mat.r[3].x * mat.r[2].y;
+
+  //14
+  res.r[3].z =
+   -mat.r[0].x * mat.r[1].y * mat.r[3].z + 
+    mat.r[0].x * mat.r[3].y * mat.r[1].z + 
+    mat.r[0].y * mat.r[1].x * mat.r[3].z - 
+    mat.r[0].y * mat.r[3].x * mat.r[1].z - 
+    mat.r[0].z * mat.r[1].x * mat.r[3].y + 
+    mat.r[0].z * mat.r[3].x * mat.r[1].y;
+
+  //15
+  res.r[3].w =
+    mat.r[0].x * mat.r[1].y * mat.r[2].z - 
+    mat.r[0].x * mat.r[2].y * mat.r[1].z - 
+    mat.r[0].y * mat.r[1].x * mat.r[2].z + 
+    mat.r[0].y * mat.r[2].x * mat.r[1].z + 
+    mat.r[0].z * mat.r[1].x * mat.r[2].y - 
+    mat.r[0].z * mat.r[2].x * mat.r[1].y;
+
+  float det = mat.r[0].x * res.r[0].x + mat.r[1].x * res.r[0].y + mat.r[2].x * res.r[0].z + mat.r[3].x * res.r[0].w;
+
+  if (det == 0) return mat;
+
+  det = 1.0f / det;
+
+  for (int i = 0; i < 4; i++) {
+    res.r[i].x *= det;
+    res.r[i].y *= det;
+    res.r[i].z *= det;
+    res.r[i].w *= det;
+  }
+
+  return res;    
+}
+
+inline void gl4dmPrintVector (GL4DMVector vec) {
+  printf("%f %f %f %f\n", vec.x, vec.y, vec.z, vec.w);
+}
+
+inline void gl4dmPrintMatrix (GL4DMMatrix mat) {
+  for (int i = 0; i < 4; i++) gl4dmPrintVector(mat.r[i]);  
 }
