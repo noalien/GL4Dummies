@@ -70,7 +70,7 @@ void test_list()
 }
 
 int main(int argc, char **argv)
-{
+{  
   test_vector();
   test_list();
   return 0;

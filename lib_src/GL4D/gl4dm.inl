@@ -163,8 +163,8 @@ inline GL4DMMatrix gl4dmMatrixTranslate (float x, float y, float z) {
   
 inline GL4DMMatrix gl4dmMatrixRotate (float angle, float x, float y, float z) {
   GL4DMMatrix res;
-  float c = cos(angle);
-  float s = sin(angle);
+  float c = cosf(angle);
+  float s = sinf(angle);
   GL4DMVector axe = {x, y, z, 1.0f};
   
   memset(&res, 0, sizeof res);
