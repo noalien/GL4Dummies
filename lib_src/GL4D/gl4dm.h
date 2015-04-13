@@ -198,7 +198,8 @@ GL4DAPI double    GL4DAPIENTRY gl4dmGURand(void);
 /*!\brief Méthodes alternative utilisant des fonctions inline 
  * (compatible seulement a partir de la norme c99)*/
 
-#if __STDC_VERSION__ >= 199901L && defined __cplus_cplus
+#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || defined __cplus_cplus
+
 typedef struct
 {
   float x, y, z, w;

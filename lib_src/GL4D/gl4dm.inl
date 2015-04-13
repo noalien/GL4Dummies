@@ -56,25 +56,25 @@ inline GL4DMVector gl4dmVectorXVector (GL4DMVector vec1, GL4DMVector vec2) {
 inline GL4DMMatrix gl4dmMatrixTranspose (GL4DMMatrix mat) {
   GL4DMMatrix res;
 
-  res[0].x = mat[0].x;
-  res[0].y = mat[1].x;
-  res[0].z = mat[2].x;
-  res[0].w = mat[3].x;
+  res.r[0].x = mat.r[0].x;
+  res.r[0].y = mat.r[1].x;
+  res.r[0].z = mat.r[2].x;
+  res.r[0].w = mat.r[3].x;
   
-  res[1].x = mat[0].y;
-  res[1].y = mat[1].y;
-  res[1].z = mat[2].y;
-  res[1].w = mat[3].y;
+  res.r[1].x = mat.r[0].y;
+  res.r[1].y = mat.r[1].y;
+  res.r[1].z = mat.r[2].y;
+  res.r[1].w = mat.r[3].y;
   
-  res[2].x = mat[0].z;
-  res[2].y = mat[1].z;
-  res[2].z = mat[2].z;
-  res[2].w = mat[3].z;
+  res.r[2].x = mat.r[0].z;
+  res.r[2].y = mat.r[1].z;
+  res.r[2].z = mat.r[2].z;
+  res.r[2].w = mat.r[3].z;
   
-  res[3].x = mat[0].w;
-  res[3].y = mat[1].w;
-  res[3].z = mat[2].w;
-  res[3].w = mat[3].w;
+  res.r[3].x = mat.r[0].w;
+  res.r[3].y = mat.r[1].w;
+  res.r[3].z = mat.r[2].w;
+  res.r[3].w = mat.r[3].w;
 
   return res;
 }
@@ -209,8 +209,8 @@ inline GL4DMMatrix gl4dmMatrixLookAt (float eyeX, float eyeY, float eyeZ, float 
   
   f = gl4dmVector3Normalize(f);
   up = gl4dmVector3Normalize(up);
-  s = gl4dmVector3Normalize(gl4dmVector3CrossProduct(f, up));
-  u = gl4dmVector3CrossProduct(s, f);
+  s = gl4dmVector3Normalize(gl4dmVector3Cross(f, up));
+  u = gl4dmVector3Cross(s, f);
   
   res.r[0].x = s.x;
   res.r[0].y = s.y;
@@ -223,7 +223,7 @@ inline GL4DMMatrix gl4dmMatrixLookAt (float eyeX, float eyeY, float eyeZ, float 
   res.r[2].z = -f.z;
   res.r[3].w = 1.0f;
   
-  res = gl4dmMatrixMultiply(res, gl4dmMatrixTranslate(-eyeX, -eyeY, -eyeZ));
+  res = gl4dmMatrixXMatrix(res, gl4dmMatrixTranslate(-eyeX, -eyeY, -eyeZ));
   
   return res;
 }
