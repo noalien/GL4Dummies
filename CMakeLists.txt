@@ -27,7 +27,7 @@ elseif(WIN32)
 	
   elseif(MSVC)
   
-    set(CMAKE_C_FLAGS "/W3 /EHsc")
+    set(CMAKE_C_FLAGS "/W3 /EHsc /wd4996")
 	
   endif()
   

@@ -15,6 +15,8 @@
 
 #include "gl4dummies.h"
 
+#include <math.h>
+
 /* MACROS DIVERS */
 
 #define GL4DM_E		        2.7182818284590452354
@@ -198,8 +200,6 @@ GL4DAPI double    GL4DAPIENTRY gl4dmGURand(void);
 /*!\brief Méthodes alternative utilisant des fonctions inline 
  * (compatible seulement a partir de la norme c99)*/
 
-#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || defined __cplus_cplus
-
 typedef struct
 {
   float x, y, z, w;
@@ -211,6 +211,5 @@ typedef struct
 } GL4DMMatrix;
 
 #include "gl4dm.inl"
-#endif
 
 #endif

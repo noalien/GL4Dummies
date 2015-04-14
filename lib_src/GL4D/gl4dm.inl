@@ -5,7 +5,7 @@
  *
 */
 
-inline GL4DMMatrix gl4dmMatrixXMatrix (GL4DMMatrix mat1, GL4DMMatrix mat2) {
+INLINE GL4DMMatrix gl4dmMatrixXMatrix (GL4DMMatrix mat1, GL4DMMatrix mat2) {
   GL4DMMatrix res;
   
   res.r[0].x = mat1.r[0].x * mat2.r[0].x + mat1.r[0].y * mat2.r[1].x + mat1.r[0].z * mat2.r[2].x + mat1.r[0].w * mat2.r[3].x;
@@ -31,7 +31,7 @@ inline GL4DMMatrix gl4dmMatrixXMatrix (GL4DMMatrix mat1, GL4DMMatrix mat2) {
   return res;
 }
 
-inline GL4DMVector gl4dmMatrixXVector (GL4DMMatrix mat, GL4DMVector vec) {
+INLINE GL4DMVector gl4dmMatrixXVector(GL4DMMatrix mat, GL4DMVector vec) {
   GL4DMVector res;
 
   res.x = mat.r[0].x * vec.x + mat.r[0].y * vec.y + mat.r[0].z * vec.z + mat.r[0].w * vec.w;
@@ -42,7 +42,7 @@ inline GL4DMVector gl4dmMatrixXVector (GL4DMMatrix mat, GL4DMVector vec) {
   return res;
 }
 
-inline GL4DMVector gl4dmVectorXVector (GL4DMVector vec1, GL4DMVector vec2) {
+INLINE GL4DMVector gl4dmVectorXVector(GL4DMVector vec1, GL4DMVector vec2) {
   GL4DMVector res;
   
   res.x = vec1.x * vec2.x;
@@ -53,7 +53,7 @@ inline GL4DMVector gl4dmVectorXVector (GL4DMVector vec1, GL4DMVector vec2) {
   return res;
 }
 
-inline GL4DMMatrix gl4dmMatrixTranspose (GL4DMMatrix mat) {
+INLINE GL4DMMatrix gl4dmMatrixTranspose(GL4DMMatrix mat) {
   GL4DMMatrix res;
 
   res.r[0].x = mat.r[0].x;
@@ -79,7 +79,7 @@ inline GL4DMMatrix gl4dmMatrixTranspose (GL4DMMatrix mat) {
   return res;
 }
   
-inline GL4DMVector gl4dmVector3Cross (GL4DMVector vec1, GL4DMVector vec2) {
+INLINE GL4DMVector gl4dmVector3Cross(GL4DMVector vec1, GL4DMVector vec2) {
   GL4DMVector res;
   
   res.x = vec1.y * vec2.z - vec1.z * vec2.y;
@@ -90,19 +90,19 @@ inline GL4DMVector gl4dmVector3Cross (GL4DMVector vec1, GL4DMVector vec2) {
   return res;
 }
 
-inline float gl4dmVector2Dot (GL4DMVector vec1, GL4DMVector vec2) {  
+INLINE float gl4dmVector2Dot(GL4DMVector vec1, GL4DMVector vec2) {
   return vec1.x * vec2.x + vec1.y * vec2.y;
 }
 
-inline float gl4dmVector3Dot (GL4DMVector vec1, GL4DMVector vec2) {  
+INLINE float gl4dmVector3Dot(GL4DMVector vec1, GL4DMVector vec2) {
   return gl4dmVector2Dot(vec1, vec2) + vec1.z * vec2.z;
 }
 
-inline float gl4dmVector4Dot (GL4DMVector vec1, GL4DMVector vec2) {  
+INLINE float gl4dmVector4Dot(GL4DMVector vec1, GL4DMVector vec2) {
   return gl4dmVector3Dot(vec1, vec2) + vec1.w * vec2.w;
 }
   
-inline GL4DMVector gl4dmVector2Normalize (GL4DMVector vec) {
+INLINE GL4DMVector gl4dmVector2Normalize(GL4DMVector vec) {
   GL4DMVector res;
   float length = sqrt(SQUARE(vec.x) + SQUARE(vec.y));
   
@@ -114,7 +114,7 @@ inline GL4DMVector gl4dmVector2Normalize (GL4DMVector vec) {
   return res;
 }
   
-inline GL4DMVector gl4dmVector3Normalize (GL4DMVector vec) {
+INLINE GL4DMVector gl4dmVector3Normalize(GL4DMVector vec) {
   GL4DMVector res;
   float length = sqrt(SQUARE(vec.x) + SQUARE(vec.y) + SQUARE(vec.z));
   
@@ -126,7 +126,7 @@ inline GL4DMVector gl4dmVector3Normalize (GL4DMVector vec) {
   return res;
 }
   
-inline GL4DMVector gl4dmVector4Normalize (GL4DMVector vec) {
+INLINE GL4DMVector gl4dmVector4Normalize(GL4DMVector vec) {
   GL4DMVector res;
   float length = sqrt(SQUARE(vec.x) + SQUARE(vec.y) + SQUARE(vec.z) + SQUARE(vec.w));
   
@@ -138,7 +138,7 @@ inline GL4DMVector gl4dmVector4Normalize (GL4DMVector vec) {
   return res;
 }
   
-inline GL4DMMatrix gl4dmMatrixIdentity (void) {
+INLINE GL4DMMatrix gl4dmMatrixIdentity(void) {
   GL4DMMatrix res;
   
   memset(&res, 0, sizeof res);
@@ -151,7 +151,7 @@ inline GL4DMMatrix gl4dmMatrixIdentity (void) {
   return res;
 }
   
-inline GL4DMMatrix gl4dmMatrixTranslate (float x, float y, float z) {
+INLINE GL4DMMatrix gl4dmMatrixTranslate(float x, float y, float z) {
   GL4DMMatrix res = gl4dmMatrixIdentity();
  
   res.r[0].w = x;
@@ -161,7 +161,7 @@ inline GL4DMMatrix gl4dmMatrixTranslate (float x, float y, float z) {
   return res;
 }
   
-inline GL4DMMatrix gl4dmMatrixRotate (float angle, float x, float y, float z) {
+INLINE GL4DMMatrix gl4dmMatrixRotate(float angle, float x, float y, float z) {
   GL4DMMatrix res;
   float c = cosf(angle);
   float s = sinf(angle);
@@ -185,7 +185,7 @@ inline GL4DMMatrix gl4dmMatrixRotate (float angle, float x, float y, float z) {
   return res;
 }
   
-inline GL4DMMatrix gl4dmMatrixScale (float x, float y, float z) {
+INLINE GL4DMMatrix gl4dmMatrixScale(float x, float y, float z) {
   GL4DMMatrix res;
  
   memset(&res, 0, sizeof res);
@@ -198,7 +198,7 @@ inline GL4DMMatrix gl4dmMatrixScale (float x, float y, float z) {
   return res;
 }
   
-inline GL4DMMatrix gl4dmMatrixLookAt (float eyeX, float eyeY, float eyeZ, float centerX, float centerY, float centerZ, float upX, float upY, float upZ) {
+INLINE GL4DMMatrix gl4dmMatrixLookAt(float eyeX, float eyeY, float eyeZ, float centerX, float centerY, float centerZ, float upX, float upY, float upZ) {
   GL4DMMatrix res;
   GL4DMVector f = {centerX - eyeX, centerY - eyeY, centerZ - eyeZ, 1.0f};
   GL4DMVector up = {upX, upY, upZ, 1.0f};
@@ -228,7 +228,7 @@ inline GL4DMMatrix gl4dmMatrixLookAt (float eyeX, float eyeY, float eyeZ, float 
   return res;
 }
   
-inline GL4DMMatrix gl4dmMatrixPerspective (float fovy, float aspect, float znear, float zfar) {
+INLINE GL4DMMatrix gl4dmMatrixPerspective(float fovy, float aspect, float znear, float zfar) {
   GL4DMMatrix res;
   float f = COTANGENT(fovy / 2.0f);
  
@@ -243,7 +243,7 @@ inline GL4DMMatrix gl4dmMatrixPerspective (float fovy, float aspect, float znear
   return res;
 }
   
-inline GL4DMMatrix gl4dmMatrixOrtho (float left, float right, float bottom, float top, float nearVal, float farVal) {
+INLINE GL4DMMatrix gl4dmMatrixOrtho(float left, float right, float bottom, float top, float nearVal, float farVal) {
   GL4DMMatrix res;
  
   memset(&res, 0, sizeof res);
@@ -259,7 +259,7 @@ inline GL4DMMatrix gl4dmMatrixOrtho (float left, float right, float bottom, floa
   return res;
 }
 
-inline GL4DMMatrix gl4dmMatrixInverse (GL4DMMatrix mat) {
+INLINE GL4DMMatrix gl4dmMatrixInverse(GL4DMMatrix mat) {
   GL4DMMatrix res;
 
   //0
@@ -422,10 +422,10 @@ inline GL4DMMatrix gl4dmMatrixInverse (GL4DMMatrix mat) {
   return res;    
 }
 
-inline void gl4dmPrintVector (GL4DMVector vec) {
+INLINE void gl4dmPrintVector(GL4DMVector vec) {
   printf("%f %f %f %f\n", vec.x, vec.y, vec.z, vec.w);
 }
 
-inline void gl4dmPrintMatrix (GL4DMMatrix mat) {
+INLINE void gl4dmPrintMatrix(GL4DMMatrix mat) {
   for (int i = 0; i < 4; i++) gl4dmPrintVector(mat.r[i]);  
 }

@@ -43,6 +43,17 @@
 #endif
 
 /****************************************************/
+/********* Gestion des inline ********/
+/****************************************************/
+#ifndef INLINE
+#  if __GNUC__ && !__GNUC_STDC_INLINE__
+#    define INLINE extern inline
+#  else
+#    define INLINE inline
+#  endif
+#endif
+
+/****************************************************/
 /**** Gestion des AUTRES spécificité MS_VStudio *****/
 /****************************************************/
 #if defined(_MSC_VER)

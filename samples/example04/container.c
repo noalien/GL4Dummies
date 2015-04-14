@@ -1,5 +1,6 @@
 #include <GL4D/vector.h>
 #include <GL4D/list.h>
+#include <GL4D/gl4dm.h>
 
 void test_vector()
 {
@@ -69,9 +70,19 @@ void test_list()
   list_delete(test_l);
 }
 
+void test_matrix()
+{
+	GL4DMMatrix test = gl4dmMatrixIdentity();
+
+	gl4dmPrintMatrix(test);
+}
+
 int main(int argc, char **argv)
 {  
   test_vector();
+  putchar('\n');
   test_list();
+  putchar('\n');
+  test_matrix();
   return 0;
 }
