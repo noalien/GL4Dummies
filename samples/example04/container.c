@@ -28,8 +28,7 @@ void test_vector()
   vector_set(test_v, &el, 9);
   vector_set(test_v, &el, 10);
 
-  int i;
-  for (i=0; i < test_v.size; i++)
+  for (int i=0; i < test_v.size; i++)
     printf("%d ", *(int *)vector_get(test_v, i));
   putchar('\n');
 
@@ -62,8 +61,7 @@ void test_list()
   list_set(test_l, &el, 9);
   list_set(test_l, &el, 10);
 
-  int i;
-  for (i = 0; i < test_l.size; i++)
+  for (int i = 0; i < test_l.size; i++)
     printf("%d ", *(int *)list_get(test_l, i));
   putchar('\n');
 
@@ -72,13 +70,29 @@ void test_list()
 
 void test_matrix()
 {
-	GL4DMMatrix test = gl4dmMatrixIdentity();
+  GL4DMMatrix projectionMatrix = gl4dmMatrixPerspective(70.0f, 16.0f/9.0f, 0.1f, 100.0f);
+  GL4DMMatrix viewMatrix = gl4dmMatrixLookAt(10.0f, 10.0f, 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+  GL4DMMatrix modelMatrix = gl4dmMatrixXMatrix(gl4dmMatrixTranslate(-10.0f, -10.0f, -10.0f), gl4dmMatrixRotate(RADIAN(25), 0.0f, 0.0f, 1.0f));
+  GL4DMMatrix normalMatrix = gl4dmMatrixTranspose(gl4dmMatrixInverse(modelMatrix));  
+  GL4DMMatrix modelViewMatrix = gl4dmMatrixXMatrix(viewMatrix, modelMatrix);
+  GL4DMMatrix modelViewProjectionMatrix = gl4dmMatrixXMatrix(projectionMatrix, modelViewMatrix);
 
-	gl4dmPrintMatrix(test);
+  printf("Projection Matrix\n");
+  gl4dmPrintMatrix(projectionMatrix);
+  printf("\nView Matrix\n");
+  gl4dmPrintMatrix(viewMatrix);
+  printf("\nModel Matrix\n");
+  gl4dmPrintMatrix(modelMatrix);
+  printf("\nNormal Matrix\n");
+  gl4dmPrintMatrix(normalMatrix);
+  printf("\nModelView Matrix\n");
+  gl4dmPrintMatrix(modelViewMatrix);
+  printf("\nModelViewProjection Matrix\n");
+  gl4dmPrintMatrix(modelViewProjectionMatrix);
 }
 
 int main(int argc, char **argv)
-{  
+{
   test_vector();
   putchar('\n');
   test_list();
