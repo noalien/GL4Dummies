@@ -46,10 +46,10 @@
 /********* Gestion des inline ********/
 /****************************************************/
 #ifndef INLINE
-#  if __GNUC__ && !__GNUC_STDC_INLINE__
-#    define INLINE extern inline
-#  else
+#  ifdef __cplusplus
 #    define INLINE inline
+#  else
+#    define INLINE static inline
 #  endif
 #endif
 

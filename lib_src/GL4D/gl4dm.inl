@@ -411,8 +411,9 @@ INLINE GL4DMMatrix gl4dmMatrixInverse(GL4DMMatrix mat) {
   if (det == 0) return mat;
 
   det = 1.0f / det;
-
-  for (int i = 0; i < 4; i++) {
+  
+  int i;
+  for (i = 0; i < 4; i++) {
     res.r[i].x *= det;
     res.r[i].y *= det;
     res.r[i].z *= det;
@@ -427,5 +428,6 @@ INLINE void gl4dmPrintVector(GL4DMVector vec) {
 }
 
 INLINE void gl4dmPrintMatrix(GL4DMMatrix mat) {
-  for (int i = 0; i < 4; i++) gl4dmPrintVector(mat.r[i]);  
+  int i;
+  for (i = 0; i < 4; i++) gl4dmPrintVector(mat.r[i]);  
 }
