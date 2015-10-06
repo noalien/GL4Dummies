@@ -28,7 +28,7 @@ void test_vector()
   vector_set(test_v, &el, 9);
   vector_set(test_v, &el, 10);
 
-  for (int i=0; i < test_v.size; i++)
+  for (size_t i=0; i < test_v.size; i++)
     printf("%d ", *(int *)vector_get(test_v, i));
   putchar('\n');
 
@@ -61,7 +61,7 @@ void test_list()
   list_set(test_l, &el, 9);
   list_set(test_l, &el, 10);
 
-  for (int i = 0; i < test_l.size; i++)
+  for (size_t i = 0; i < test_l.size; i++)
     printf("%d ", *(int *)list_get(test_l, i));
   putchar('\n');
 

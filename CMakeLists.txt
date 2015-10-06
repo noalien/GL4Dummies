@@ -14,16 +14,19 @@ set(GL4DUMMIES_INCLUDE_DIRS lib_src)
 if(UNIX)
 
   set(CMAKE_C_FLAGS "-W -Wall")
+  find_package(Math REQUIRED)
 
 elseif(APPLE)
 
   set(CMAKE_C_FLAGS "-W -Wall")
+  find_package(Math REQUIRED)
 
 elseif(WIN32)
 
   if(MINGW)
   
     set(CMAKE_C_FLAGS "-W -Wall")
+    find_package(Math REQUIRED)
 	
   elseif(MSVC)
   
@@ -37,6 +40,7 @@ find_package(OpenGL REQUIRED)
 find_package(SDL2 REQUIRED)
 
 include_directories(${GL4DUMMIES_INCLUDE_DIRS}
+  ${MATH_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIRS}
   ${SDL2_INCLUDE_DIRS}
   )
@@ -53,6 +57,7 @@ set_target_properties(GL4dummies
   SOVERSION 1
   )
 target_link_libraries(GL4dummies
+  ${MATH_LIBRARIES}
   ${OPENGL_LIBRARIES}
   ${SDL2_LIBRARIES}
   )
@@ -95,7 +100,10 @@ target_link_libraries(gl4dContainer GL4dummies)
 #add_executable(example5 ${example05_source_files})
 #target_link_libraries(example5 GL4dummies)
 
-if(WIN32)
+
+if(UNIX OR APPLE OR MINGW)
+  set_target_properties(gl4dContainer PROPERTIES COMPILE_FLAGS "-std=c99")
+elseif(WIN32)
   set_target_properties(gl4dWalkOnPolygons PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
   set_target_properties(gl4dLandscape PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
   set_target_properties(gl4dObjLoader PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
