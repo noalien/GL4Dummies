@@ -95,9 +95,19 @@
 #  define GL_GLEXT_PROTOTYPES
 #endif
 
+#ifdef __ANDROID__
+#include <android/log.h>
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+typedef double GLdouble;
+#define GL_DOUBLE GL_FLOAT
+#else
 #include <SDL.h>
 #include <SDL_opengl.h>
+#endif
+
 #include <stdio.h>
+#include <stdlib.h>
 
 #if defined(_WIN32)
 #include "gl4wdummies.h"

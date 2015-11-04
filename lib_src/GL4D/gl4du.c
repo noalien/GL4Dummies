@@ -316,11 +316,15 @@ GLuint gl4duCreateProgram(const char * firstone, ...) {
       if(!(sId = gl4duCreateShader(GL_FRAGMENT_SHADER, &filename[4]))) goto gl4duCreateProgram_ERROR;
       attachShader(*prg, *findidInShadersList(sId));
       fprintf(stderr, "\t\t%s : fragment shader\n", &filename[4]);
-    } else if(!strncmp("<gs>", filename, 4)) { /* geometry shader */
+    }
+#ifndef __ANDROID__
+    else if(!strncmp("<gs>", filename, 4)) { /* geometry shader */
       if(!(sId = gl4duCreateShader(GL_GEOMETRY_SHADER, &filename[4]))) goto gl4duCreateProgram_ERROR;
       attachShader(*prg, *findidInShadersList(sId));
       fprintf(stderr, "\t\t%s : geometry shader\n", &filename[4]);
-    } else { /* ??? shader */
+    }
+#endif
+    else { /* ??? shader */
       fprintf(stderr, "%s (%d): %s: erreur de syntaxe dans \"%s\"\n",
 	      __FILE__, __LINE__, __func__, filename);
     }
@@ -379,11 +383,15 @@ GLuint gl4duCreateProgramFED(const char * encData, const char * firstone, ...) {
       if(!(sId = gl4duCreateShaderFED(decData, GL_FRAGMENT_SHADER, &filename[4]))) goto gl4duCreateProgram_ERROR;
       attachShader(*prg, *findidInShadersList(sId));
       fprintf(stderr, "\t\t%s : fragment shader\n", &filename[4]);
-    } else if(!strncmp("<gs>", filename, 4)) { /* geometry shader */
+    }
+#ifndef __ANDROID__
+    else if(!strncmp("<gs>", filename, 4)) { /* geometry shader */
       if(!(sId = gl4duCreateShaderFED(decData, GL_GEOMETRY_SHADER, &filename[4]))) goto gl4duCreateProgram_ERROR;
       attachShader(*prg, *findidInShadersList(sId));
       fprintf(stderr, "\t\t%s : geometry shader\n", &filename[4]);
-    } else { /* ??? shader */
+    }
+#endif
+    else { /* ??? shader */
       fprintf(stderr, "%s (%d): %s: erreur de syntaxe dans \"%s\"\n",
 	      __FILE__, __LINE__, __func__, filename);
     }
@@ -919,7 +927,13 @@ void gl4duPopMatrix(void) {
 void sendMatrix(void * m, void **ppId) {
   _GL4DUMatrix * matrix = (_GL4DUMatrix * )m;
   GLint pId = *(GLint *)ppId;
+#ifdef __ANDROID__
+  /*!\todo voir pourquoi le transpose génère une erreur sous Android */
+  glUniformMatrix4fv(glGetUniformLocation(pId, matrix->name), 1, GL_FALSE, matrixData(matrix));
+  //__android_log_print(ANDROID_LOG_ERROR, "AndroidGL4D", "PROGRAM %d, Matrix %s : %d\n", pId, matrix->name, glGetUniformLocation(pId, matrix->name));
+#else
   glUniformMatrix4fv(glGetUniformLocation(pId, matrix->name), 1, GL_TRUE, matrixData(matrix));
+#endif
 }
 
 /*!\brief envoie la matrice courante au program shader en cours et en
