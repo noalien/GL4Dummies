@@ -929,7 +929,12 @@ void sendMatrix(void * m, void **ppId) {
   GLint pId = *(GLint *)ppId;
 #ifdef __ANDROID__
   /*!\todo voir pourquoi le transpose génère une erreur sous Android */
-  glUniformMatrix4fv(glGetUniformLocation(pId, matrix->name), 1, GL_FALSE, matrixData(matrix));
+  GLfloat t[16], * M = matrixData(matrix);
+  t[0] = M[0]; t[1] = M[4]; t[2] = M[8]; t[3] = M[12];
+  t[4] = M[1]; t[5] = M[5]; t[6] = M[9]; t[7] = M[13];
+  t[8] = M[2]; t[9] = M[6]; t[10] = M[10]; t[11] = M[14];
+  t[12] = M[3]; t[13] = M[7]; t[14] = M[11]; t[15] = M[15];
+  glUniformMatrix4fv(glGetUniformLocation(pId, matrix->name), 1, GL_FALSE, t);
   //__android_log_print(ANDROID_LOG_ERROR, "AndroidGL4D", "PROGRAM %d, Matrix %s : %d\n", pId, matrix->name, glGetUniformLocation(pId, matrix->name));
 #else
   glUniformMatrix4fv(glGetUniformLocation(pId, matrix->name), 1, GL_TRUE, matrixData(matrix));
@@ -1225,31 +1230,15 @@ void gl4duScaled(GLdouble sx, GLdouble sy, GLdouble sz) {
   gl4duMultMatrixd(mat);
 }
 
-/*!\brief Définie des transformations pour simuler un point de vue
- * avec direction de regard et orientation.
- *
- * Version \a GL4Dummies de la fonction gluLookAt pour les types
- * GLfloat (les matrices GL_FLOAT). Pour la version gérant les double
- * voir \see gl4duLookAtd.
- *
- * \param eyeX abcsisse de l'oeil.
- * \param eyeY ordonnée de l'oeil.
- * \param eyeZ cote de l'oeil.
- * \param centerX abcsisse du point observé.
- * \param centerY ordonnée du point observé.
- * \param centerZ cote du point observé.
- * \param upX X du vecteur décrivant l'orientation de la "tete" de l'observateur (vecteur haut)
- * \param upY Y du vecteur décrivant l'orientation de la "tete" de l'observateur (vecteur haut)
- * \param upZ Y du vecteur décrivant l'orientation de la "tete" de l'observateur (vecteur haut)
- */
-void gl4duLookAtf(GLfloat eyeX,  GLfloat eyeY,  GLfloat eyeZ,  GLfloat centerX,  GLfloat centerY,  GLfloat centerZ,  GLfloat upX,  GLfloat upY,  GLfloat upZ) {
+void gl4duLookAtf_DNW(GLfloat eyeX,  GLfloat eyeY,  GLfloat eyeZ,  GLfloat centerX,  GLfloat centerY,  GLfloat centerZ,  GLfloat upX,  GLfloat upY,  GLfloat upZ) {
   GLfloat haut[3] = { upX, upY, upZ }, dirVue[] = { centerX - eyeX, centerY - eyeY, centerZ - eyeZ };
   GLfloat mat[] = {
     0.0f,       0.0f,       0.0f,       0.0f,
     0.0f,       0.0f,       0.0f,       0.0f,
     -dirVue[0], -dirVue[1], -dirVue[2], 0.0f,
-    0.0f,       0.0f,       0.0f,       1.0f,
+    0.0f,       0.0f,       0.0f,       1.0f
   };
+  //MMAT4TRANSPOSE(mat);
   MVEC3NORMALIZE(dirVue);
   /* Première version
      GLfloat cote[3];
@@ -1270,6 +1259,57 @@ void gl4duLookAtf(GLfloat eyeX,  GLfloat eyeY,  GLfloat eyeZ,  GLfloat centerX, 
  * avec direction de regard et orientation.
  *
  * Version \a GL4Dummies de la fonction gluLookAt pour les types
+ * GLfloat (les matrices GL_FLOAT). Pour la version gérant les double
+ * voir \see gl4duLookAtd.
+ *
+ * \param eyeX abcsisse de l'oeil.
+ * \param eyeY ordonnée de l'oeil.
+ * \param eyeZ cote de l'oeil.
+ * \param centerX abcsisse du point observé.
+ * \param centerY ordonnée du point observé.
+ * \param centerZ cote du point observé.
+ * \param upX X du vecteur décrivant l'orientation de la "tete" de l'observateur (vecteur haut)
+ * \param upY Y du vecteur décrivant l'orientation de la "tete" de l'observateur (vecteur haut)
+ * \param upZ Y du vecteur décrivant l'orientation de la "tete" de l'observateur (vecteur haut)
+ */
+void gl4duLookAtf(GLfloat eyeX, GLfloat eyeY, GLfloat eyeZ, GLfloat centerX, GLfloat centerY, GLfloat centerZ, GLfloat upX, GLfloat upY, GLfloat upZ) {
+  GLfloat forward[3], side[3], up[3];
+  GLfloat m[] = {
+        1.0f,       0.0f,       0.0f,       0.0f,
+        0.0f,       1.0f,       0.0f,       0.0f,
+        0.0f,       0.0f,       1.0f,       0.0f,
+        0.0f,       0.0f,       0.0f,       1.0f
+  };
+  forward[0] = centerX - eyeX;
+  forward[1] = centerY - eyeY;
+  forward[2] = centerZ - eyeZ;
+  up[0] = upX;
+  up[1] = upY;
+  up[2] = upZ;
+  MVEC3NORMALIZE(forward);
+  /* side = forward x up */
+  MVEC3CROSS(side, forward, up);
+  MVEC3NORMALIZE(side);
+  /* up = side x forward */
+  MVEC3CROSS(up, side, forward);
+  m[0] = side[0];
+  m[4] = side[1];
+  m[8] = side[2];
+  m[1] = up[0];
+  m[5] = up[1];
+  m[9] = up[2];
+  m[2] = -forward[0];
+  m[6] = -forward[1];
+  m[10] = -forward[2];
+  gl4duMultMatrixf(m);
+  gl4duTranslatef(-eyeX, -eyeY, -eyeZ);
+}
+
+
+/*!\brief Définie des transformations pour simuler un point de vue
+ * avec direction de regard et orientation.
+ *
+ * Version \a GL4Dummies de la fonction gluLookAt pour les types
  * GLdouble (les matrices GL_DOUBLE). Pour la version gérant les
  * double voir \see gl4duLookAtf.
  *
@@ -1284,18 +1324,35 @@ void gl4duLookAtf(GLfloat eyeX,  GLfloat eyeY,  GLfloat eyeZ,  GLfloat centerX, 
  * \param upZ Y du vecteur décrivant l'orientation de la "tete" de l'observateur (vecteur haut)
  */
 void gl4duLookAtd(GLdouble eyeX,  GLdouble eyeY,  GLdouble eyeZ,  GLdouble centerX,  GLdouble centerY,  GLdouble centerZ,  GLdouble upX,  GLdouble upY,  GLdouble upZ) {
-  GLdouble haut[3] = { upX, upY, upZ }, dirVue[] = { centerX - eyeX, centerY - eyeY, centerZ - eyeZ };
-  GLdouble mat[] = {
-    0.0f,       0.0f,       0.0f,       0.0f,
-    0.0f,       0.0f,       0.0f,       0.0f,
-    -dirVue[0], -dirVue[1], -dirVue[2], 0.0f,
-    0.0f,       0.0f,       0.0f,       1.0f,
+  GLdouble forward[3], side[3], up[3];
+  GLdouble m[] = {
+          1.0,       0.0,       0.0,       0.0,
+          0.0,       1.0,       0.0,       0.0,
+          0.0,       0.0,       1.0,       0.0,
+          0.0,       0.0,       0.0,       1.0
   };
-  MVEC3NORMALIZE(dirVue);
-  MVEC3CROSS(mat, dirVue, haut);
-  MVEC3NORMALIZE(mat);
-  MVEC3CROSS(&mat[4], mat, dirVue);
-  gl4duMultMatrixd(mat);
+  forward[0] = centerX - eyeX;
+  forward[1] = centerY - eyeY;
+  forward[2] = centerZ - eyeZ;
+  up[0] = upX;
+  up[1] = upY;
+  up[2] = upZ;
+  MVEC3NORMALIZE(forward);
+  /* side = forward x up */
+  MVEC3CROSS(side, forward, up);
+  MVEC3NORMALIZE(side);
+  /* up = side x forward */
+  MVEC3CROSS(up, side, forward);
+  m[0] = side[0];
+  m[4] = side[1];
+  m[8] = side[2];
+  m[1] = up[0];
+  m[5] = up[1];
+  m[9] = up[2];
+  m[2] = -forward[0];
+  m[6] = -forward[1];
+  m[10] = -forward[2];
+  gl4duMultMatrixd(m);
   gl4duTranslated(-eyeX, -eyeY, -eyeZ);
 }
 

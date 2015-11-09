@@ -4,6 +4,10 @@
 
 #include "gl4droid.h"
 
+#define  LOG_TAG    "gl4droid"
+#define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,  LOG_TAG, __VA_ARGS__)
+#define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+
 static GLuint loadShader(GLenum shaderType, const char* pSource) {
     GLuint shader = glCreateShader(shaderType);
     if (shader) {
@@ -18,7 +22,11 @@ static GLuint loadShader(GLenum shaderType, const char* pSource) {
                 char* buf = (char*) malloc(infoLen);
                 if (buf) {
                     glGetShaderInfoLog(shader, infoLen, NULL, buf);
+                    LOGE("Could not compile %s shader :\n%s\n",
+                         shaderType == GL_VERTEX_SHADER ? "vertex" : (shaderType == GL_FRAGMENT_SHADER ? "fragment" : "<unknown>"),
+                         buf);
                     free(buf);
+                    exit(1);
                 }
                 glDeleteShader(shader);
                 shader = 0;
@@ -49,6 +57,7 @@ GLuint gl4droidCreateProgram(const char* pVertexSource, const char* pFragmentSou
                 char* buf = (char*) malloc(bufLength);
                 if (buf) {
                     glGetProgramInfoLog(program, bufLength, NULL, buf);
+                    LOGE("Could not link program:\n%s\n", buf);
                     free(buf);
                 }
             }
