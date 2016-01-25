@@ -7,6 +7,8 @@
 
 #include "gl4du.h"
 
+#ifdef __ANDROID__
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -15,6 +17,8 @@ extern GLuint gl4droidCreateProgram(const char *pVertexSource, const char *pFrag
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif //_GL4DROID_H

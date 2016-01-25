@@ -4,6 +4,8 @@
 
 #include "gl4droid.h"
 
+#ifdef __ANDROID__
+
 #define  LOG_TAG    "gl4droid"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,  LOG_TAG, __VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
@@ -67,3 +69,5 @@ GLuint gl4droidCreateProgram(const char* pVertexSource, const char* pFragmentSou
     }
     return program;
 }
+
+#endif
