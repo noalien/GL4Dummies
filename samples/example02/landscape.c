@@ -373,17 +373,17 @@ static void loop(SDL_Window * win) {
 
 
     if(_keys[KLEFT]) {
-      _cam.theta += dt * dtheta;
-    }
-    if(_keys[KRIGHT]) {
       _cam.theta -= dt * dtheta;
     }
+    if(_keys[KRIGHT]) {
+      _cam.theta += dt * dtheta;
+    }
     if(_keys[KUP]) {
-      _cam.x += -dt * pas * sin(_cam.theta);
+      _cam.x += dt * pas * sin(_cam.theta);
       _cam.z += -dt * pas * cos(_cam.theta);
     }
     if(_keys[KDOWN]) {
-      _cam.x += dt * pas * sin(_cam.theta);
+      _cam.x += -dt * pas * sin(_cam.theta);
       _cam.z += dt * pas * cos(_cam.theta);
     }
 
