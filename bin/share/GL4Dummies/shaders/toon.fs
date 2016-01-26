@@ -22,8 +22,7 @@ void main(void) {
   vec3 lum = normalize(vsoModPosition.xyz - lumpos.xyz);
   il = dot(normalize(vsoNormal), -lum);
   color = vec3(1) * il;
-  fragColor = vec4(color, 1.0);
-  /*for(int i = 0; i < colors.length(); i++) {
+  for(int i = 0; i < colors.length(); i++) {
     if(il < colors[i].a) {
       color = colors[i].rgb;
       break;
@@ -32,5 +31,5 @@ void main(void) {
   if(heightMap == 1)
     fragColor = vec4(texture(myTexture, vsoTexCoord).r);
   else
-    fragColor = mix(vec4(texture(myTexture, vsoTexCoord).rgb, 1.0), vec4(color, 1.0), 0.9);*/
+    fragColor = mix(vec4(texture(myTexture, vsoTexCoord).rgb, 1.0), vec4(color, 1.0), 0.9);
 }
