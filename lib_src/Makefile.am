@@ -9,6 +9,7 @@ __top_builddir__bin_libGL4Dummiesinclude_HEADERS = \
 	GL4D/gl4dm.h GL4D/gl4du.h		\
 	GL4D/gl4dummies.h GL4D/gl4wdummies.h	\
 	GL4D/gl4droid.h	\
+	GL4D/gl4duw_SDL2.h \
 	GL4D/list.h GL4D/vector.h GL4D/gl4dm.inl \
         GL4D/gl4dq.h
 
@@ -19,19 +20,20 @@ __top_builddir__bin_libGL4Dummies_la_SOURCES = \
 	GL4D/gl4du.c GL4D/gl4du.h				\
 	GL4D/gl4dummies.c GL4D/gl4dummies.h GL4D/gl4wdummies.h	\
 	GL4D/gl4droid.h	GL4D/gl4droid.c	\
+	GL4D/gl4duw_SDL2.h GL4D/gl4duw_SDL2.c \
 	GL4D/list.c GL4D/list.h					\
 	GL4D/vector.c GL4D/vector.h                             \
         GL4D/gl4dq.c
 
 if USE_VERSION_RC
 __top_builddir__bin_libGL4Dummies_la_LDFLAGS =      \
-        -no-undefined           \
+        $(SDL_LIBS) -no-undefined           \
         -release $(LT_RELEASE)  \
         -version-info  $(VERSION_INFO) -Wl,version.o
 __top_builddir__bin_libGL4Dummies_la_DEPENDENCIES = version.o
 else
 __top_builddir__bin_libGL4Dummies_la_LDFLAGS =      \
-        -no-undefined           \
+        $(SDL_LIBS) -no-undefined           \
         -release 0.1  \
         -version-info $(VERSION_INFO)
 endif

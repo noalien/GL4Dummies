@@ -23,12 +23,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "\0"
             VALUE "FileDescription", "GL4Dummies\0"
-            VALUE "FileVersion", "0, 1, 2, 0\0"
+            VALUE "FileVersion", "0, 1, 4, 0\0"
             VALUE "InternalName", "GL4Dummies\0"
-            VALUE "LegalCopyright", "Copyright © 2015 Farès Belhadj\0"
+            VALUE "LegalCopyright", "Copyright © 2016 Farès Belhadj\0"
             VALUE "OriginalFilename", "GL4Dummies.dll\0"
             VALUE "ProductName", "OpenGL For Dummies\0"
-            VALUE "ProductVersion", "0, 1, 2, 0\0"
+            VALUE "ProductVersion", "0, 1, 6, 0\0"
         END
     END
     BLOCK "VarFileInfo"
