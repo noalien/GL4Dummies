@@ -9,7 +9,19 @@
  * manière de glut.
  */
 #include <stdio.h>
+#include "bin_tree.h"
 #include "gl4duw_SDL2.h"
+
+typedef struct window_t window_t;
+
+struct window_t {
+  char * name;
+  SDL_Window * window;
+  SDL_GLContext glContext;
+};
+
+/*!\brief arbre binaire contenant l'ensemble des fenêtres crées. */
+static bin_tree_t  * _btWindows = NULL;
 
 /*!\brief les paramètre par défaut du contexte OpenGL */
 static int _glMajorVersion = 3, _glMinorVersion = 2, _glProfileMask = SDL_GL_CONTEXT_PROFILE_CORE, _glDoubleBuffer = 1, _glDepthSize = 16;
@@ -19,35 +31,8 @@ static int _hasInit = 0;
 static SDL_Window * _current_win = NULL;
 static SDL_GLContext _current_oglContext = NULL;
 
-/*!\brief est appelée au moment de sortir du programme (atexit), elle
- *  libère la (les) fenêtre(s) SDL et le(s) contexte(s) OpenGL lié(s).
- */
-static void quit(void) {
-  if(_current_oglContext)
-    SDL_GL_DeleteContext(_current_oglContext);
-  if(_current_win)
-    SDL_DestroyWindow(_current_win);
-}
-
-/*!\brief initialise SDL et GL4Dummies.
- *
- * \param argc nombre d'arguments passés au programme (premier argument de la fonction main).
- * \param argv liste des arguments passés au programme (second argument de la fonction main).
- * \return 0 en cas d'échec, !=0 sinon. 
- */
-static int initGL4DUW(int argc, char ** argv) {
-  if(_hasInit) return 1;
-  if(SDL_Init(SDL_INIT_VIDEO) < 0) {
-    fprintf(stderr, "%s (%d): %s:\n\tErreur lors de l'initialisation de SDL :  %s", 
-	    __FILE__, __LINE__, __func__, SDL_GetError());
-    return 0;
-  }
-  atexit(SDL_Quit);
-  atexit(quit);
-  gl4duInit(argc, argv);
-  _hasInit = 1;
-  return 1;
-}
+static void quit(void);
+static int  initGL4DUW(int argc, char ** argv);
 
 /*!\brief modifie les paramètre par défaut du contexte OpenGL.
  *
@@ -93,14 +78,14 @@ void gl4duwSetGLAttributes(int glMajorVersion, int glMinorVersion, int glProfile
  * SDL_WINDOW_HIDDEN, SDL_WINDOW_BORDERLESS, SDL_WINDOW_RESIZABLE,
  * SDL_WINDOW_MINIMIZED, SDL_WINDOW_MAXIMIZED,
  * SDL_WINDOW_INPUT_GRABBED, SDL_WINDOW_ALLOW_HIGHDPI.
- * \return non-zéro en cas de réussite, zéro en cas d'échec.
+ * \return GL_TRUE en cas de réussite, GL_FALSE en cas d'échec.
  * \see gl4duwSetGLAttributes
  * \see SDL_CreateWindow
  */
-int gl4duwCreateWindow(int argc, char ** argv, const char * title, int x, int y, 
+GLboolean gl4duwCreateWindow(int argc, char ** argv, const char * title, int x, int y, 
 		       int width, int height, Uint32 wflags) {
   SDL_Window * win = NULL;
-  if(_current_win) return 1; /* \todo à enlever quand la gestion de multiples fenetres sera effective */
+  if(_current_win) return GL_FALSE; /* \todo à enlever quand la gestion de multiples fenetres sera effective */
   initGL4DUW(argc, argv);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, _glMajorVersion);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, _glMinorVersion);
@@ -111,17 +96,47 @@ int gl4duwCreateWindow(int argc, char ** argv, const char * title, int x, int y,
 			      width, height, SDL_WINDOW_OPENGL | wflags)) == NULL ) {
     fprintf(stderr, "%s (%d): %s:\n\tErreur lors de la creation de la fenetre SDL : %s", 
 	    __FILE__, __LINE__, __func__, SDL_GetError());
-    return 0;
+    return GL_FALSE;
   }
   if( (_current_oglContext = SDL_GL_CreateContext(win)) == NULL ) {
     SDL_DestroyWindow(win);
     fprintf(stderr, "%s (%d): %s:\n\tErreur lors de la creation du contexte OpenGL : %s", 
 	    __FILE__, __LINE__, __func__, SDL_GetError());
-    return 0;
+    return GL_FALSE;
   }
   fprintf(stderr, "OpenGL version: %s\n", glGetString(GL_VERSION));
   fprintf(stderr, "Supported shaders version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));  
   (_current_win = win);
+  return GL_TRUE;
+}
+
+/*!\brief est appelée au moment de sortir du programme (atexit), elle
+ *  libère la (les) fenêtre(s) SDL et le(s) contexte(s) OpenGL lié(s).
+ */
+static void quit(void) {
+  if(_current_oglContext)
+    SDL_GL_DeleteContext(_current_oglContext);
+  if(_current_win)
+    SDL_DestroyWindow(_current_win);
+}
+
+/*!\brief initialise SDL et GL4Dummies.
+ *
+ * \param argc nombre d'arguments passés au programme (premier argument de la fonction main).
+ * \param argv liste des arguments passés au programme (second argument de la fonction main).
+ * \return 0 en cas d'échec, !=0 sinon. 
+ */
+static int initGL4DUW(int argc, char ** argv) {
+  if(_hasInit) return 1;
+  if(SDL_Init(SDL_INIT_VIDEO) < 0) {
+    fprintf(stderr, "%s (%d): %s:\n\tErreur lors de l'initialisation de SDL :  %s", 
+	    __FILE__, __LINE__, __func__, SDL_GetError());
+    return 0;
+  }
+  atexit(SDL_Quit);
+  atexit(quit);
+  gl4duInit(argc, argv);
+  _hasInit = 1;
   return 1;
 }
 
