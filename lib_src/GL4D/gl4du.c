@@ -5,6 +5,10 @@
  * \author Farès BELHADJ amsi@grafeet.fr (ou amsi@ai.univ-paris8.fr)
  * \date March 28, 2008
  *
+ * \todo ajouter la prise en compte de différents contextes GL dans la
+ * structure shader_t et ainsi différencier les shaders (même quand
+ * c'est les mêmes) créés dans différents contextes
+ *
  * \todo ajouter, pour pas mal de fonctions, une gestion des erreurs à
  * la errno ...
  */
