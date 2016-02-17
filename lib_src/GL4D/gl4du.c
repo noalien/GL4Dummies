@@ -1297,13 +1297,13 @@ void gl4duLookAtf(GLfloat eyeX, GLfloat eyeY, GLfloat eyeZ, GLfloat centerX, GLf
   /* up = side x forward */
   MVEC3CROSS(up, side, forward);
   m[0] = side[0];
-  m[4] = side[1];
-  m[8] = side[2];
-  m[1] = up[0];
+  m[1] = side[1];
+  m[2] = side[2];
+  m[4] = up[0];
   m[5] = up[1];
-  m[9] = up[2];
-  m[2] = -forward[0];
-  m[6] = -forward[1];
+  m[6] = up[2];
+  m[8] = -forward[0];
+  m[9] = -forward[1];
   m[10] = -forward[2];
   gl4duMultMatrixf(m);
   gl4duTranslatef(-eyeX, -eyeY, -eyeZ);
@@ -1348,13 +1348,13 @@ void gl4duLookAtd(GLdouble eyeX,  GLdouble eyeY,  GLdouble eyeZ,  GLdouble cente
   /* up = side x forward */
   MVEC3CROSS(up, side, forward);
   m[0] = side[0];
-  m[4] = side[1];
-  m[8] = side[2];
-  m[1] = up[0];
+  m[1] = side[1];
+  m[2] = side[2];
+  m[4] = up[0];
   m[5] = up[1];
-  m[9] = up[2];
-  m[2] = -forward[0];
-  m[6] = -forward[1];
+  m[6] = up[2];
+  m[8] = -forward[0];
+  m[9] = -forward[1];
   m[10] = -forward[2];
   gl4duMultMatrixd(m);
   gl4duTranslated(-eyeX, -eyeY, -eyeZ);
