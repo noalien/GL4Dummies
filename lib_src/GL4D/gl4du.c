@@ -964,16 +964,14 @@ void gl4duSendMatrices(void) {
   btForAll(_gl4duMatrices, sendMatrix, (void **)&pId);
 }
 
-/*!\brief Création d'une matrice de projection selon l'ancienne
- * fonction glFrustum et la stocke dans la matrice en cours.
+/*!\brief Création d'une matrice de projection perspective selon
+ * l'ancienne fonction glFrustum et la multiplie dans la matrice en
+ * cours.
  *
  * La matrice en cours doit être de type GLfloat sinon utiliser \a
  * gl4duFrustumd si le type est GLdouble.
  *
  * \see gl4duFrustumd
- *
- * \todo créer le modèle de gestion de matrices en cours avec piles de matrices
- * \todo rajouter gl4duOrthof et gl4duLookAtf
  */
 void gl4duFrustumf(GLfloat  l, GLfloat  r, GLfloat  b, GLfloat  t, GLfloat  n, GLfloat  f) {
   GLfloat frustum[16];
@@ -981,21 +979,47 @@ void gl4duFrustumf(GLfloat  l, GLfloat  r, GLfloat  b, GLfloat  t, GLfloat  n, G
   gl4duMultMatrixf(frustum);
 }
 
-/*!\brief Création d'une matrice de projection selon l'ancienne
- * fonction glFrustum et la stocke dans la matrice en cours.
+/*!\brief Création d'une matrice de projection perspective selon
+ * l'ancienne fonction glFrustum et la multiplie dans la matrice en
+ * cours.
  *
  * La matrice en cours doit être de type GLdouble sinon utiliser \a
  * gl4duFrustumf si le type est GLfloat.
  *
  * \see gl4duFrustumf
- *
- * \todo créer le modèle de gestion de matrices en cours avec piles de matrices
- * \todo rajouter gl4duOrthod et gl4duLookAtd
  */
 void gl4duFrustumd(GLdouble l, GLdouble r, GLdouble b, GLdouble t, GLdouble n, GLdouble f) {
   GLdouble frustum[16];
   MFRUSTUM(frustum, l, r, b, t, n, f);
   gl4duMultMatrixd(frustum);
+}
+
+/*!\brief Création d'une matrice de projection orthogonale selon
+ * l'ancienne fonction glOrtho et la multiplie dans la matrice en cours.
+ *
+ * La matrice en cours doit être de type GLfloat sinon utiliser \a
+ * gl4duOrthod si le type est GLdouble.
+ *
+ * \see gl4duOrthod
+ */
+void gl4duOrthof(GLfloat  l, GLfloat  r, GLfloat  b, GLfloat  t, GLfloat  n, GLfloat  f) {
+  GLfloat ortho[16];
+  MORTHO(ortho, l, r, b, t, n, f);
+  gl4duMultMatrixf(ortho);
+}
+
+/*!\brief Création d'une matrice de projection orthogonale selon
+ * l'ancienne fonction glOrtho et la multiplie dans la matrice en cours.
+ *
+ * La matrice en cours doit être de type GLdouble sinon utiliser \a
+ * gl4duOrthof si le type est GLfloat.
+ *
+ * \see gl4duOrthof
+ */
+void gl4duOrthod(GLdouble  l, GLdouble  r, GLdouble  b, GLdouble  t, GLdouble  n, GLdouble  f) {
+  GLdouble ortho[16];
+  MORTHO(ortho, l, r, b, t, n, f);
+  gl4duMultMatrixd(ortho);
 }
 
 /*!\brief Chargement d'une matrice identité dans la matrice en cours.

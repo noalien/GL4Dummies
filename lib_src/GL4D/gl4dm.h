@@ -81,8 +81,9 @@
     (r)[15] = (a)[12] * (b)[3] + (a)[13] * (b)[7] + (a)[14] * (b)[11] + (a)[15] * (b)[15]; \
   } while(0)
 
-/*!\brief Multiplication d'une deux matrices 4x4. Les matrices \a a et \a
- * b sont multipliées et le résultat est stocké dans \a r. */
+/*!\brief Multiplication d'une matrices 4x4 par un vecteur. La matrice
+ * \a m et le vecteur \a v sont multipliés et le résultat est stocké
+ * dans le vecteur \a r. */
 #define MMAT4XVEC4(r, m, v) do {					\
     (r)[0]  = (m)[0]  * (v)[0] + (m)[1]  * (v)[1] + (m)[2]  * (v)[2]  + (m)[3]  * (v)[3]; \
     (r)[1]  = (m)[4]  * (v)[0] + (m)[5]  * (v)[1] + (m)[6]  * (v)[2]  + (m)[7]  * (v)[3]; \
@@ -262,10 +263,8 @@
     }									\
   } while(0)
 
-/*!\brief Création d'une matrice de projection selon l'ancienne
- * fonction glFrustum.
- *
- * \todo rajouter la ORTHO, l'équivalent de gluLookAt
+/*!\brief Création d'une matrice de projection en perspective selon
+ * l'ancienne fonction glFrustum.
  */
 #define MFRUSTUM(mat, l, r, b, t, n, f) do {		\
     (mat)[0]  = 2.0 * (n) / ((r) - (l));		\
@@ -284,6 +283,28 @@
     (mat)[13] = 0.0;					\
     (mat)[14] = -1.0;					\
     (mat)[15] = 0.0;					\
+  } while(0)
+
+/*!\brief Création d'une matrice de projection orthogonale selon
+ * l'ancienne fonction glOrtho.
+ */
+#define MORTHO(mat, l, r, b, t, n, f) do {		\
+    (mat)[0]  = 2.0 / ((r) - (l));		        \
+    (mat)[1]  = 0.0;					\
+    (mat)[2]  = 0.0;					\
+    (mat)[3]  = -((r) + (l)) / ((r) - (l));		\
+    (mat)[4]  = 0.0;					\
+    (mat)[5]  = 2.0 / ((t) - (b));		        \
+    (mat)[6]  = 0.0;					\
+    (mat)[7]  = -((t) + (b)) / ((t) - (b));		\
+    (mat)[8]  = 0.0;					\
+    (mat)[9]  = 0.0;					\
+    (mat)[10] = -2.0 / ((f) - (n));		        \
+    (mat)[11] = -((f) + (n)) / ((f) - (n));		\
+    (mat)[12] = 0.0;					\
+    (mat)[13] = 0.0;					\
+    (mat)[14] = 0.0;					\
+    (mat)[15] = 1.0;					\
   } while(0)
 
 /*!\brief Chargement d'une matrice identitéé dans \a m. */
