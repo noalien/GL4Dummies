@@ -155,12 +155,16 @@ static void findPathOfMe(const char * argv0) {
 
 /*!\brief Initialise la bibliothèque.
  *
- * récupère le chemin relatif à partir duquel le binaire a été exécuté
+ * Récupère le chemin relatif à partir duquel le binaire a été exécuté
  * et le stocke dans \a _pathOfMe.
+ *
+ * Initialise gl4dg via \ref gl4dgInit
+ *
  * \see _pathOfMe
  */
 void gl4duInit(int argc, char ** argv) {
   findPathOfMe(argc > 0 ? argv[0] : "");
+  gl4dgInit();
 }
 
 /*!\brief Ajoute \a _pathOfMe au chemin \a filename passé en argument
@@ -433,6 +437,8 @@ void gl4duClean(GL4DUenum what) {
   }
   if(what & GL4DU_MATRICES)
     btFree(&_gl4duMatrices, freeGL4DUMatrix);
+  if(what & GL4DU_GEOMETRY)
+    gl4dgClean();
 }
 
 /*!\brief supprime programs et/ou shaders non liés.

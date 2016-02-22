@@ -11,6 +11,7 @@
 
 #include "gl4dummies.h"
 #include "gl4dm.h"
+#include "gl4dg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,6 +32,7 @@ extern "C" {
 	GL4DU_SHADER          = ((unsigned long long)1) << 32,
     GL4DU_PROGRAM         = ((unsigned long long)1) << 33,
     GL4DU_MATRICES        = ((unsigned long long)1) << 34,
+    GL4DU_GEOMETRY        = ((unsigned long long)1) << 35,
     GL4DU_ALL             = (unsigned long long)0xffffffffffffffffLL
 #endif
   };
