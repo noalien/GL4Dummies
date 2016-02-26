@@ -15,11 +15,13 @@
 
 typedef struct geom_t geom_t;
 typedef struct gsphere_t gsphere_t;
+typedef struct gquad_t gquad_t;
 typedef enum geom_e geom_e;
 
 enum geom_e {
   GE_NONE = 0,
   GE_SPHERE,
+  GE_QUAD,
   GE_CUBE,
   GE_CYLINDER,
   GE_TORUS,
@@ -35,6 +37,10 @@ struct geom_t {
 struct gsphere_t {
   GLuint buffers[2];
   GLuint slices, stacks;
+};
+
+struct gquad_t {
+  GLuint buffer;
 };
 
 static geom_t * _garray = NULL;
@@ -62,10 +68,14 @@ void gl4dgInit(void) {
 
 void gl4dgClean(void) {
   if(_glist) {
-    llFree(_glist, freeGeom);
+    llFree(_glist, NULL);
     _glist = NULL;
   }
   if(_garray) {
+    int i;
+    for(i = 0; i < _garray_size; i++)
+      if(_garray[i].vao || _garray[i].geom)
+	freeGeom(&_garray[i]);
     free(_garray);
     _garray = NULL;
   }
@@ -101,6 +111,42 @@ GLuint gl4dgGenSpheref(GLuint slices, GLuint stacks) {
   free(index);
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  return ++i;
+}
+
+GLuint gl4dgGenQuadf(void) {
+  GLfloat data[] = {
+    /* 4 coordonnées de sommets */
+    -1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f,
+    -1.0f,  1.0f, 0.0f, 1.0f,  1.0f, 0.0f,
+    /* 4 normales */
+    0.0f, 0.0f, 1.0f,
+    0.0f, 0.0f, 1.0f,
+    0.0f, 0.0f, 1.0f,
+    0.0f, 0.0f, 1.0f,
+    /* 2 coordonnées de texture par sommet */
+    0.0f, 0.0f, 1.0f, 0.0f, 
+    0.0f, 1.0f, 1.0f, 1.0f
+  };
+  GLuint i = genId();
+  gquad_t * q = malloc(sizeof *q);
+  assert(q);
+  _garray[i].geom = q;
+  _garray[i].type = GE_QUAD;
+  glGenVertexArrays(1, &_garray[i].vao);
+  glBindVertexArray(_garray[i].vao);
+  glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(1);
+  glEnableVertexAttribArray(2);
+  glGenBuffers(1, &(q->buffer));
+  glBindBuffer(GL_ARRAY_BUFFER, q->buffer);
+  glBufferData(GL_ARRAY_BUFFER, sizeof data, data, GL_STATIC_DRAW);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);  
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const void *)((4 * 3) * sizeof *data));  
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (const void *)((8 * 3) * sizeof *data));  
+  glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
   return ++i;
 }
 
@@ -111,6 +157,11 @@ void gl4dgDraw(GLuint id) {
     glDrawElements(GL_TRIANGLES, 6 * ((gsphere_t *)(_garray[id].geom))->slices * ((gsphere_t *)(_garray[id].geom))->stacks, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
     break;
+  case GE_QUAD:
+    glBindVertexArray(_garray[id].vao);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+    break;
   default:
     break;
   }
@@ -118,10 +169,9 @@ void gl4dgDraw(GLuint id) {
 
 void gl4dgDelete(GLuint id) {
   --id;
-  _garray[id].id   = id;
+  freeGeom(&_garray[id]);
   _garray[id].vao  = 0;
   _garray[id].type = 0;
-  freeGeom(&_garray[id]);
   llPush(_glist, &_garray[id]);
 }
 
@@ -131,6 +181,10 @@ static void freeGeom(void * data) {
   case GE_SPHERE:
     glDeleteVertexArrays(1, &(geom->vao));
     glDeleteBuffers(2, ((gsphere_t *)(geom->geom))->buffers);
+    break;
+  case GE_QUAD:
+    glDeleteVertexArrays(1, &(geom->vao));
+    glDeleteBuffers(1, &(((gquad_t *)(geom->geom))->buffer));
     break;
   default:
     break;

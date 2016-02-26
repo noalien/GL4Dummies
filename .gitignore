@@ -20,7 +20,6 @@
 /Windows/*.sdf
 /Windows/*.user
 
-bin
 x64
 Makefile
 CMakeFiles
