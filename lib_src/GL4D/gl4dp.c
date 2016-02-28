@@ -56,6 +56,31 @@ void gl4dpSetColor(Uint32 color) {
  * \return l'identifiant (OpenGL) de la texture générée.
  */
 GLuint gl4dpInitScreenWithDimensions(GLuint w, GLuint h) {
+  const char * imvs = 
+    "<imvs>gl4dp_basic_with_transforms.vs</imvs>\
+     #version 330\n					\
+     layout (location = 0) in vec3 vsiPosition;\n	\
+     layout (location = 1) in vec3 vsiNormal;\n		\
+     layout (location = 2) in vec2 vsiTexCoord;\n	\
+     uniform float rotation;\n				\
+     uniform vec2 scale, translate, ptranslate;\n\
+     out vec2 vsoTexCoord;\n			\
+     void main(void) {\n						\
+       mat2 r = mat2(cos(rotation), sin(rotation), -sin(rotation), cos(rotation));\n \
+       vec2 v;\n							\
+       v = r * (vsiPosition.xy - ptranslate) + ptranslate;\n		\
+       gl_Position = vec4(v, 0.0, 1.0);\n				\
+       vsoTexCoord = (vsiTexCoord / scale) - sign(scale) * translate;\n	\
+     }\n";
+  const char * imfs =
+    "<imfs>gl4dp_basic.fs</imfs>\n\
+     #version 330\n				  \
+     uniform sampler2D myTexture;\n		  \
+     in  vec2 vsoTexCoord;\n			  \
+     out vec4 fragColor;\n						\
+     void main(void) {\n						\
+       fragColor = texture(myTexture, vec2(vsoTexCoord.x, vsoTexCoord.y));\n \
+     }";
   assert(w * h);
   addScreen(w, h);
   glBindTexture(GL_TEXTURE_2D, (*_cur_screen)->tId);
@@ -65,7 +90,7 @@ GLuint gl4dpInitScreenWithDimensions(GLuint w, GLuint h) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
   if(_pId == 0) {
     _quadId = gl4dgGenQuadf();
-    _pId = gl4duCreateProgram("<vs>../share/GL4Dummies/shaders/gl4dp_basic_with_transforms.vs", "<fs>../share/GL4Dummies/shaders/gl4dp_basic.fs", NULL);
+    _pId = gl4duCreateProgram(imvs, imfs, NULL);
   }
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
   return (*_cur_screen)->tId;

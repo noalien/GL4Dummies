@@ -14,6 +14,7 @@
  */
 
 #include "gl4du.h"
+#include "gl4dh.h"
 #include "bin_tree.h"
 #include <sys/stat.h>
 #include <stdlib.h>
@@ -35,6 +36,7 @@ struct shader_t {
   GLenum shadertype;
   char * filename;
   time_t mod_time;
+  GLboolean verify_timestamp;
   unsigned todelete:1;
   int nprograms, sprograms;
   program_t ** programs;
@@ -78,7 +80,7 @@ static bin_tree_t ** _gl4dLastMatrixn = NULL;
 
 static shader_t **  findfnInShadersList(const char * filename);
 static shader_t **  findidInShadersList(GLuint id);
-static shader_t **  addInShadersList(GLenum shadertype, const char * filename);
+static shader_t **  addInShadersList(GLenum shadertype, const char * filename, const char * shadercode);
 static shader_t **  addInShadersListFED(const char * decData, GLenum shadertype, const char * filename);
 static void         deleteFromShadersList(shader_t ** shp);
 static program_t ** findInProgramsList(GLuint id);
@@ -247,11 +249,28 @@ GLuint gl4duCreateShader(GLenum shadertype, const char * filename) {
   // la ligne précédente fait ça snprintf(temp, sizeof temp, "%s/%s", _pathOfMe, filename);
   sh = findfnInShadersList(temp);
   if(*sh) return (*sh)->id;
-  sh = addInShadersList(shadertype, filename);
+  sh = addInShadersList(shadertype, filename, NULL);
   if(!sh) {
     fprintf(stderr, "trying with another path (%s)\n", temp);
-    sh = addInShadersList(shadertype, temp);
+    sh = addInShadersList(shadertype, temp, NULL);
   }
+  return (sh) ? (*sh)->id : 0;
+}
+
+/*!\brief retourne l'identifiant du shader dont le code source est \a
+ * shadercode et le nom de fichier est \a filename ; le nom de fichier
+ * est fictif et sert seulement d'identifiant.
+ *
+ * Soit le shader existe déjà et l'identifiant est juste retourné avec
+ * \ref findfnInShadersList, soit il est créer en utilisant \ref
+ * gl4duCreateShader, glShaderSource et glCompileShader. 
+ *
+ * \return l'identifiant du shader correspondant au code source \a shadercode.
+ */
+GLuint gl4duCreateShaderIM(GLenum shadertype, const char * filename, const char * shadercode) {
+  shader_t ** sh = findfnInShadersList(filename);
+  if(*sh) return (*sh)->id;
+  sh = addInShadersList(shadertype, filename, shadercode);
   return (sh) ? (*sh)->id : 0;
 }
 
@@ -309,6 +328,7 @@ GLuint gl4duCreateProgram(const char * firstone, ...) {
   const char * filename;
   program_t ** prg;
   GLuint sId, pId = glCreateProgram();
+  char fn[BUFSIZ], format[BUFSIZ];
   if(!pId) return pId;
   prg = addInProgramsList(pId);
 
@@ -317,19 +337,52 @@ GLuint gl4duCreateProgram(const char * firstone, ...) {
   fprintf(stderr, "%s (%d): Creation du programme %d a l'aide des Shaders :\n", __FILE__, __LINE__, pId);
   do {
     if(!strncmp("<vs>", filename, 4)) { /* vertex shader */
+      fprintf(stderr, "%s : vertex shader\n", &filename[4]);
       if(!(sId = gl4duCreateShader(GL_VERTEX_SHADER, &filename[4]))) goto gl4duCreateProgram_ERROR;
       attachShader(*prg, *findidInShadersList(sId));
-      fprintf(stderr, "\t\t%s : vertex shader\n", &filename[4]);
+    } else if(!strncmp("<imvs>", filename, 6)) { /* in memory vertex shader */
+      fn[0] = 0;
+      snprintf(format, sizeof format, "<imvs>%%%d[^\t\n<>$!:;,=\"|]</imvs>", BUFSIZ - 1);
+      if(sscanf(filename, format, fn) != 1 || strncmp("</imvs>", &filename[6 + strlen(fn)], 7)) {
+	fprintf(stderr, "%s (%d): %s: erreur lors du parsing de %s\n",
+		__FILE__, __LINE__, __func__, filename);
+	continue;
+      }
+      fprintf(stderr, "%s : vertex shader\n", fn);
+      if(!(sId = gl4duCreateShaderIM(GL_VERTEX_SHADER, fn, &filename[13 + strlen(fn)]))) goto gl4duCreateProgram_ERROR;
+      attachShader(*prg, *findidInShadersList(sId));
     } else if(!strncmp("<fs>", filename, 4)) { /* fragment shader */
+      fprintf(stderr, "%s : fragment shader\n", &filename[4]);
       if(!(sId = gl4duCreateShader(GL_FRAGMENT_SHADER, &filename[4]))) goto gl4duCreateProgram_ERROR;
       attachShader(*prg, *findidInShadersList(sId));
-      fprintf(stderr, "\t\t%s : fragment shader\n", &filename[4]);
+    } else if(!strncmp("<imfs>", filename, 6)) { /* in memory fragment shader */
+      fn[0] = 0;
+      snprintf(format, sizeof format, "<imfs>%%%d[^\t\n<>$!:;,=\"|]</imfs>", BUFSIZ - 1);
+      if(sscanf(filename, format, fn) != 1 || strncmp("</imfs>", &filename[6 + strlen(fn)], 7)) {
+	fprintf(stderr, "%s (%d): %s: erreur lors du parsing de %s\n",
+		__FILE__, __LINE__, __func__, filename);
+	continue;
+      }
+      fprintf(stderr, "%s : fragment shader\n", fn);
+      if(!(sId = gl4duCreateShaderIM(GL_FRAGMENT_SHADER, fn, &filename[13 + strlen(fn)]))) goto gl4duCreateProgram_ERROR;
+      attachShader(*prg, *findidInShadersList(sId));
     }
 #ifndef __ANDROID__
     else if(!strncmp("<gs>", filename, 4)) { /* geometry shader */
+      fprintf(stderr, "%s : geometry shader\n", &filename[4]);
       if(!(sId = gl4duCreateShader(GL_GEOMETRY_SHADER, &filename[4]))) goto gl4duCreateProgram_ERROR;
       attachShader(*prg, *findidInShadersList(sId));
-      fprintf(stderr, "\t\t%s : geometry shader\n", &filename[4]);
+    } else if(!strncmp("<imgs>", filename, 6)) { /* in memory geometry shader */
+      fn[0] = 0;
+      snprintf(format, sizeof format, "<imgs>%%%d[^\t\n<>$!:;,=\"|]</imgs>", BUFSIZ - 1);
+      if(sscanf(filename, format, fn) != 1 || strncmp("</imgs>", &filename[6 + strlen(fn)], 7)) {
+	fprintf(stderr, "%s (%d): %s: erreur lors du parsing de %s\n",
+		__FILE__, __LINE__, __func__, filename);
+	continue;
+      }
+      fprintf(stderr, "%s : geometry shader\n", fn);
+      if(!(sId = gl4duCreateShaderIM(GL_GEOMETRY_SHADER, fn, &filename[13 + strlen(fn)]))) goto gl4duCreateProgram_ERROR;
+      attachShader(*prg, *findidInShadersList(sId));
     }
 #endif
     else { /* ??? shader */
@@ -384,19 +437,19 @@ GLuint gl4duCreateProgramFED(const char * encData, const char * firstone, ...) {
   fprintf(stderr, "%s (%d): Creation du programme %d a l'aide des Shaders :\n", __FILE__, __LINE__, pId);
   do {
     if(!strncmp("<vs>", filename, 4)) { /* vertex shader */
+      fprintf(stderr, "%s : vertex shader\n", &filename[4]);
       if(!(sId = gl4duCreateShaderFED(decData, GL_VERTEX_SHADER, &filename[4]))) goto gl4duCreateProgram_ERROR;
       attachShader(*prg, *findidInShadersList(sId));
-      fprintf(stderr, "\t\t%s : vertex shader\n", &filename[4]);
     } else if(!strncmp("<fs>", filename, 4)) { /* fragment shader */
+      fprintf(stderr, "%s : fragment shader\n", &filename[4]);
       if(!(sId = gl4duCreateShaderFED(decData, GL_FRAGMENT_SHADER, &filename[4]))) goto gl4duCreateProgram_ERROR;
       attachShader(*prg, *findidInShadersList(sId));
-      fprintf(stderr, "\t\t%s : fragment shader\n", &filename[4]);
     }
 #ifndef __ANDROID__
     else if(!strncmp("<gs>", filename, 4)) { /* geometry shader */
+      fprintf(stderr, "%s : geometry shader\n", &filename[4]);
       if(!(sId = gl4duCreateShaderFED(decData, GL_GEOMETRY_SHADER, &filename[4]))) goto gl4duCreateProgram_ERROR;
       attachShader(*prg, *findidInShadersList(sId));
-      fprintf(stderr, "\t\t%s : geometry shader\n", &filename[4]);
     }
 #endif
     else { /* ??? shader */
@@ -439,6 +492,8 @@ void gl4duClean(GL4DUenum what) {
     btFree(&_gl4duMatrices, freeGL4DUMatrix);
   if(what & GL4DU_GEOMETRY)
     gl4dgClean();
+  if(what & GL4DU_DEMO_HELPER)
+    gl4dhClean();
 }
 
 /*!\brief supprime programs et/ou shaders non liés.
@@ -487,6 +542,10 @@ int gl4duUpdateShaders(void) {
   return 0;
 #endif
   while(*ptr) {
+    if(!(*ptr)->verify_timestamp) {
+      ptr = &((*ptr)->next);
+      continue;
+    }
     if(stat((*ptr)->filename, &buf) != 0) {
       fprintf(stderr, "%s:%d:In %s: erreur %d: %s\n",
 	      __FILE__, __LINE__, __func__, errno, strerror(errno));
@@ -502,7 +561,7 @@ int gl4duUpdateShaders(void) {
 	ot = (*ptr)->shadertype;
 	fn = strdup((*ptr)->filename);
 	deleteFromShadersList(ptr);
-	ptr = addInShadersList(ot, fn);
+	ptr = addInShadersList(ot, fn, NULL);
 	for(i = 0; i < n; i++) {
 	  attachShader(p[i], *ptr);
 	  glLinkProgram(p[i]->id);
@@ -513,7 +572,7 @@ int gl4duUpdateShaders(void) {
 	ot = (*ptr)->shadertype;
 	fn = strdup((*ptr)->filename);
 	deleteFromShadersList(ptr);
-	ptr = addInShadersList(ot, fn);
+	ptr = addInShadersList(ot, fn, NULL);
       }
       maj = 1;
     } else
@@ -563,11 +622,14 @@ static shader_t ** findidInShadersList(GLuint id) {
 
 /*!\brief ajoute un nouveau shader dans la liste de shaders \ref shaders_list.
  *
+ * \param shadertype type de shader (vertex, fragment et geometry)
+ * \param filename nom du fichier shader
+ * \param shadercode source du shader, si NULL sera récupéré depuis \a filename
  * \return l'adresse du shader ajouté sinon NULL.
  */
-static shader_t ** addInShadersList(GLenum shadertype, const char * filename) {
+static shader_t ** addInShadersList(GLenum shadertype, const char * filename, const char * shadercode) {
   GLuint id;
-  char * txt;
+  char * txt = NULL;
   struct stat buf;
   shader_t * ptr;
   if(!(id = glCreateShader(shadertype))) {
@@ -575,23 +637,27 @@ static shader_t ** addInShadersList(GLenum shadertype, const char * filename) {
 	    __FILE__, __LINE__, __func__);
     return NULL;
   }
-  if(!(txt = gl4dReadTextFile(filename))) {
-    glDeleteShader(id);
-    return NULL;
-  }
-  if(stat(filename, &buf) != 0) {
-    fprintf(stderr, "%s:%d:In %s: erreur %d: %s\n",
-	    __FILE__, __LINE__, __func__, errno, strerror(errno));
-    glDeleteShader(id);
-    return NULL;
-  }
+  if(shadercode == NULL) {
+    if(!(txt = gl4dReadTextFile(filename))) {
+      glDeleteShader(id);
+      return NULL;
+    }
+    if(stat(filename, &buf) != 0) {
+      fprintf(stderr, "%s:%d:In %s: erreur %d: %s\n",
+	      __FILE__, __LINE__, __func__, errno, strerror(errno));
+      glDeleteShader(id);
+      return NULL;
+    }
+  } else
+    txt = (char *)shadercode;
   ptr = shaders_list;
   shaders_list = malloc(sizeof * shaders_list);
   assert(shaders_list);
   shaders_list->id         = id;
   shaders_list->shadertype = shadertype;
   shaders_list->filename   = strdup(filename);
-  shaders_list->mod_time   = buf.st_mtime;
+  shaders_list->mod_time   = shadercode ? INT_MAX : buf.st_mtime;
+  shaders_list->verify_timestamp = shadercode ? GL_FALSE : GL_TRUE;
   shaders_list->todelete   = 0;
   shaders_list->nprograms  = 0;
   shaders_list->sprograms  = 2;
@@ -601,7 +667,8 @@ static shader_t ** addInShadersList(GLenum shadertype, const char * filename) {
   glShaderSource(id, 1, (const char **)&txt, NULL);
   glCompileShader(id);
   gl4duPrintShaderInfoLog(id, stderr);
-  free(txt);
+  if(shadercode == NULL)
+    free(txt);
   return &shaders_list;
 }
 
@@ -630,6 +697,7 @@ static shader_t ** addInShadersListFED(const char * decData, GLenum shadertype, 
   shaders_list->shadertype = shadertype;
   shaders_list->filename   = strdup(filename);
   shaders_list->mod_time   = INT_MAX;
+  shaders_list->verify_timestamp = GL_FALSE;
   shaders_list->todelete   = 0;
   shaders_list->nprograms  = 0;
   shaders_list->sprograms  = 2;

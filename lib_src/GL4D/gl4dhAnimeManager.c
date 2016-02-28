@@ -65,7 +65,10 @@ void gl4dhInit(GL4DHanime * animations, int w, int h, void (*callBeforeAllAnimat
 /*!\brief demande l'état libération à tous les éléments du tableau d'animations.
  */
 void gl4dhClean(void) {
-  callAllWithState(_animations, GL4DH_FREE);
+  if(_animations) {
+    callAllWithState(_animations, GL4DH_FREE);
+    _animations = NULL;
+  }
   if(_wTexId) {
     glDeleteTextures(1, &_wTexId);
     _wTexId = 0;

@@ -24,15 +24,18 @@ extern "C" {
     GL4DU_MATRIX          = 1024, /* les data de la matrice */
     GL4DU_MATRIX_TYPE     = 1025,
 #if defined(_MSC_VER) /* ENUM n'est que 32bits sous MSC !!! */
-	GL4DU_SHADER          = 1 << 29,
-    GL4DU_PROGRAM         = 1 << 30,
-    GL4DU_MATRICES        = 1 << 31,
+    GL4DU_SHADER          = 1 << 20,
+    GL4DU_PROGRAM         = 1 << 21,
+    GL4DU_MATRICES        = 1 << 22,
+    GL4DU_GEOMETRY        = 1 << 23,
+    GL4DU_DEMO_HELPER     = 1 << 24,
     GL4DU_ALL             = 0xffffffff
 #else
-	GL4DU_SHADER          = ((unsigned long long)1) << 32,
+    GL4DU_SHADER          = ((unsigned long long)1) << 32,
     GL4DU_PROGRAM         = ((unsigned long long)1) << 33,
     GL4DU_MATRICES        = ((unsigned long long)1) << 34,
     GL4DU_GEOMETRY        = ((unsigned long long)1) << 35,
+    GL4DU_DEMO_HELPER     = ((unsigned long long)1) << 36,
     GL4DU_ALL             = (unsigned long long)0xffffffffffffffffLL
 #endif
   };
@@ -44,6 +47,7 @@ extern "C" {
   GL4DAPI void      GL4DAPIENTRY gl4duPrintProgramInfoLog(GLuint object, FILE * f);
   GL4DAPI void      GL4DAPIENTRY gl4duPrintFPS(FILE * fp);
   GL4DAPI GLuint    GL4DAPIENTRY gl4duCreateShader(GLenum shadertype, const char * filename);
+  GL4DAPI GLuint    GL4DAPIENTRY gl4duCreateShaderIM(GLenum shadertype, const char * filename, const char * shadercode);
   GL4DAPI GLuint    GL4DAPIENTRY gl4duCreateShaderFED(const char * decData, GLenum shadertype, const char * filename);
   GL4DAPI GLuint    GL4DAPIENTRY gl4duFindShader(const char * filename);
   GL4DAPI void      GL4DAPIENTRY gl4duDeleteShader(GLuint id);
