@@ -53,7 +53,7 @@ AM_PATH_SDL2($SDL_VERSION, :,
            AC_MSG_ERROR([*** SDL version $SDL_VERSION not found!])
 )
 
-CFLAGS="-Wall -03"
+CFLAGS="-Wall -O3"
 LDFLAGS="-lm"
 
 echo "	***	Configuring for ... $host	***"
