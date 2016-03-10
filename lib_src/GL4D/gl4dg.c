@@ -10,18 +10,21 @@
 
 #include "linked_list.h"
 #include "gl4dg.h"
+#include "gl4dm.h"
 #include <stdlib.h>
 #include <assert.h>
 
 typedef struct geom_t geom_t;
 typedef struct gsphere_t gsphere_t;
 typedef struct gquad_t gquad_t;
+typedef struct gcone_t gcone_t;
 typedef enum geom_e geom_e;
 
 enum geom_e {
   GE_NONE = 0,
   GE_SPHERE,
   GE_QUAD,
+  GE_CONE,
   GE_CUBE,
   GE_CYLINDER,
   GE_TORUS,
@@ -43,6 +46,12 @@ struct gquad_t {
   GLuint buffer;
 };
 
+struct gcone_t {
+  GLuint buffers[2];
+  GLuint slices;
+  GLboolean base;
+};
+
 static geom_t * _garray = NULL;
 static GLint _garray_size = 256;
 static linked_list_t * _glist = NULL;
@@ -52,6 +61,7 @@ static void      freeGeom(void * data);
 static GLuint    genId(void);
 static GLfloat * mkSphereVerticesf(GLuint longitudes, GLuint latitudes);
 static GLuint  * mkSphereIndex(GLuint longitudes, GLuint latitudes);
+static GLfloat * mkConeVerticesf(GLuint longitudes, GLboolean base);
 
 void gl4dgInit(void) {
   int i;
@@ -150,6 +160,32 @@ GLuint gl4dgGenQuadf(void) {
   return ++i;
 }
 
+GLuint gl4dgGenConef(GLuint slices, GLboolean base) {
+  GLfloat * data = NULL;
+  GLuint i = genId();
+  gcone_t * c = malloc(sizeof *c);
+  assert(c);
+  _garray[i].geom = c;
+  _garray[i].type = GE_CONE;
+  c->slices = slices; c->base = base;
+  data = mkConeVerticesf(slices, base);
+  glGenVertexArrays(1, &_garray[i].vao);
+  glBindVertexArray(_garray[i].vao);
+  glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(1);
+  glEnableVertexAttribArray(2);
+  glGenBuffers(2, c->buffers);
+  glBindBuffer(GL_ARRAY_BUFFER, c->buffers[0]);
+  glBufferData(GL_ARRAY_BUFFER, 8 * (slices + 1 + /* le sommet ou le centre de la base */ 1) * sizeof *data, data, GL_STATIC_DRAW);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)0);  
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(3 * sizeof *data));  
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(6 * sizeof *data));  
+  free(data);
+  glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  return ++i;
+}
+
 void gl4dgDraw(GLuint id) {
   switch(_garray[--id].type) {
   case GE_SPHERE:
@@ -160,6 +196,11 @@ void gl4dgDraw(GLuint id) {
   case GE_QUAD:
     glBindVertexArray(_garray[id].vao);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+    break;
+  case GE_CONE:
+    glBindVertexArray(_garray[id].vao);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, ((gcone_t *)(_garray[id].geom))->slices + 2);
     glBindVertexArray(0);
     break;
   default:
@@ -185,6 +226,10 @@ static void freeGeom(void * data) {
   case GE_QUAD:
     glDeleteVertexArrays(1, &(geom->vao));
     glDeleteBuffers(1, &(((gquad_t *)(geom->geom))->buffer));
+    break;
+  case GE_CONE:
+    glDeleteVertexArrays(1, &(geom->vao));
+    glDeleteBuffers(2, ((gcone_t *)(geom->geom))->buffers);
     break;
   default:
     break;
@@ -254,4 +299,41 @@ static GLuint * mkSphereIndex(GLuint longitudes, GLuint latitudes) {
     }
   }
   return index;
+}
+
+
+static GLfloat * mkConeVerticesf(GLuint longitudes, GLboolean base) {
+  int j, k = 0;
+  GLdouble phi, y = -1.0;
+  GLfloat * data;
+  GLdouble c2MPI_Long = 2.0 * M_PI / longitudes;
+  const GLdouble _1pi_4 = M_PI / 4.0, _3pi_4 = 3.0 * M_PI / 4.0, _5pi_4 = 5.0 * M_PI / 4.0, _7pi_4 = 7.0 * M_PI / 4.0;
+  data = malloc(8 * (longitudes + 2) * sizeof *data);
+  assert(data);
+  data[k++] = 0; data[k++] = 1; data[k++] = 0;
+  data[k++] = 0; data[k++] = 1; data[k++] = 0;
+  data[k++] = 0.5; data[k++] = 0.5; 
+  for(j = 0; j <= longitudes; j++) {
+    phi = j * c2MPI_Long;
+    data[k++] = cos(phi); 
+    data[k++] = y; 
+    data[k++] = -sin(phi);
+    data[k] = 2.0f * data[k - 3] / sqrt(5.0); k++;
+    data[k++] = 1.0f / sqrt(5.0); 
+    data[k] = 2.0f * data[k - 3] / sqrt(5.0); k++;
+    if(phi < _1pi_4 || phi > _7pi_4) {
+      data[k++] = 1.0;
+      data[k++] = 0.5 + tan(phi) / 2.0;
+    } else if(phi < _3pi_4) {
+      data[k++] = 0.5 - tan(phi - GL4DM_PI_2) / 2.0;
+      data[k++] = 1.0;
+    } else if(phi < _5pi_4) {
+      data[k++] = 0.0;
+      data[k++] = 0.5 - tan(phi) / 2.0;
+    } else {
+      data[k++] = 0.5 + tan(phi - GL4DM_PI_2) / 2.0;
+      data[k++] = 0.0;
+    }
+  }
+  return data;
 }
