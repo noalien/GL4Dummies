@@ -17,6 +17,7 @@ extern "C" {
   
   GL4DAPI void      GL4DAPIENTRY gl4dgInit(void);
   GL4DAPI void      GL4DAPIENTRY gl4dgClean(void);
+  GL4DAPI GLuint    GL4DAPIENTRY gl4dgGetVAO(GLuint id);
   GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenSpheref(GLuint slices, GLuint stacks);
   GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenQuadf(void);
   GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenConef(GLuint slices, GLboolean base);

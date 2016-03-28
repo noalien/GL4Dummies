@@ -93,6 +93,10 @@ void gl4dgClean(void) {
   _hasInit = 0;
 }
 
+GLuint gl4dgGetVAO(GLuint id) {
+  return _garray[--id].vao;
+}
+
 GLuint gl4dgGenSpheref(GLuint slices, GLuint stacks) {
   GLfloat * idata = NULL;
   GLuint * index = NULL;
