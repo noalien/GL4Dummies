@@ -96,6 +96,10 @@
 #endif
 
 #ifdef __ANDROID__
+#define __GL4D_ES2__
+#endif
+
+#ifdef __ANDROID__
 #include <android/log.h>
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
@@ -111,6 +115,14 @@ typedef double GLdouble;
 
 #if defined(_WIN32)
 #include "gl4wdummies.h"
+#endif
+
+#ifdef __GL4D_ES2__
+#define GL4D_VAO_INDEX GL_UNSIGNED_SHORT
+typedef GLushort GL4Dvaoindex;
+#else
+#define GL4D_VAO_INDEX GL_UNSIGNED_INT
+typedef GLuint GL4Dvaoindex;
 #endif
 
 #ifdef __cplusplus

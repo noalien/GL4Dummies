@@ -5,7 +5,6 @@
  * \author Fares BELHADJ amsi@ai.univ-paris8.fr
  * \date February 22, 2016
  * \todo commenter
- * \todo gérer GLES 2, SHORT à la place de INT
  */
 
 #include "linked_list.h"
@@ -18,6 +17,7 @@ typedef struct geom_t geom_t;
 typedef struct gsphere_t gsphere_t;
 typedef struct gquad_t gquad_t;
 typedef struct gcone_t gcone_t;
+typedef struct gcylinder_t gcylinder_t;
 typedef enum geom_e geom_e;
 
 enum geom_e {
@@ -25,6 +25,7 @@ enum geom_e {
   GE_SPHERE,
   GE_QUAD,
   GE_CONE,
+  GE_FAN_CONE,
   GE_CUBE,
   GE_CYLINDER,
   GE_TORUS,
@@ -47,7 +48,13 @@ struct gquad_t {
 };
 
 struct gcone_t {
-  GLuint buffers[2];
+  GLuint buffer;
+  GLuint slices;
+  GLboolean base;
+};
+
+struct gcylinder_t {
+  GLuint buffer;
   GLuint slices;
   GLboolean base;
 };
@@ -57,11 +64,13 @@ static GLint _garray_size = 256;
 static linked_list_t * _glist = NULL;
 static int _hasInit = 0;
 
-static void      freeGeom(void * data);
-static GLuint    genId(void);
-static GLfloat * mkSphereVerticesf(GLuint longitudes, GLuint latitudes);
-static GLuint  * mkSphereIndex(GLuint longitudes, GLuint latitudes);
-static GLfloat * mkConeVerticesf(GLuint longitudes, GLboolean base);
+static void            freeGeom(void * data);
+static GLuint          genId(void);
+static GLfloat       * mkSphereVerticesf(GLuint longitudes, GLuint latitudes);
+static GL4Dvaoindex  * mkSphereIndex(GLuint longitudes, GLuint latitudes);
+static GLfloat       * mkConeVerticesf(GLuint longitudes, GLboolean base);
+static GLfloat       * mkFanConeVerticesf(GLuint longitudes, GLboolean base);
+static GLfloat       * mkCylinderVerticesf(GLuint longitudes, GLboolean base);
 
 void gl4dgInit(void) {
   int i;
@@ -99,7 +108,7 @@ GLuint gl4dgGetVAO(GLuint id) {
 
 GLuint gl4dgGenSpheref(GLuint slices, GLuint stacks) {
   GLfloat * idata = NULL;
-  GLuint * index = NULL;
+  GL4Dvaoindex * index = NULL;
   GLuint i = genId();
   gsphere_t * s = malloc(sizeof *s);
   assert(s);
@@ -178,9 +187,61 @@ GLuint gl4dgGenConef(GLuint slices, GLboolean base) {
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
   glEnableVertexAttribArray(2);
-  glGenBuffers(2, c->buffers);
-  glBindBuffer(GL_ARRAY_BUFFER, c->buffers[0]);
-  glBufferData(GL_ARRAY_BUFFER, 8 * (slices + 1 + /* le sommet ou le centre de la base */ 1) * sizeof *data, data, GL_STATIC_DRAW);
+  glGenBuffers(1, &(c->buffer));
+  glBindBuffer(GL_ARRAY_BUFFER, c->buffer);
+  glBufferData(GL_ARRAY_BUFFER, (16 * (slices + 1) + (base ? 8 : 0) * (slices + 2)) * sizeof *data, data, GL_STATIC_DRAW);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)0);  
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(3 * sizeof *data));  
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(6 * sizeof *data));  
+  free(data);
+  glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  return ++i;
+}
+
+GLuint gl4dgGenFanConef(GLuint slices, GLboolean base) {
+  GLfloat * data = NULL;
+  GLuint i = genId();
+  gcone_t * c = malloc(sizeof *c);
+  assert(c);
+  _garray[i].geom = c;
+  _garray[i].type = GE_FAN_CONE;
+  c->slices = slices; c->base = base;
+  data = mkFanConeVerticesf(slices, base);
+  glGenVertexArrays(1, &_garray[i].vao);
+  glBindVertexArray(_garray[i].vao);
+  glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(1);
+  glEnableVertexAttribArray(2);
+  glGenBuffers(1, &(c->buffer));
+  glBindBuffer(GL_ARRAY_BUFFER, c->buffer);
+  glBufferData(GL_ARRAY_BUFFER, (base ? 16 : 8) * (slices + 1 + /* le sommet ou le centre de la base */ 1) * sizeof *data, data, GL_STATIC_DRAW);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)0);  
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(3 * sizeof *data));  
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(6 * sizeof *data));  
+  free(data);
+  glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  return ++i;
+}
+
+GLuint gl4dgGenCylinderf(GLuint slices, GLboolean base) {
+  GLfloat * data = NULL;
+  GLuint i = genId();
+  gcylinder_t * c = malloc(sizeof *c);
+  assert(c);
+  _garray[i].geom = c;
+  _garray[i].type = GE_CYLINDER;
+  c->slices = slices; c->base = base;
+  data = mkCylinderVerticesf(slices, base);
+  glGenVertexArrays(1, &_garray[i].vao);
+  glBindVertexArray(_garray[i].vao);
+  glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(1);
+  glEnableVertexAttribArray(2);
+  glGenBuffers(1, &(c->buffer));
+  glBindBuffer(GL_ARRAY_BUFFER, c->buffer);
+  glBufferData(GL_ARRAY_BUFFER, (16 * (slices + 1) + (base ? 16 : 0) * (slices + 2)) * sizeof *data, data, GL_STATIC_DRAW);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)0);  
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(3 * sizeof *data));  
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(6 * sizeof *data));  
@@ -194,7 +255,7 @@ void gl4dgDraw(GLuint id) {
   switch(_garray[--id].type) {
   case GE_SPHERE:
     glBindVertexArray(_garray[id].vao);
-    glDrawElements(GL_TRIANGLES, 6 * ((gsphere_t *)(_garray[id].geom))->slices * ((gsphere_t *)(_garray[id].geom))->stacks, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 6 * ((gsphere_t *)(_garray[id].geom))->slices * ((gsphere_t *)(_garray[id].geom))->stacks, GL4D_VAO_INDEX, 0);
     glBindVertexArray(0);
     break;
   case GE_QUAD:
@@ -203,8 +264,28 @@ void gl4dgDraw(GLuint id) {
     glBindVertexArray(0);
     break;
   case GE_CONE:
+  case GE_FAN_CONE:
     glBindVertexArray(_garray[id].vao);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, ((gcone_t *)(_garray[id].geom))->slices + 2);
+    if(_garray[id].type == GE_CONE)
+      glDrawArrays(GL_TRIANGLE_STRIP, 0, 2 * (((gcone_t *)(_garray[id].geom))->slices + 1));
+    else
+      glDrawArrays(GL_TRIANGLE_FAN, 0, ((gcone_t *)(_garray[id].geom))->slices + 2);
+    if(((gcone_t *)(_garray[id].geom))->base) {
+      if(_garray[id].type == GE_CONE)
+	glDrawArrays(GL_TRIANGLE_FAN, 2 * (((gcone_t *)(_garray[id].geom))->slices + 1), ((gcone_t *)(_garray[id].geom))->slices + 2);
+      else
+	glDrawArrays(GL_TRIANGLE_FAN, ((gcone_t *)(_garray[id].geom))->slices + 2, ((gcone_t *)(_garray[id].geom))->slices + 2);
+    }
+    glBindVertexArray(0);
+    break;
+  case GE_CYLINDER:
+    glBindVertexArray(_garray[id].vao);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 2 * (((gcylinder_t *)(_garray[id].geom))->slices + 1));
+    if(((gcylinder_t *)(_garray[id].geom))->base) {
+      glDrawArrays(GL_TRIANGLE_FAN, 2 * (((gcylinder_t *)(_garray[id].geom))->slices + 1), ((gcylinder_t *)(_garray[id].geom))->slices + 2);
+      glDrawArrays(GL_TRIANGLE_FAN, 2 * (((gcylinder_t *)(_garray[id].geom))->slices + 1) + ((gcylinder_t *)(_garray[id].geom))->slices + 2, 
+		   ((gcylinder_t *)(_garray[id].geom))->slices + 2);
+    }
     glBindVertexArray(0);
     break;
   default:
@@ -232,8 +313,13 @@ static void freeGeom(void * data) {
     glDeleteBuffers(1, &(((gquad_t *)(geom->geom))->buffer));
     break;
   case GE_CONE:
+  case GE_FAN_CONE:
     glDeleteVertexArrays(1, &(geom->vao));
-    glDeleteBuffers(2, ((gcone_t *)(geom->geom))->buffers);
+    glDeleteBuffers(1, &(((gcone_t *)(geom->geom))->buffer));
+    break;
+  case GE_CYLINDER:
+    glDeleteVertexArrays(1, &(geom->vao));
+    glDeleteBuffers(1, &(((gcylinder_t *)(geom->geom))->buffer));
     break;
   default:
     break;
@@ -284,7 +370,7 @@ static GLfloat * mkSphereVerticesf(GLuint longitudes, GLuint latitudes) {
   return data;
 }
 
-static GLuint * mkSphereIndex(GLuint longitudes, GLuint latitudes) {
+static GL4Dvaoindex * mkSphereIndex(GLuint longitudes, GLuint latitudes) {
   int i, ni, j, nj, k;
   GLuint * index;
   index = malloc(6 * longitudes * latitudes * sizeof *index);
@@ -306,38 +392,125 @@ static GLuint * mkSphereIndex(GLuint longitudes, GLuint latitudes) {
 }
 
 
+static inline void fcvNormals(GLfloat * p, GLfloat y, int i) {
+  p[i] = 2.0f * p[i - 3] / sqrt(5.0);
+  p[i + 1] = 1.0f / sqrt(5.0); 
+  p[i + 2] = 2.0f * p[i - 1] / sqrt(5.0);
+}
+
+static inline void fcvbNormals(GLfloat * p, GLfloat y, int i) {
+  p[i] = 0;
+  p[i + 1] = y; 
+  p[i + 2] = 0;
+}
+
+#define CONE_FAN do {						\
+    data[k++] = 0; data[k++] = b ? y : 1; data[k++] = 0;	\
+    data[k++] = 0; data[k++] =  b ? y : 1; data[k++] = 0;	\
+    data[k++] = 0.5; data[k++] = 0.5;				\
+    for(j = 0; j <= longitudes; j++) {				\
+      phi = j * c2MPI_Long;					\
+      data[k++] = cos(sens * phi);				\
+      data[k++] = y;						\
+      data[k++] = -sin(sens * phi);				\
+      normals(data, y, k); k += 3;				\
+      if(phi < _1pi_4 || phi > _7pi_4) {			\
+	data[k++] = 1.0;					\
+	data[k++] = 0.5 + tan(phi) / 2.0;			\
+      } else if(phi < _3pi_4) {					\
+	data[k++] = 0.5 - tan(phi - GL4DM_PI_2) / 2.0;		\
+	data[k++] = 1.0;					\
+      } else if(phi < _5pi_4) {					\
+	data[k++] = 0.0;					\
+	data[k++] = 0.5 - tan(phi) / 2.0;			\
+      } else {							\
+	data[k++] = 0.5 + tan(phi - GL4DM_PI_2) / 2.0;		\
+	data[k++] = 0.0;					\
+      }								\
+    }								\
+  } while(0)
+
+
 static GLfloat * mkConeVerticesf(GLuint longitudes, GLboolean base) {
-  int j, k = 0;
+  int j, k = 0, b;
   GLdouble phi, y = -1.0;
   GLfloat * data;
-  GLdouble c2MPI_Long = 2.0 * M_PI / longitudes;
+  GLdouble c2MPI_Long = 2.0 * M_PI / longitudes, sens, s;
   const GLdouble _1pi_4 = M_PI / 4.0, _3pi_4 = 3.0 * M_PI / 4.0, _5pi_4 = 5.0 * M_PI / 4.0, _7pi_4 = 7.0 * M_PI / 4.0;
-  data = malloc(8 * (longitudes + 2) * sizeof *data);
+  void (*normals)(GLfloat *, GLfloat, int);
+  data = malloc((16 * (longitudes + 1) + (base ? 8 : 0) * (longitudes + 2)) * sizeof *data);
   assert(data);
-  data[k++] = 0; data[k++] = 1; data[k++] = 0;
-  data[k++] = 0; data[k++] = 1; data[k++] = 0;
-  data[k++] = 0.5; data[k++] = 0.5; 
+  normals = fcvNormals;
+  for(j = 0; j <= longitudes; j++) {
+    data[k++] = 0; data[k++] = 1; data[k++] = 0;
+    data[k++] = 0; data[k++] = 1; data[k++] = 0;
+    data[k++] = (s = j / (GLdouble)longitudes); data[k++] = 1;
+    phi = j * c2MPI_Long;
+    data[k++] = cos(phi); 
+    data[k++] = -1; 
+    data[k++] = -sin(phi);
+    normals(data, 0, k); k += 3;
+    data[k++] = s; data[k++] = 0;
+  }
+  if(base) {
+    sens = -1.0;
+    normals = fcvbNormals;
+    b = 1;
+    CONE_FAN;
+  }
+
+  return data;
+}
+
+static GLfloat * mkFanConeVerticesf(GLuint longitudes, GLboolean base) {
+  int j, k = 0, b;
+  GLdouble phi, y = -1.0;
+  GLfloat * data;
+  GLdouble c2MPI_Long = 2.0 * M_PI / longitudes, sens;
+  const GLdouble _1pi_4 = M_PI / 4.0, _3pi_4 = 3.0 * M_PI / 4.0, _5pi_4 = 5.0 * M_PI / 4.0, _7pi_4 = 7.0 * M_PI / 4.0;
+  void (*normals)(GLfloat *, GLfloat, int);
+  data = malloc((base ? 16 : 8) * (longitudes + 2) * sizeof *data);
+  assert(data);
+  for(b = 0; b < (base ? 2 : 1); b++) {
+    sens = b ? -1.0 : 1.0;
+    normals = b ? fcvbNormals : fcvNormals;
+    CONE_FAN;
+  }
+  return data;
+}
+
+static GLfloat * mkCylinderVerticesf(GLuint longitudes, GLboolean base) {
+  int j, k = 0, b;
+  GLdouble phi, y = -1.0;
+  GLfloat * data;
+  GLdouble c2MPI_Long = 2.0 * M_PI / longitudes, sens, s;
+  const GLdouble _1pi_4 = M_PI / 4.0, _3pi_4 = 3.0 * M_PI / 4.0, _5pi_4 = 5.0 * M_PI / 4.0, _7pi_4 = 7.0 * M_PI / 4.0;
+  void (*normals)(GLfloat *, GLfloat, int);
+  data = malloc((16 * (longitudes + 1) + (base ? 16 : 0) * (longitudes + 2)) * sizeof *data);
+  assert(data);
+  normals = fcvNormals;
   for(j = 0; j <= longitudes; j++) {
     phi = j * c2MPI_Long;
     data[k++] = cos(phi); 
-    data[k++] = y; 
+    data[k++] = 1; 
     data[k++] = -sin(phi);
-    data[k] = 2.0f * data[k - 3] / sqrt(5.0); k++;
-    data[k++] = 1.0f / sqrt(5.0); 
-    data[k] = 2.0f * data[k - 3] / sqrt(5.0); k++;
-    if(phi < _1pi_4 || phi > _7pi_4) {
-      data[k++] = 1.0;
-      data[k++] = 0.5 + tan(phi) / 2.0;
-    } else if(phi < _3pi_4) {
-      data[k++] = 0.5 - tan(phi - GL4DM_PI_2) / 2.0;
-      data[k++] = 1.0;
-    } else if(phi < _5pi_4) {
-      data[k++] = 0.0;
-      data[k++] = 0.5 - tan(phi) / 2.0;
-    } else {
-      data[k++] = 0.5 + tan(phi - GL4DM_PI_2) / 2.0;
-      data[k++] = 0.0;
-    }
+    normals(data, 0, k); k += 3;
+    data[k++] = (s = j / (GLdouble)longitudes); data[k++] = 1;
+    data[k] = data[k - 8]; k++; 
+    data[k++] = -1; 
+    data[k] = data[k - 8]; k++; 
+    normals(data, 0, k); k += 3;
+    data[k++] = s; data[k++] = 0;
+  }
+  if(base) {
+    sens = 1.0;
+    normals = fcvbNormals;
+    b = 1;
+    y = 1;
+    CONE_FAN;
+    sens = -1.0;
+    y = -1;
+    CONE_FAN;
   }
   return data;
 }

@@ -21,6 +21,8 @@ extern "C" {
   GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenSpheref(GLuint slices, GLuint stacks);
   GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenQuadf(void);
   GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenConef(GLuint slices, GLboolean base);
+  GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenFanConef(GLuint slices, GLboolean base);
+  GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenCylinderf(GLuint slices, GLboolean base);
   GL4DAPI void      GL4DAPIENTRY gl4dgDraw(GLuint id);
   GL4DAPI void      GL4DAPIENTRY gl4dgDelete(GLuint id);
   
