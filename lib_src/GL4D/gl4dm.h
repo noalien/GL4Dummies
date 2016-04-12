@@ -53,7 +53,7 @@
 #endif
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
-#define SIGN(i) ((i) > 0 ? 1 : -1)
+#define SIGN(i) ((i) < 0 ? -1 : 1)
 #define SQUARE(X) ((X)*(X))
 #define COTANGENT(X) (cos(X)/sin(X))
 #define RADIAN(X) (GL4DM_PI * (X) / 180)

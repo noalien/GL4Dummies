@@ -18,11 +18,14 @@ extern "C" {
   GL4DAPI void      GL4DAPIENTRY gl4dgInit(void);
   GL4DAPI void      GL4DAPIENTRY gl4dgClean(void);
   GL4DAPI GLuint    GL4DAPIENTRY gl4dgGetVAO(GLuint id);
-  GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenSpheref(GLuint slices, GLuint stacks);
   GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenQuadf(void);
+  GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenCubef(void);
+  GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenSpheref(GLuint slices, GLuint stacks);
   GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenConef(GLuint slices, GLboolean base);
   GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenFanConef(GLuint slices, GLboolean base);
   GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenCylinderf(GLuint slices, GLboolean base);
+  GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenDiskf(GLuint slices);
+  GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenTorusf(GLuint slices, GLuint stacks, GLfloat radius);
   GL4DAPI void      GL4DAPIENTRY gl4dgDraw(GLuint id);
   GL4DAPI void      GL4DAPIENTRY gl4dgDelete(GLuint id);
   
