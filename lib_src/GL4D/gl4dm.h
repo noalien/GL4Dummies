@@ -32,6 +32,7 @@
 #define GL4DM_2_SQRTPI	        1.12837916709551257390
 #define GL4DM_SQRT2	        1.41421356237309504880
 #define GL4DM_SQRT1_2	        0.70710678118654752440
+#define GL4DM_EPSILON           1.19209290e-07F
 
 #ifdef MIN
 #  undef MIN
@@ -321,6 +322,7 @@ GL4DAPI double    GL4DAPIENTRY gl4dmURand(void);
 GL4DAPI double    GL4DAPIENTRY gl4dmSURand(void);
 GL4DAPI double    GL4DAPIENTRY gl4dmGRand(void);
 GL4DAPI double    GL4DAPIENTRY gl4dmGURand(void);
+GL4DAPI GLfloat * GL4DAPIENTRY gl4dmTriangleEdge(GLuint width, GLuint height, GLfloat H);
 
 #ifdef __cplusplus
 }

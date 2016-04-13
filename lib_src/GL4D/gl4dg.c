@@ -14,6 +14,40 @@
 #include <stdlib.h>
 #include <assert.h>
 
+/*!\brief permet de sélectionner une topologie à utiliser selon le
+ * niveau d'optimisation géométrique choisie. */
+#define SELECT_GEOMETRY_OPTIMIZATION(index, geom, w, h) do {		\
+    switch(_geometry_optimization_level) {				\
+    case 0:								\
+      (index) = mkRegularGridTriangleIndices((w), (h));			\
+      (geom)->index_mode = GL_TRIANGLES;				\
+      (geom)->index_row_count = 6 * ((w) - 1) * ((h) - 1);		\
+      (geom)->index_nb_rows = 1;					\
+      break;								\
+    case 1:								\
+      (index) = mkRegularGridStripsIndices((w), (h));			\
+      (geom)->index_mode = GL_TRIANGLE_STRIP;				\
+      (geom)->index_row_count = 2 * (w);				\
+      (geom)->index_nb_rows = ((h) - 1);				\
+      break;								\
+    default:								\
+      index = mkRegularGridStripIndices((w), (h));			\
+      (geom)->index_mode = GL_TRIANGLE_STRIP;				\
+      (geom)->index_row_count = 2 * (w) * ((h) - 1);			\
+      (geom)->index_nb_rows = 1;					\
+      break;								\
+    }									\
+  } while(0)
+
+/*!\brief dessine un element-array selon la topologie de l'objet. */
+#define DRAW_WITH_GEOMETRY_OPTIMIZATION(geom) do {			\
+    int i, d;								\
+    for(i = 0, d = 0; i <  (geom)->index_nb_rows; i++) {		\
+      glDrawElements((geom)->index_mode, (geom)->index_row_count, GL4D_VAO_INDEX, (const GLvoid *)(intptr_t)d); \
+      d += (geom)->index_row_count * sizeof(GL4Dvaoindex);		\
+    }									\
+  } while(0)
+
 typedef struct geom_t geom_t;
 typedef struct gsphere_t gsphere_t;
 typedef struct gstatic_t gstatic_t;
@@ -21,6 +55,7 @@ typedef struct gcone_t gcone_t;
 typedef struct gcylinder_t gcylinder_t;
 typedef struct gdisk_t gdisk_t;
 typedef struct gtorus_t gtorus_t;
+typedef struct ggrid2d_t ggrid2d_t;
 typedef enum   geom_e geom_e;
 
 enum geom_e {
@@ -33,6 +68,7 @@ enum geom_e {
   GE_CYLINDER,
   GE_DISK,
   GE_TORUS,
+  GE_GRID2D,
   GE_TEAPOT
 };
 
@@ -45,6 +81,9 @@ struct geom_t {
 struct gsphere_t {
   GLuint buffers[2];
   GLuint slices, stacks;
+  GLenum index_mode;
+  GLsizei index_row_count;
+  GLsizei index_nb_rows;
 };
 
 struct gstatic_t {
@@ -72,23 +111,40 @@ struct gtorus_t {
   GLuint buffers[2];
   GLuint slices, stacks;
   GLdouble radius;
+  GLenum index_mode;
+  GLsizei index_row_count;
+  GLsizei index_nb_rows;
+};
+
+struct ggrid2d_t {
+  GLuint buffers[2];
+  GLuint width, height;
+  GLenum index_mode;
+  GLsizei index_row_count;
+  GLsizei index_nb_rows;
 };
 
 static geom_t * _garray = NULL;
 static GLint _garray_size = 256;
 static linked_list_t * _glist = NULL;
 static int _hasInit = 0;
+static GLuint _geometry_optimization_level = 1;
 
 static void            freeGeom(void * data);
 static GLuint          genId(void);
 static GLuint          mkStaticf(geom_e type);
 static GLfloat       * mkSphereVerticesf(GLuint slices, GLuint stacks);
-static GL4Dvaoindex  * mkSphereIndex(GLuint slices, GLuint stacks);
+static GL4Dvaoindex  * mkRegularGridTriangleIndices(GLuint width, GLuint height);
+static GL4Dvaoindex  * mkRegularGridStripsIndices(GLuint width, GLuint height);
+static GL4Dvaoindex  * mkRegularGridStripIndices(GLuint width, GLuint height);
 static GLfloat       * mkConeVerticesf(GLuint slices, GLboolean base);
 static GLfloat       * mkFanConeVerticesf(GLuint slices, GLboolean base);
 static GLfloat       * mkCylinderVerticesf(GLuint slices, GLboolean base);
 static GLfloat       * mkDiskVerticesf(GLuint slices);
 static GLfloat       * mkTorusVerticesf(GLuint slices, GLuint stacks, GLfloat radius);
+static GLfloat       * mkGrid2dVerticesf(GLuint width, GLuint height, GLfloat * heightmap);
+static void            mkGrid2dNormalsf(GLuint width, GLuint height, GLfloat * data);
+static inline void     triangleNormalf(GLfloat * out, GLfloat * p0, GLfloat * p1, GLfloat * p2);
 
 void gl4dgInit(void) {
   int i;
@@ -120,6 +176,10 @@ void gl4dgClean(void) {
   _hasInit = 0;
 }
 
+void gl4dgSetGeometryOptimizationLevel(GLuint level) {
+  _geometry_optimization_level = level;
+}
+
 GLuint gl4dgGetVAO(GLuint id) {
   return _garray[--id].vao;
 }
@@ -134,7 +194,7 @@ GLuint gl4dgGenSpheref(GLuint slices, GLuint stacks) {
   _garray[i].type = GE_SPHERE;
   s->slices = slices; s->stacks = stacks;
   idata = mkSphereVerticesf(slices, stacks);
-  index = mkSphereIndex(slices, stacks);
+  SELECT_GEOMETRY_OPTIMIZATION(index, s, slices + 1, stacks + 1);
   glGenVertexArrays(1, &_garray[i].vao);
   glBindVertexArray(_garray[i].vao);
   glEnableVertexAttribArray(0);
@@ -147,7 +207,7 @@ GLuint gl4dgGenSpheref(GLuint slices, GLuint stacks) {
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (5 * sizeof *idata), (const void *)0);  
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (5 * sizeof *idata), (const void *)(3 * sizeof *idata));  
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, s->buffers[1]);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * slices * stacks * sizeof *index, index, GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, s->index_row_count * s->index_nb_rows * sizeof *index, index, GL_STATIC_DRAW);
   free(idata);
   free(index);
   glBindVertexArray(0);
@@ -279,7 +339,7 @@ GLuint gl4dgGenTorusf(GLuint slices, GLuint stacks, GLfloat radius) {
   s->slices = slices; s->stacks = stacks;
   s->radius = radius;
   idata = mkTorusVerticesf(slices, stacks, radius);
-  index = mkSphereIndex(slices, stacks);
+  SELECT_GEOMETRY_OPTIMIZATION(index, s, slices + 1, stacks + 1);
   glGenVertexArrays(1, &_garray[i].vao);
   glBindVertexArray(_garray[i].vao);
   glEnableVertexAttribArray(0);
@@ -292,7 +352,43 @@ GLuint gl4dgGenTorusf(GLuint slices, GLuint stacks, GLfloat radius) {
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *idata), (const void *)(3 * sizeof *idata));  
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *idata), (const void *)(6 * sizeof *idata));  
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, s->buffers[1]);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * slices * stacks * sizeof *index, index, GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, s->index_row_count * s->index_nb_rows * sizeof *index, index, GL_STATIC_DRAW);
+  free(idata);
+  free(index);
+  glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  return ++i;
+}
+
+GLuint gl4dgGenGrid2df(GLuint width, GLuint height) {
+  return gl4dgGenGrid2dFromHeightMapf(width, height, NULL);
+}
+
+GLuint gl4dgGenGrid2dFromHeightMapf(GLuint width, GLuint height, GLfloat * heightmap) {
+  GLfloat * idata = NULL;
+  GL4Dvaoindex * index = NULL;
+  GLuint i = genId();
+  ggrid2d_t * s = malloc(sizeof *s);
+  assert(s);
+  _garray[i].geom = s;
+  _garray[i].type = GE_GRID2D;
+  s->width = width; s->height = height;
+  idata = mkGrid2dVerticesf(width, height, heightmap);
+  SELECT_GEOMETRY_OPTIMIZATION(index, s, width, height);
+  glGenVertexArrays(1, &_garray[i].vao);
+  glBindVertexArray(_garray[i].vao);
+  glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(1);
+  glEnableVertexAttribArray(2);
+  glGenBuffers(2, s->buffers);
+  glBindBuffer(GL_ARRAY_BUFFER, s->buffers[0]);
+  glBufferData(GL_ARRAY_BUFFER, 8 * width * height * sizeof *idata, idata, GL_STATIC_DRAW);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *idata), (const void *)0);  
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *idata), (const void *)(3 * sizeof *idata));  
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *idata), (const void *)(6 * sizeof *idata));  
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, s->buffers[1]);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, s->index_row_count * s->index_nb_rows * sizeof *index, index, GL_STATIC_DRAW);
   free(idata);
   free(index);
   glBindVertexArray(0);
@@ -305,12 +401,17 @@ void gl4dgDraw(GLuint id) {
   switch(_garray[--id].type) {
   case GE_SPHERE:
     glBindVertexArray(_garray[id].vao);
-    glDrawElements(GL_TRIANGLES, 6 * ((gsphere_t *)(_garray[id].geom))->slices * ((gsphere_t *)(_garray[id].geom))->stacks, GL4D_VAO_INDEX, 0);
+    DRAW_WITH_GEOMETRY_OPTIMIZATION((gsphere_t *)(_garray[id].geom));
     glBindVertexArray(0);
     break;
   case GE_TORUS:
     glBindVertexArray(_garray[id].vao);
-    glDrawElements(GL_TRIANGLES, 6 * ((gtorus_t *)(_garray[id].geom))->slices * ((gtorus_t *)(_garray[id].geom))->stacks, GL4D_VAO_INDEX, 0);
+    DRAW_WITH_GEOMETRY_OPTIMIZATION((gtorus_t *)(_garray[id].geom));
+    glBindVertexArray(0);
+    break;
+  case GE_GRID2D:
+    glBindVertexArray(_garray[id].vao);
+    DRAW_WITH_GEOMETRY_OPTIMIZATION((ggrid2d_t *)(_garray[id].geom));
     glBindVertexArray(0);
     break;
   case GE_QUAD:
@@ -381,6 +482,10 @@ static void freeGeom(void * data) {
   case GE_TORUS:
     glDeleteVertexArrays(1, &(geom->vao));
     glDeleteBuffers(2, ((gtorus_t *)(geom->geom))->buffers);
+    break;
+  case GE_GRID2D:
+    glDeleteVertexArrays(1, &(geom->vao));
+    glDeleteBuffers(2, ((ggrid2d_t *)(geom->geom))->buffers);
     break;
   case GE_QUAD:
   case GE_CUBE:
@@ -519,27 +624,76 @@ static GLfloat * mkSphereVerticesf(GLuint slices, GLuint stacks) {
   return data;
 }
 
-static GL4Dvaoindex * mkSphereIndex(GLuint slices, GLuint stacks) {
-  int i, ni, j, nj, k;
+static GL4Dvaoindex * mkRegularGridTriangleIndices(GLuint width, GLuint height) {
+  int y, ny, x, nx, k, yw, nyw, wm1 = width - 1, hm1 = height - 1;
   GLuint * index;
-  index = malloc(6 * slices * stacks * sizeof *index);
+  assert(height > 1 && width > 1);
+  index = malloc(6 * wm1 * hm1 * sizeof *index);
   assert(index);
-  for(i = 0, k = 0; i < stacks; i++) {
-    ni = i + 1;
-    for(j = 0; j < slices; j++) {
-      nj = j + 1;
-      index[k++] = i * (slices + 1) + j;
-      index[k++] = i * (slices + 1) + nj;
-      index[k++] = ni * (slices + 1) + j;
+  for(y = 0, k = 0; y < hm1; y++) {
+    ny = y + 1;
+    yw = y * width;
+    nyw = ny * width;
+    for(x = 0; x < wm1; x++) {
+      nx = x + 1;
+      index[k++] = yw  + x;
+      index[k++] = yw  + nx;
+      index[k++] = nyw + x;
 
-      index[k++] = ni * (slices + 1) + j;
-      index[k++] = i * (slices + 1) + nj;
-      index[k++] = ni * (slices + 1) + nj;
+      index[k++] = nyw + x;
+      index[k++] = yw + nx;
+      index[k++] = nyw + nx;
     }
   }
   return index;
 }
 
+static GL4Dvaoindex * mkRegularGridStripsIndices(GLuint width, GLuint height) {
+  int y, x, k, yw, nyw, hm1 = height - 1;
+  GLuint * index;
+  assert(height > 1 && width > 1);
+  index = malloc(2 * width * hm1 * sizeof *index);
+  assert(index);
+  for(y = 0, k = 0; y < hm1; y++) {
+    yw = y * width;
+    nyw = yw + width;
+    for(x = 0; x < width; x++) {
+      index[k++] = nyw + x;
+      index[k++] = yw  + x;
+    }
+  }
+  return index;
+}
+
+static GL4Dvaoindex * mkRegularGridStripIndices(GLuint width, GLuint height) {
+  int y, x, k, yw, nyw, nnyw, wm1 = width - 1, hm1 = height - 1, hi = hm1 - ((height&1) ? 0 : 1);
+  GLuint * index;
+  assert(height > 1 && width > 1);
+  index = malloc(2 * width * hm1 * sizeof *index);
+  assert(index);
+  for(y = 0, k = 0; y < hi; y += 2) {
+    yw = y * width;
+    nyw = yw + width;
+    nnyw = nyw + width;
+    for(x = 0; x < width; x++) {
+      index[k++] = nyw + x;
+      index[k++] = yw  + x;
+    }
+    for(x = wm1; x >= 0; x--) {
+      index[k++] = nyw  + x;
+      index[k++] = nnyw + x;
+    }
+  }
+  if(!(height&1)) {
+    yw = y * width;
+    nyw = yw + width;
+    for(x = 0; x < width; x++) {
+      index[k++] = nyw + x;
+      index[k++] = yw + x;
+    }
+  }
+  return index;
+}
 
 static inline void fcvNormals(GLfloat * p, GLfloat y, int i) {
   p[i] = 2.0f * p[i - 3] / sqrt(5.0);
@@ -568,9 +722,9 @@ static inline void fcvbNormals(GLfloat * p, GLfloat y, int i) {
     (d)[(i)++] = 0.5; (d)[(i)++] = 0.5;					\
     for(j = 0; j <= (slices); j++) {					\
       phi = j * c2MPI_Long;						\
-      (d)[(i)++] = cos(sens * phi);					\
+      (d)[(i)++] = -cos(sens * phi);					\
       (d)[(i)++] = (ye);						\
-      (d)[(i)++] = -sin(sens * phi);					\
+      (d)[(i)++] = sin(sens * phi);					\
       (normals)((d), (ye), (i)); (i) += 3;				\
       if(phi < _1pi_4 || phi > _7pi_4) {				\
 	(d)[(i)++] = 1.0;						\
@@ -687,4 +841,75 @@ static GLfloat * mkTorusVerticesf(GLuint slices, GLuint stacks, GLfloat radius) 
     }
   }
   return data;
+}
+
+static GLfloat * mkGrid2dVerticesf(GLuint width, GLuint height, GLfloat * heightmap) {
+  int i, j, k, iw;
+  GLdouble x, z, tx, tz;
+  GLfloat * data;
+  data = malloc(8 * width * height * sizeof *data);
+  assert(data);
+  if(heightmap) {
+    for(i = 0, k = 0; i < height; i++) {
+      z = -1.0 + 2.0 * (tz = i / (height - 1.0));
+      iw = i * width;
+      for(j = 0; j < width; j++) {
+	x = -1.0 + 2.0 * (tx = j / (width - 1.0));
+	data[k++] = x; data[k++] = 2.0 * heightmap[iw + j] - 1.0; data[k++] = z;
+	k += 3;
+	data[k++] = tx; data[k++] = tz;
+      }
+    }
+    mkGrid2dNormalsf(width, height, data);
+  } else {
+    for(i = 0, k = 0; i < height; i++) {
+      z = -1.0 + 2.0 * (tz = i / (height - 1.0));
+      for(j = 0; j < width; j++) {
+	x = -1.0 + 2.0 * (tx = j / (width - 1.0));
+	data[k++] = x;  data[k++] = 0; data[k++] = z;
+	data[k++] = 0;  data[k++] = 1; data[k++] = 0; 
+	data[k++] = tx; data[k++] = tz;
+      }
+    }
+  }
+  return data;
+}
+
+static void mkGrid2dNormalsf(GLuint width, GLuint height, GLfloat * data) {
+  int x, z, zw, i, wm1 = width - 1, hm1 = height - 1;
+  GLfloat n[18];
+  for(z = 1; z < hm1; z++) {
+    zw = z * width;
+    for(x = 1; x < wm1; x++) {
+      triangleNormalf(&n[0],  &data[8 * (x + zw)], &data[8 * (x + 1 + zw)], &data[8 * (x + 1 + (z + 1) * width)]);
+      triangleNormalf(&n[3],  &data[8 * (x + zw)], &data[8 * (x + 1 + (z + 1) * width)], &data[8 * (x + (z + 1) * width)]);
+      triangleNormalf(&n[6],  &data[8 * (x + zw)], &data[8 * (x + (z + 1) * width)], &data[8 * (x - 1 + zw)]);
+      triangleNormalf(&n[9],  &data[8 * (x + zw)], &data[8 * (x - 1 + zw)], &data[8 * (x - 1 + (z - 1) * width)]);
+      triangleNormalf(&n[12], &data[8 * (x + zw)], &data[8 * (x - 1 + (z - 1) * width)], &data[8 * (x + (z - 1) * width)]);
+      triangleNormalf(&n[15], &data[8 * (x + zw)], &data[8 * (x + (z - 1) * width)], &data[8 * (x + 1 + zw)]);
+      data[8 * (x + zw) + 3] = 0;
+      data[8 * (x + zw) + 4] = 0;
+      data[8 * (x + zw) + 5] = 0;
+      for(i = 0; i < 6; i++) {
+        data[8 * (x + zw) + 3] += n[3 * i + 0];
+        data[8 * (x + zw) + 4] += n[3 * i + 1];
+        data[8 * (x + zw) + 5] += n[3 * i + 2]; 
+      }
+      data[8 * (x + zw) + 3] /= 6.0;
+      data[8 * (x + zw) + 4] /= 6.0;
+      data[8 * (x + zw) + 5] /= 6.0;
+    }
+  }
+}
+
+static inline void triangleNormalf(GLfloat * out, GLfloat * p0, GLfloat * p1, GLfloat * p2) {
+  GLfloat v0[3], v1[3];
+  v0[0] = p1[0] - p0[0];
+  v0[1] = p1[1] - p0[1];
+  v0[2] = p1[2] - p0[2];
+  v1[0] = p2[0] - p1[0];
+  v1[1] = p2[1] - p1[1];
+  v1[2] = p2[2] - p1[2];
+  MVEC3CROSS(out, v0, v1);
+  MVEC3NORMALIZE(out);
 }
