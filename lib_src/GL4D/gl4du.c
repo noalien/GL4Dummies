@@ -16,6 +16,7 @@
 #include "gl4du.h"
 #include "gl4dh.h"
 #include "bin_tree.h"
+#include "linked_list.h"
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <math.h>
@@ -77,6 +78,9 @@ static bin_tree_t  *  _gl4duMatrices = NULL;
 static _GL4DUMatrix * _gl4dCurMatrix = NULL;
 /*!\brief le noeud vers la dernière matrice \a _GL4DUMatrix créée. */
 static bin_tree_t ** _gl4dLastMatrixn = NULL;
+/*!\brief pile des fonctions à appeler lors du "at exit" de \ref
+ *  gl4duClean. Cette liste est remplie par \ref gl4duAtExit. */
+static linked_list_t * _aelist = NULL;
 
 static shader_t **  findfnInShadersList(const char * filename);
 static shader_t **  findidInShadersList(GLuint id);
@@ -494,7 +498,28 @@ void gl4duClean(GL4DUenum what) {
     gl4dgClean();
   if(what & GL4DU_DEMO_HELPER)
     gl4dhClean();
+  if(what & GL4DU_AT_EXIT) {
+    if(_aelist) {
+      while(!llEmpty(_aelist))
+	((void (*)(void))llPop(_aelist))();
+      llFree(_aelist, NULL);
+      _aelist = NULL;
+    }
+  }
 }
+
+/*!\brief ajoute \a func dans la liste des fonctions à appeler lors du
+ * \ref gl4duClean avec l'argument GL4DU_AT_EXIT ou GL4DU_ALL.
+ *
+ * \param func la fonction à ajouter dans la liste.
+ */
+void gl4duAtExit(void (*func)(void)) {
+  if(_aelist == NULL) {
+    _aelist = llNew();
+  }
+  llPush(_aelist, func);
+}
+
 
 /*!\brief supprime programs et/ou shaders non liés.
  */

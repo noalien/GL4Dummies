@@ -76,7 +76,7 @@ static inline GLfloat hurst(GLfloat d, GLfloat H) {
   return d / powf(2.0f, 2.0f * H);
 }
 
-static inline void triangle_edge(GLfloat *im, int x, int y, int w, int h, int width, GLfloat ri, GLfloat H) {
+static void triangle_edge(GLfloat *im, int x, int y, int w, int h, int width, GLfloat ri, GLfloat H) {
   GLint v;
   GLint p[9][2], i, w_2 = w >> 1, w_21 = w_2 + (w&1), h_2 = h >> 1, h_21 = h_2 + (h&1);
   ri = hurst(ri, H);
@@ -90,7 +90,7 @@ static inline void triangle_edge(GLfloat *im, int x, int y, int w, int h, int wi
   p[7][0] = x;       p[7][1] = y + h_2;
   p[8][0] = x + w_2; p[8][1] = y + h_2;
   for(i = 4; i < 8; i++) {
-    if(im[p[i][0] + p[i][1] * width] >= GL4DM_EPSILON)
+    if(im[p[i][0] + p[i][1] * width] > 0)
       continue;
     im[v = p[i][0] + p[i][1] * width] = (im[p[i - 4][0] + p[i - 4][1] * width] +
                                          im[p[(i - 3) % 4][0] + p[(i - 3) % 4][1] * width]) / 2.0;
@@ -103,7 +103,7 @@ static inline void triangle_edge(GLfloat *im, int x, int y, int w, int h, int wi
                                          im[p[2][0] + p[2][1] * width] +
                                          im[p[3][0] + p[3][1] * width]) / 4.0;
     im[v] += gl4dmSURand() * ri * sqrt(2);
-    im[v] = MIN(MAX(im[v], 0.0), 1.0);
+    im[v] = MIN(MAX(im[v], GL4DM_EPSILON), 1.0);
   }
   if(w_2 > 1 || h_2 > 1)
     triangle_edge(im, p[0][0], p[0][1], w_2, h_2, width, ri, H);
@@ -126,6 +126,10 @@ static inline void triangle_edge(GLfloat *im, int x, int y, int w, int h, int wi
  */
 GLfloat * gl4dmTriangleEdge(GLuint width, GLuint height, GLfloat H) {
   GLfloat * hm = calloc(width * height, sizeof *hm);
+  hm[0] = GL4DM_EPSILON + gl4dmURand();
+  hm[width - 1] = GL4DM_EPSILON + gl4dmURand();
+  hm[(height - 1) * width + width - 1] = GL4DM_EPSILON + gl4dmURand();
+  hm[(height - 1) * width] = GL4DM_EPSILON + gl4dmURand();
   triangle_edge(hm, 0, 0, width - 1, height - 1, width, 1, H);
   return hm;
 }

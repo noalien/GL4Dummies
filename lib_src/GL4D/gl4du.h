@@ -29,6 +29,7 @@ extern "C" {
     GL4DU_MATRICES        = 1 << 22,
     GL4DU_GEOMETRY        = 1 << 23,
     GL4DU_DEMO_HELPER     = 1 << 24,
+    GL4DU_AT_EXIT         = 1 << 25,
     GL4DU_ALL             = 0xffffffff
 #else
     GL4DU_SHADER          = ((unsigned long long)1) << 32,
@@ -36,6 +37,7 @@ extern "C" {
     GL4DU_MATRICES        = ((unsigned long long)1) << 34,
     GL4DU_GEOMETRY        = ((unsigned long long)1) << 35,
     GL4DU_DEMO_HELPER     = ((unsigned long long)1) << 36,
+    GL4DU_AT_EXIT         = ((unsigned long long)1) << 36,
     GL4DU_ALL             = (unsigned long long)0xffffffffffffffffLL
 #endif
   };
@@ -55,6 +57,7 @@ extern "C" {
   GL4DAPI GLuint    GL4DAPIENTRY gl4duCreateProgramFED(const char * encData, const char * firstone, ...);
   GL4DAPI void      GL4DAPIENTRY gl4duDeleteProgram(GLuint id);
   GL4DAPI void      GL4DAPIENTRY gl4duCleanUnattached(GL4DUenum what);
+  GL4DAPI void      GL4DAPIENTRY gl4duAtExit(void (*func)(void));
   GL4DAPI void      GL4DAPIENTRY gl4duClean(GL4DUenum what);
   GL4DAPI int       GL4DAPIENTRY gl4duUpdateShaders(void);
   GL4DAPI GLboolean GL4DAPIENTRY gl4duGenMatrix(GLenum type, const char * name);
