@@ -400,6 +400,31 @@ void gl4dpCopyFromSDLSurfaceWithTransforms(SDL_Surface * s, const GLfloat scale[
   drawTex((*_cur_screen)->tId, s0, t0);
 }
 
+/*!\brief convertie une surface SDL en un tableau de luminances
+ * comprises entre 0 et 1 (L = 0.299 * R + 0.587 * G + 0.114 * B). Le
+ * repère des y est remis vers le haut pour un usage GL.
+ *
+ * \param s La surface SDL à convertir
+ * \return le pointeur vers le tableau de luminances (à libérer avec free).
+ */
+GLfloat * gl4dpSDLSurfaceToLuminanceMap(SDL_Surface * s) {
+  int x, y, yw, wh = s->w * s->h;
+  Uint32 * p;
+  Uint8 r, g, b;
+  SDL_Surface * d = SDL_ConvertSurfaceFormat(s, SDL_PIXELFORMAT_ABGR8888, 0);
+  GLfloat * wm = malloc(wh * sizeof *wm);
+  assert(wm);
+  for(y = d->h -1, p = d->pixels; y >= 0; y--) {
+    yw = y * d->w;
+    for(x = 0; x < d->w; x++) {
+      SDL_GetRGB(*p++, d->format, &r, &g, &b);
+      wm[yw + x] = (0.299f * r) / 255.0f + (0.587f * g) / 255.0f + (0.114f * b) / 255.0f;
+    }
+  }
+  SDL_FreeSurface(d);
+  return wm;
+}
+
 /*!\brief copie la surface SDL vers l'écran en cours en prenant 100% de l'écran.
  */
 void gl4dpCopyFromSDLSurface(SDL_Surface * s) {

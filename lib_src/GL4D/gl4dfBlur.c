@@ -42,7 +42,7 @@ static void blurfinit(GLuint in, GLuint out, GLuint radius, GLuint nb_iterations
 static void blurfblur(GLuint in, GLuint out, GLuint radius, GLuint nb_iterations, GLuint weight, GLboolean flipV) {
   int i, n;
   GLint vp[4], w, h;
-  GLboolean dt = glIsEnabled(GL_DEPTH_TEST);
+  GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND);
   GLuint rin = in, cfbo, rout = out ? out : _tempTId[1];
   GLint polygonMode[2];
   glGetIntegerv(GL_POLYGON_MODE, polygonMode);
@@ -85,6 +85,7 @@ static void blurfblur(GLuint in, GLuint out, GLuint radius, GLuint nb_iterations
       glUniform2fv(glGetUniformLocation(_blurPId, "offset"), BLUR_MAX_RADIUS, (i % 2) ? _offsetH : _offsetV);
       glUniform1i(glGetUniformLocation(_blurPId,  "nweights"), radius);
       if(dt) glDisable(GL_DEPTH_TEST);
+      if(bl) glDisable(GL_BLEND);
       glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D, i == 0 ? rin : _tempTId[2]);
       glActiveTexture(GL_TEXTURE1);
@@ -94,19 +95,19 @@ static void blurfblur(GLuint in, GLuint out, GLuint radius, GLuint nb_iterations
       glBindTexture(GL_TEXTURE_2D, 0);
       glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D, 0);
-      if(dt) glEnable(GL_DEPTH_TEST);
     }
     rin = rout;
   }
   if(!out) { /* Copier à l'écran en cas de out nul */
     glUseProgram(0);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, cfbo);
     glBlitFramebuffer(0, 0, _width, _height, vp[0], vp[1], vp[2], vp[3], GL_COLOR_BUFFER_BIT, GL_LINEAR);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
   }
   glViewport(vp[0], vp[1], vp[2], vp[3]);
   glBindFramebuffer(GL_FRAMEBUFFER, cfbo);
   glPolygonMode(GL_FRONT_AND_BACK, polygonMode[0]);
+  if(dt) glEnable(GL_DEPTH_TEST);
+  if(bl) glEnable(GL_BLEND);
 }
 
 static void init(void) {

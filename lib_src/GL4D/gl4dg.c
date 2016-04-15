@@ -617,8 +617,8 @@ static GLfloat * mkSphereVerticesf(GLuint slices, GLuint stacks) {
       data[k++] = -r * cos(phi); 
       data[k++] = y; 
       data[k++] = r * sin(phi);
-      data[k++] = 1.0 - phi / (2.0 * M_PI); 
-      data[k++] = 1.0 - (theta + M_PI_2) / M_PI;
+      data[k++] = phi / (2.0 * M_PI); 
+      data[k++] = (theta + M_PI_2) / M_PI;
     }
   }
   return data;
@@ -851,7 +851,7 @@ static GLfloat * mkGrid2dVerticesf(GLuint width, GLuint height, GLfloat * height
   assert(data);
   if(heightmap) {
     for(i = 0, k = 0; i < height; i++) {
-      z = -1.0 + 2.0 * (tz = i / (height - 1.0));
+      z = 1.0 - 2.0 * (tz = i / (height - 1.0));
       iw = i * width;
       for(j = 0; j < width; j++) {
 	x = -1.0 + 2.0 * (tx = j / (width - 1.0));

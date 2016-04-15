@@ -87,7 +87,7 @@ static void sobelfinit(GLuint in, GLuint out, GLboolean flipV) {
 static void sobelfsobel(GLuint in, GLuint out, GLboolean flipV) {
   int n;
   GLint vp[4], w, h;
-  GLboolean dt = glIsEnabled(GL_DEPTH_TEST);
+  GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND);
   GLuint rin = in, cfbo, rout = out ? out : _tempTId[1];
   GLint polygonMode[2];
   glGetIntegerv(GL_POLYGON_MODE, polygonMode);
@@ -132,21 +132,22 @@ static void sobelfsobel(GLuint in, GLuint out, GLboolean flipV) {
     glUniform1i(glGetUniformLocation(_sobelPId,  "mixMode"), _mixMode);
     glUniform1f(glGetUniformLocation(_sobelPId,  "mixFactor"), _mixFactor);
     if(dt) glDisable(GL_DEPTH_TEST);
+    if(bl) glDisable(GL_BLEND);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, rin);
     gl4dgDraw(_plan);
     glBindTexture(GL_TEXTURE_2D, 0);
-    if(dt) glEnable(GL_DEPTH_TEST);
   }
   if(!out) { /* Copier à l'écran en cas de out nul */
     glUseProgram(0);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, cfbo);
     glBlitFramebuffer(0, 0, _width, _height, vp[0], vp[1], vp[2], vp[3], GL_COLOR_BUFFER_BIT, GL_LINEAR);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
   }
   glViewport(vp[0], vp[1], vp[2], vp[3]);
   glBindFramebuffer(GL_FRAMEBUFFER, cfbo);
   glPolygonMode(GL_FRONT_AND_BACK, polygonMode[0]);
+  if(dt) glEnable(GL_DEPTH_TEST);
+  if(bl) glEnable(GL_BLEND);
 }
 
 static void init(void) {

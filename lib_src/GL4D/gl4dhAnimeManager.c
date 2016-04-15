@@ -26,7 +26,7 @@ static GLuint _fbo = 0;
 /*!\brief identifiant de la texture liée en écriture au framebuffer
  * \ref _fbo (la texture dans laquelle les animations sont
  * dessinées) */
-static GLuint _wTexId = 0;
+static GLuint _wTexId = 0, _wdTexId = 0;
 /*!\brief largeur et hauteur de la texture \ref _wTexId liée en
  * écriture au framebuffer \ref _fbo */
 static int _w = 1, _h = 1;
@@ -49,13 +49,22 @@ void gl4dhInit(GL4DHanime * animations, int w, int h, void (*callBeforeAllAnimat
   glBindTexture(GL_TEXTURE_2D, _wTexId);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+  if(!_wdTexId)
+    glGenTextures(1, &_wdTexId);
+  glBindTexture(GL_TEXTURE_2D, _wdTexId);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, w, h, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
   glBindTexture(GL_TEXTURE_2D, 0);
 
   glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,  _wTexId,  0);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _wdTexId, 0);
   if(callBeforeAllAnimationsInit)
     callBeforeAllAnimationsInit();
   callAllWithState(_animations, GL4DH_INIT);
@@ -72,6 +81,10 @@ void gl4dhClean(void) {
   if(_wTexId) {
     glDeleteTextures(1, &_wTexId);
     _wTexId = 0;
+  }
+  if(_wdTexId) {
+    glDeleteTextures(1, &_wdTexId);
+    _wdTexId = 0;
   }
   if(_fbo) {
     glDeleteFramebuffers(1, &_fbo);

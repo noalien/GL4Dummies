@@ -72,28 +72,29 @@
 extern "C" {
 #endif
 
-  GL4DAPI Uint32 GL4DAPIENTRY gl4dpGetColor(void);
-  GL4DAPI void   GL4DAPIENTRY gl4dpSetColor(Uint32 color);
-  GL4DAPI GLuint GL4DAPIENTRY gl4dpInitScreenWithDimensions(GLuint w, GLuint h);
-  GL4DAPI GLuint GL4DAPIENTRY gl4dpInitScreen(void);
-  GL4DAPI int    GL4DAPIENTRY gl4dpSetScreen(GLuint id);
-  GL4DAPI void   GL4DAPIENTRY gl4dpDeleteScreen(void);
-  GL4DAPI GLuint GL4DAPIENTRY gl4dpGetTextureId(void);
-  GL4DAPI GLuint GL4DAPIENTRY gl4dpGetWidth(void);
-  GL4DAPI GLuint GL4DAPIENTRY gl4dpGetHeight(void);
-  GL4DAPI void   GL4DAPIENTRY gl4dpClearScreen(void);
-  GL4DAPI void   GL4DAPIENTRY gl4dpClearScreenWith(Uint32 color);
-  GL4DAPI void   GL4DAPIENTRY gl4dpUpdateScreen(GLint * rect);
-  GL4DAPI void   GL4DAPIENTRY gl4dpRect(GLint * rect);
-  GL4DAPI void   GL4DAPIENTRY gl4dpLine(int x0, int y0, int x1, int y1);
-  GL4DAPI void   GL4DAPIENTRY gl4dpCircle(int x0, int y0, int r);
-  GL4DAPI Uint32 GL4DAPIENTRY gl4dpGetPixel(int x, int y);
-  GL4DAPI void   GL4DAPIENTRY gl4dpPutPixel(int x, int y);
-  GL4DAPI void   GL4DAPIENTRY gl4dpHLine(int x0, int x1, int y);
-  GL4DAPI void   GL4DAPIENTRY gl4dpFilledCircle(int x0, int y0, int r);
-  GL4DAPI void   GL4DAPIENTRY gl4dpCopyFromSDLSurfaceWithTransforms(SDL_Surface * s, const GLfloat scale[2], const GLfloat translate[2]);
-  GL4DAPI void   GL4DAPIENTRY gl4dpCopyFromSDLSurface(SDL_Surface * s);
-  GL4DAPI void   GL4DAPIENTRY gl4dpMap(GLuint dstSId, GLuint srcSId, const GLfloat pRect[4], const GLfloat tRect[4], GLfloat rotation);
+  GL4DAPI Uint32    GL4DAPIENTRY gl4dpGetColor(void);
+  GL4DAPI void      GL4DAPIENTRY gl4dpSetColor(Uint32 color);
+  GL4DAPI GLuint    GL4DAPIENTRY gl4dpInitScreenWithDimensions(GLuint w, GLuint h);
+  GL4DAPI GLuint    GL4DAPIENTRY gl4dpInitScreen(void);
+  GL4DAPI int       GL4DAPIENTRY gl4dpSetScreen(GLuint id);
+  GL4DAPI void      GL4DAPIENTRY gl4dpDeleteScreen(void);
+  GL4DAPI GLuint    GL4DAPIENTRY gl4dpGetTextureId(void);
+  GL4DAPI GLuint    GL4DAPIENTRY gl4dpGetWidth(void);
+  GL4DAPI GLuint    GL4DAPIENTRY gl4dpGetHeight(void);
+  GL4DAPI void      GL4DAPIENTRY gl4dpClearScreen(void);
+  GL4DAPI void      GL4DAPIENTRY gl4dpClearScreenWith(Uint32 color);
+  GL4DAPI void      GL4DAPIENTRY gl4dpUpdateScreen(GLint * rect);
+  GL4DAPI void      GL4DAPIENTRY gl4dpRect(GLint * rect);
+  GL4DAPI void      GL4DAPIENTRY gl4dpLine(int x0, int y0, int x1, int y1);
+  GL4DAPI void      GL4DAPIENTRY gl4dpCircle(int x0, int y0, int r);
+  GL4DAPI Uint32    GL4DAPIENTRY gl4dpGetPixel(int x, int y);
+  GL4DAPI void      GL4DAPIENTRY gl4dpPutPixel(int x, int y);
+  GL4DAPI void      GL4DAPIENTRY gl4dpHLine(int x0, int x1, int y);
+  GL4DAPI void      GL4DAPIENTRY gl4dpFilledCircle(int x0, int y0, int r);
+  GL4DAPI void      GL4DAPIENTRY gl4dpCopyFromSDLSurfaceWithTransforms(SDL_Surface * s, const GLfloat scale[2], const GLfloat translate[2]);
+  GL4DAPI void      GL4DAPIENTRY gl4dpCopyFromSDLSurface(SDL_Surface * s);
+  GL4DAPI GLfloat * GL4DAPIENTRY gl4dpSDLSurfaceToLuminanceMap(SDL_Surface * s);
+  GL4DAPI void      GL4DAPIENTRY gl4dpMap(GLuint dstSId, GLuint srcSId, const GLfloat pRect[4], const GLfloat tRect[4], GLfloat rotation);
 
 #ifdef __cplusplus
 }
