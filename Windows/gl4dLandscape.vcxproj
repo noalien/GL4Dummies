@@ -40,16 +40,16 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>..\lib_src;.\dependencies\include\SDL2;$(IncludePath)</IncludePath>
-    <LibraryPath>..\bin\Debug;.\dependencies\lib;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)\..\bin\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)\..\bin\$(Configuration)\</IntDir>
+    <LibraryPath>..\bin\Win32;.\dependencies\lib;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)\..\bin\Win32\</OutDir>
+    <IntDir>$(SolutionDir)\..\bin\Win32\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>..\lib_src;.\dependencies\include\SDL2;$(IncludePath)</IncludePath>
-    <LibraryPath>..\bin\Release;.\dependencies\lib;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)\..\bin\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)\..\bin\$(Configuration)\</IntDir>
+    <LibraryPath>..\bin\Win32;.\dependencies\lib;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)\..\bin\Win32\</OutDir>
+    <IntDir>$(SolutionDir)\..\bin\Win32\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -65,7 +65,7 @@
       <AdditionalDependencies>GL4Dummies.lib;OpenGL32.lib;SDL2main.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <BuildLog>
-      <Path>..\bin\$(Configuration)\$(MSBuildProjectName).log</Path>
+      <Path>..\bin\Win32\$(MSBuildProjectName).log</Path>
     </BuildLog>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -86,7 +86,7 @@
       <AdditionalDependencies>GL4Dummies.lib;OpenGL32.lib;SDL2main.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <BuildLog>
-      <Path>..\bin\$(Configuration)\$(MSBuildProjectName).log</Path>
+      <Path>..\bin\Win32\$(MSBuildProjectName).log</Path>
     </BuildLog>
   </ItemDefinitionGroup>
   <ItemGroup>
