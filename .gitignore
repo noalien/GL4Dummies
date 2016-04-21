@@ -3,9 +3,7 @@
 *.lo
 *.in
 *~
-*.sln
 *.sdf
-*.suo
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
