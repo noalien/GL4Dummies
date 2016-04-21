@@ -4,8 +4,6 @@
  *
  * \author Fares BELHADJ amsi@ai.univ-paris8.fr
  * \date February 22, 2016
- * \todo commenter
- * \todo indexer la sphère et le torus en triangle_strip
  */
 
 #include "linked_list.h"

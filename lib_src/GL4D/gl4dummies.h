@@ -1,8 +1,6 @@
 /*!\file gl4dummies.h
  *
- * \brief gestion simplifiée de GL sous différents OS avec aide sur la
- * vidéo (OpenCV ?) et le cryptage automatique des shaders (à
- * implémenter sur l'ensemble des OS)
+ * \brief gestion simplifiée de GL sous différents OS et fonctionnalité de cryptage des shaders.
  *
  * \author Farès BELHADJ amsi@grafeet.fr (ou amsi@ai.univ-paris8.fr)
  * \date March 28, 2008 - February 07, 2014

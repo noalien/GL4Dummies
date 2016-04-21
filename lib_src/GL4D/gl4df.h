@@ -5,7 +5,11 @@
  *
  * \author Farès BELHADJ amsi@ai.univ-paris8.fr
  * \date April 14, 2016
- * 
+ *
+ * \todo écrire le code pour : GL4D/gl4dfMedian.c
+ * GL4D/gl4dfScattering.c GL4D/gl4dfFocus.c GL4D/gl4dfConversion.c
+ * GL4D/gl4dfMedia.c GL4D/gl4dfFractalPainting.c GL4D/gl4dfHatching.c
+ * GL4D/gl4dfSegmentation.c GL4D/gl4dfOpticalFlow.c
  */
 #ifndef _GL4DF_H
 #define _GL4DF_H
