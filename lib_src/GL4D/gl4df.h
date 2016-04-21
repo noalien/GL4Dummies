@@ -14,7 +14,7 @@
 #ifndef _GL4DF_H
 #define _GL4DF_H
 
-#include <GL4D/gl4dummies.h>
+#include "gl4dummies.h"
 
 #ifdef __cplusplus
 extern "C" {

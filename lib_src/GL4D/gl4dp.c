@@ -10,9 +10,12 @@
  * utilisées en interne pour plus de gain (exemple gl4dpPutPixel).
  * \todo améliorer gl4dpMap.
  */
+#if defined(_MSC_VER)
+#  define _USE_MATH_DEFINES
+#endif
+#include <math.h>
 #include "gl4dp.h"
 #include "gl4dg.h"
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -229,8 +232,10 @@ static void updateScreenFromGPU(void) {
  */
 void gl4dpUpdateScreen(GLint * rect) {
   const GLfloat s[2] = {1.0, 1.0}, t[2] = {0.0, 0.0};
-  if(!(*_cur_screen)->isCPUToDate)
-    return updateScreenFromGPU();
+  if(!(*_cur_screen)->isCPUToDate) {
+	updateScreenFromGPU();
+	return;
+  }
   glBindTexture(GL_TEXTURE_2D, (*_cur_screen)->tId);
   if(!(*_cur_screen)->isGPUToDate) {
     if(rect == NULL)
@@ -334,9 +339,9 @@ void gl4dpHLine(int x0, int x1, int y) {
   int x, pasX = (x1 - x0) < 0 ? -1 : 1, x1pp;
   if(!(*_cur_screen)->isCPUToDate)
     updateScreenFromGPU();
-  y  = MIN(MAX(0, y), gl4dpGetHeight() - 1);
-  x0 = MIN(MAX(0, x0), gl4dpGetWidth() - 1);
-  x1 = MIN(MAX(0, x1), gl4dpGetWidth() - 1);
+  y  = MIN(MAX(0, y), ((int)gl4dpGetHeight()) - 1);
+  x0 = MIN(MAX(0, x0), ((int)gl4dpGetWidth()) - 1);
+  x1 = MIN(MAX(0, x1), ((int)gl4dpGetWidth()) - 1);
   x1pp = x1 + pasX;
   for(x = x0; x != x1pp; x += pasX)
     gl4dpPutPixel(x, y);

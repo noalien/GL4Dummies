@@ -13,7 +13,7 @@
 
 void gl4dqComputeScalaire(gl4dqQuaternion q){
   float t = 1.0f - (q[1] * q[1]) - (q[2] * q[2]) - (q[3] * q[3]);
-  q[0] = (t>0.0) ? -sqrt(t) : 0.0;
+  q[0] = (t > 0) ? (float)-sqrt(t) : 0;
 }
 
 void gl4dqConjugate(const gl4dqQuaternion q, gl4dqQuaternion conjugate){
@@ -33,7 +33,7 @@ void gl4dqMultiply(const gl4dqQuaternion qa, const gl4dqQuaternion qb, gl4dqQuat
 }
 
 float gl4dqMagnitude(gl4dqQuaternion q){
-  return sqrt((q[0]*q[0])+(q[1]*q[1]) +(q[2]*q[2])+(q[3]*q[3]));
+  return (float)sqrt((q[0]*q[0])+(q[1]*q[1]) +(q[2]*q[2])+(q[3]*q[3]));
 }
 
 void gl4dqNormalize(gl4dqQuaternion q){

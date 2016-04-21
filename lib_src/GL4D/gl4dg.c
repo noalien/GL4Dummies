@@ -6,6 +6,10 @@
  * \date February 22, 2016
  */
 
+#if defined(_MSC_VER)
+#  define _USE_MATH_DEFINES
+#endif
+#include <math.h>
 #include "linked_list.h"
 #include "gl4dg.h"
 #include "gl4dm.h"
@@ -606,11 +610,11 @@ static GLfloat * mkSphereVerticesf(GLuint slices, GLuint stacks) {
   GLdouble cMPI_Lat = M_PI / stacks;
   data = malloc(5 * (slices + 1) * (stacks + 1) * sizeof *data);
   assert(data);
-  for(i = 0, k = 0; i <= stacks; i++) {
+  for(i = 0, k = 0; i <= (int)stacks; i++) {
     theta  = -M_PI_2 + i * cMPI_Lat;
     y = sin(theta);
     r = cos(theta);
-    for(j = 0; j <= slices; j++) {
+    for(j = 0; j <= (int)slices; j++) {
       phi = j * c2MPI_Long;
       data[k++] = -r * cos(phi); 
       data[k++] = y; 
@@ -655,7 +659,7 @@ static GL4Dvaoindex * mkRegularGridStripsIndices(GLuint width, GLuint height) {
   for(y = 0, k = 0; y < hm1; y++) {
     yw = y * width;
     nyw = yw + width;
-    for(x = 0; x < width; x++) {
+    for(x = 0; x < (int)width; x++) {
       index[k++] = nyw + x;
       index[k++] = yw  + x;
     }
@@ -673,7 +677,7 @@ static GL4Dvaoindex * mkRegularGridStripIndices(GLuint width, GLuint height) {
     yw = y * width;
     nyw = yw + width;
     nnyw = nyw + width;
-    for(x = 0; x < width; x++) {
+    for(x = 0; x < (int)width; x++) {
       index[k++] = nyw + x;
       index[k++] = yw  + x;
     }
@@ -685,7 +689,7 @@ static GL4Dvaoindex * mkRegularGridStripIndices(GLuint width, GLuint height) {
   if(!(height&1)) {
     yw = y * width;
     nyw = yw + width;
-    for(x = 0; x < width; x++) {
+    for(x = 0; x < (int)width; x++) {
       index[k++] = nyw + x;
       index[k++] = yw + x;
     }
@@ -748,7 +752,7 @@ static GLfloat * mkConeVerticesf(GLuint slices, GLboolean base) {
   GLdouble c2MPI_Long = 2.0 * M_PI / slices, s;
   data = malloc((16 * (slices + 1) + (base ? 8 : 0) * (slices + 2)) * sizeof *data);
   assert(data);
-  for(j = 0; j <= slices; j++) {
+  for(j = 0; j <= (int)slices; j++) {
     data[k++] = 0; data[k++] = 1; data[k++] = 0;
     data[k++] = 0; data[k++] = 1; data[k++] = 0;
     data[k++] = (s = j / (GLdouble)slices); data[k++] = 1;
@@ -760,7 +764,7 @@ static GLfloat * mkConeVerticesf(GLuint slices, GLboolean base) {
     data[k++] = s; data[k++] = 0;
   }
   if(base)
-    DISK_FAN(data, k, -1, -1, slices, fcvbNormals);
+    DISK_FAN(data, k, -1, -1, (int)slices, fcvbNormals);
   return data;
 }
 
@@ -769,9 +773,9 @@ static GLfloat * mkFanConeVerticesf(GLuint slices, GLboolean base) {
   GLfloat * data;
   data = malloc((base ? 16 : 8) * (slices + 2) * sizeof *data);
   assert(data);
-  DISK_FAN(data, k, 1, -1, slices, fcvNormals);
+  DISK_FAN(data, k, 1, -1, (int)slices, fcvNormals);
   if(base)
-    DISK_FAN(data, k, -1, -1, slices, fcvbNormals);
+    DISK_FAN(data, k, -1, -1, (int)slices, fcvbNormals);
   return data;
 }
 
@@ -782,7 +786,7 @@ static GLfloat * mkCylinderVerticesf(GLuint slices, GLboolean base) {
   GLdouble c2MPI_Long = 2.0 * M_PI / slices, s;
   data = malloc((16 * (slices + 1) + (base ? 16 : 0) * (slices + 2)) * sizeof *data);
   assert(data);
-  for(j = 0; j <= slices; j++) {
+  for(j = 0; j <= (int)slices; j++) {
     phi = j * c2MPI_Long;
     data[k++] = -cos(phi); 
     data[k++] = 1; 
@@ -796,8 +800,8 @@ static GLfloat * mkCylinderVerticesf(GLuint slices, GLboolean base) {
     data[k++] = s; data[k++] = 0;
   }
   if(base) {
-    DISK_FAN(data, k,  1,  1, slices, fcvbNormals);
-    DISK_FAN(data, k, -1, -1, slices, fcvbNormals);
+    DISK_FAN(data, k,  1,  1, (int)slices, fcvbNormals);
+    DISK_FAN(data, k, -1, -1, (int)slices, fcvbNormals);
   }
   return data;
 }
@@ -807,7 +811,7 @@ static GLfloat * mkDiskVerticesf(GLuint slices) {
   GLfloat * data;
   data = malloc(8 * (slices + 2) * sizeof *data);
   assert(data);
-  DISK_FAN(data, k, 0, 0, slices, fcvbNormals);
+  DISK_FAN(data, k, 0, 0, (int)slices, fcvbNormals);
   return data;
 }
 
@@ -819,11 +823,11 @@ static GLfloat * mkTorusVerticesf(GLuint slices, GLuint stacks, GLfloat radius) 
   GLdouble c2MPI_Lat  = 2.0 * M_PI / stacks;
   data = malloc(8 * (slices + 1) * (stacks + 1) * sizeof *data);
   assert(data);
-  for(i = 0, k = 0; i <= stacks; i++) {
+  for(i = 0, k = 0; i <= (int)stacks; i++) {
     theta  = i * c2MPI_Lat;
     y = radius * sin(theta);
     r = radius * cos(theta);
-    for(j = 0; j <= slices; j++) {
+    for(j = 0; j <= (int)slices; j++) {
       phi = j * c2MPI_Long;
       x = -cos(phi);
       z = sin(phi);
@@ -848,10 +852,10 @@ static GLfloat * mkGrid2dVerticesf(GLuint width, GLuint height, GLfloat * height
   data = malloc(8 * width * height * sizeof *data);
   assert(data);
   if(heightmap) {
-    for(i = 0, k = 0; i < height; i++) {
+    for(i = 0, k = 0; i < (int)height; i++) {
       z = 1.0 - 2.0 * (tz = i / (height - 1.0));
       iw = i * width;
-      for(j = 0; j < width; j++) {
+      for(j = 0; j < (int)width; j++) {
 	x = -1.0 + 2.0 * (tx = j / (width - 1.0));
 	data[k++] = x; data[k++] = 2.0 * heightmap[iw + j] - 1.0; data[k++] = z;
 	k += 3;
@@ -860,9 +864,9 @@ static GLfloat * mkGrid2dVerticesf(GLuint width, GLuint height, GLfloat * height
     }
     mkGrid2dNormalsf(width, height, data);
   } else {
-    for(i = 0, k = 0; i < height; i++) {
+    for(i = 0, k = 0; i < (int)height; i++) {
       z = -1.0 + 2.0 * (tz = i / (height - 1.0));
-      for(j = 0; j < width; j++) {
+      for(j = 0; j < (int)width; j++) {
 	x = -1.0 + 2.0 * (tx = j / (width - 1.0));
 	data[k++] = x;  data[k++] = 0; data[k++] = z;
 	data[k++] = 0;  data[k++] = 1; data[k++] = 0; 

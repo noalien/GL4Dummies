@@ -689,6 +689,20 @@ void gl4dBindFramebuffer(GLenum target, GLuint framebuffer) {
 	    __FILE__, __LINE__, __func__);
 }
 
+/*!\brief fait appel a glDeleteFramebuffers ou
+ * glDeleteFramebuffersEXT selon la disponibilité
+ */
+void gl4dDeleteFramebuffers(GLsizei n, GLuint * ids) {
+  void (__stdcall *p)(GLsizei, GLuint *);
+  if((p = getProcAddress("glDeleteFramebuffers")))
+    p(n, ids);
+  else if((p = getProcAddress("glDeleteFramebuffersEXT")))
+    p(n, ids);
+  else
+    fprintf(stderr, "%s:%d:In %s: Aucune procedure pour DeleteFramebuffers\n",
+	    __FILE__, __LINE__, __func__);
+}
+
 /*!\brief fait appel a glFramebufferTexture2D ou
  * glFramebufferTexture2DEXT selon la disponibilité
  */

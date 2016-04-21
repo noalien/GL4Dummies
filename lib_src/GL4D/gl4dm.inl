@@ -261,7 +261,8 @@ INLINE GL4DMMatrix gl4dmMatrixOrtho(float left, float right, float bottom, float
 
 INLINE GL4DMMatrix gl4dmMatrixInverse(GL4DMMatrix mat) {
   GL4DMMatrix res;
-
+  float det;
+  int i;
   //0
   res.r[0].x =
     mat.r[1].y * mat.r[2].z * mat.r[3].w - 
@@ -406,13 +407,12 @@ INLINE GL4DMMatrix gl4dmMatrixInverse(GL4DMMatrix mat) {
     mat.r[0].z * mat.r[1].x * mat.r[2].y - 
     mat.r[0].z * mat.r[2].x * mat.r[1].y;
 
-  float det = mat.r[0].x * res.r[0].x + mat.r[1].x * res.r[0].y + mat.r[2].x * res.r[0].z + mat.r[3].x * res.r[0].w;
+  det = mat.r[0].x * res.r[0].x + mat.r[1].x * res.r[0].y + mat.r[2].x * res.r[0].z + mat.r[3].x * res.r[0].w;
 
   if (det == 0) return mat;
 
   det = 1.0f / det;
   
-  int i;
   for (i = 0; i < 4; i++) {
     res.r[i].x *= det;
     res.r[i].y *= det;

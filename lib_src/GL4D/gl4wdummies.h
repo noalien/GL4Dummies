@@ -138,6 +138,7 @@
     #define glBindFragDataLocationEXT       gl4dBindFragDataLocation
     #define glBlitFramebuffer               gl4dBlitFramebuffer
     #define glGenFramebuffers               gl4dGenFramebuffers
+    #define glDeleteFramebuffers            gl4dDeleteFramebuffers
     #define glBindFramebuffer               gl4dBindFramebuffer
     #define glFramebufferTexture2D          gl4dFramebufferTexture2D
     #define glDrawBuffers                   gl4dDrawBuffers
@@ -304,6 +305,7 @@
     GL4DAPI void      GL4DAPIENTRY gl4dBindFragDataLocation(GLuint program, GLuint colorNumber, const GLchar * name);
     GL4DAPI void      GL4DAPIENTRY gl4dBlitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
     GL4DAPI void      GL4DAPIENTRY gl4dGenFramebuffers(GLsizei n, GLuint * ids);
+    GL4DAPI void      GL4DAPIENTRY gl4dDeleteFramebuffers(GLsizei n, GLuint * ids);
     GL4DAPI void      GL4DAPIENTRY gl4dBindFramebuffer(GLenum target, GLuint framebuffer);
     GL4DAPI void      GL4DAPIENTRY gl4dFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
     GL4DAPI void      GL4DAPIENTRY gl4dDrawBuffers(GLsizei n, const GLenum * bufs);

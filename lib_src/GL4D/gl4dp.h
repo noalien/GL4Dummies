@@ -11,7 +11,7 @@
 
 #define _DEMO_HELPER_PRIMITIVES_H
 
-#include <GL4D/gl4du.h>
+#include "gl4du.h"
 
 #if SDL_BYTEORDER == SDL_BIGENDIAN 
 /*!\brief décalage pour la composante rouge */
@@ -54,6 +54,9 @@
 			  ((Uint32)(Uint8)(b)) << B_SHIFT |	\
 			  ((Uint32)(Uint8)(a)) << A_SHIFT )
 /*!\brief macro qui convertie un r, un g et un b en couleur Uint32 rgba dont l'alpha est à 255 */
+#ifdef RGB //FOR MSVC
+#undef RGB
+#endif
 #define RGB(r, g, b) RGBA(r, g, b, 255)
 /*!\brief macro permettant d'extraire une composante en utilisant l'argument \a shift */
 #define EXTRACT_COMP(coul, shift) ((((Uint32)(coul)) >> (shift)) & 0xFF)
@@ -66,7 +69,7 @@
 /*!\brief macro permettant d'extraire une composante alpha de l'Uint32 \a coul */
 #define ALPHA(coul) EXTRACT_COMP(coul, A_SHIFT)
 /*!\brief macro pour tester si x et y sont dans limites de l'ecran */
-#define IN_SCREEN(x, y) ((x) >= 0 && (x) < gl4dpGetWidth() && (y) >= 0 && (y) < gl4dpGetHeight())
+#define IN_SCREEN(x, y) ((x) >= 0 && (x) < (int)gl4dpGetWidth() && (y) >= 0 && (y) < (int)gl4dpGetHeight())
 
 #ifdef __cplusplus
 extern "C" {

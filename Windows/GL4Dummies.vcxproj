@@ -42,7 +42,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <IncludePath>.\dependencies\include\SDL2;$(IncludePath)</IncludePath>
     <LibraryPath>.\dependencies\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\..\bin\$(Configuration)\</OutDir>
@@ -59,7 +59,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>DLLSPEC;WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_NONSTDC_NO_DEPRECATE;DLLSPEC;WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -70,7 +70,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;SDL2main.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <BuildLog>
       <Path>..\bin\$(Configuration)\$(MSBuildProjectName).log</Path>
@@ -79,7 +79,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>DLLSPEC;WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_NONSTDC_NO_DEPRECATE;DLLSPEC;WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -88,7 +88,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;SDL2main.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <BuildLog>
       <Path>..\bin\$(Configuration)\$(MSBuildProjectName).log</Path>
@@ -102,9 +102,27 @@
   <ItemGroup>
     <ClCompile Include="..\lib_src\GL4D\aes.c" />
     <ClCompile Include="..\lib_src\GL4D\bin_tree.c" />
+    <ClCompile Include="..\lib_src\GL4D\gl4dfBlur.c" />
+    <ClCompile Include="..\lib_src\GL4D\gl4dfConversion.c" />
+    <ClCompile Include="..\lib_src\GL4D\gl4dfFocus.c" />
+    <ClCompile Include="..\lib_src\GL4D\gl4dfFractalPainting.c" />
+    <ClCompile Include="..\lib_src\GL4D\gl4dfHatching.c" />
+    <ClCompile Include="..\lib_src\GL4D\gl4dfMedia.c" />
+    <ClCompile Include="..\lib_src\GL4D\gl4dfMedian.c" />
+    <ClCompile Include="..\lib_src\GL4D\gl4dfOpticalFlow.c" />
+    <ClCompile Include="..\lib_src\GL4D\gl4dfScattering.c" />
+    <ClCompile Include="..\lib_src\GL4D\gl4dfSegmentation.c" />
+    <ClCompile Include="..\lib_src\GL4D\gl4dfSobel.c" />
+    <ClCompile Include="..\lib_src\GL4D\gl4dg.c" />
+    <ClCompile Include="..\lib_src\GL4D\gl4dhAnimeManager.c" />
     <ClCompile Include="..\lib_src\GL4D\gl4dm.c" />
+    <ClCompile Include="..\lib_src\GL4D\gl4dp.c" />
+    <ClCompile Include="..\lib_src\GL4D\gl4dq.c" />
+    <ClCompile Include="..\lib_src\GL4D\gl4droid.c" />
     <ClCompile Include="..\lib_src\GL4D\gl4du.c" />
     <ClCompile Include="..\lib_src\GL4D\gl4dummies.c" />
+    <ClCompile Include="..\lib_src\GL4D\gl4duw_SDL2.c" />
+    <ClCompile Include="..\lib_src\GL4D\linked_list.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
