@@ -1,3 +1,13 @@
+/*!\file gl4dfBlurWeights.h
+ *
+ * \brief poids des matrices de convolution d'un Gaussian Blur : poids
+ * pour les matrices de rayon 0 à 128.
+ *
+ * \author Farès BELHADJ amsi@ai.univ-paris8.fr
+ * \date April 14, 2016
+ * 
+ */
+
 #define BLUR_MAX_RADIUS 128
 
 /* A utiliser dans le cas de la regénération des poids */

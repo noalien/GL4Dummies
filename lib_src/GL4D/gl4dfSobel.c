@@ -1,4 +1,4 @@
-/*!\file gl4dfSobel.h
+/*!\file gl4dfSobel.c
  *
  * \brief filre réalisant un sobel à partir d'une texture ou l'écran
  * vers une texture ou l'écran.

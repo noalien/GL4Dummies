@@ -1,27 +1,31 @@
-/*
- *  FIPS-197 compliant AES implementation
+/*!\file aes.c
  *
- *  Copyright (C) 2003-2006  Christophe Devine
+ *  \brief Utilisée pour décrypter des shaders données en archive cryptée AES. 
+ * 
+ *  FIPS-197 compliant AES implementation\n
+ *
+ *  Copyright (C) 2003-2006  Christophe Devine\n
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
- *  License, version 2.1 as published by the Free Software Foundation.
+ *  License, version 2.1 as published by the Free Software Foundation.\n
  *
  *  This library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
+ *  Lesser General Public License for more details.\n
  *
  *  You should have received a copy of the GNU Lesser General Public
  *  License along with this library; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- *  MA  02110-1301  USA
- */
-/*
- *  The AES block cipher was designed by Vincent Rijmen and Joan Daemen.
+ *  MA  02110-1301  USA\n
  *
- *  http://csrc.nist.gov/encryption/aes/rijndael/Rijndael.pdf
- *  http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf
+ *  The AES block cipher was designed by Vincent Rijmen and Joan Daemen.\n
+ *
+ *  http://csrc.nist.gov/encryption/aes/rijndael/Rijndael.pdf\n
+ *  http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf\n
+ *
+ *  \author Christophe Devine
  */
 
 #if defined(_WIN32)

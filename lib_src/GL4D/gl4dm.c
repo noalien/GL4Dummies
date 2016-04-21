@@ -120,7 +120,7 @@ static void triangle_edge(GLfloat *im, int x, int y, int w, int h, int width, GL
  * entre 0 et 1.
  *
  * \param width la largeur de la heightmap
- * \param width la hauteur de la heightmap
+ * \param height la hauteur de la heightmap
  * \param H exposant de Hurst, permet de controler la dimension fractale de la heightmap. La valeur standard est 0.5 (sinon entre 0 et 1)
  * \return la heightmap allouée/générée et qu'il faudra libérer avec free.
  */

@@ -1,6 +1,9 @@
-//
-// Created by Farès Belhadj on 02/11/15.
-//
+/*!\file gl4droid.h
+ *
+ * \brief Fonctionnalités spécifiques au système Android. 
+ * \author Farès Belhadj amsi@ai.univ-paris8.fr
+ * \date November 11, 2015
+ */
 
 #ifndef _GL4DROID_H
 #define _GL4DROID_H
@@ -13,6 +16,13 @@
 extern "C" {
 #endif
 
+/*!\brief Créé un program shader à partir des sources d'un vertex et
+ *  un fragment shader passés comme chaines de caractères. 
+ *
+ *\param pVertexSource source du vertex shader.
+ *\param pFragmentSource source du fragment shader.
+ *\return l'identifiant du program shader créé.
+ */
 extern GLuint gl4droidCreateProgram(const char *pVertexSource, const char *pFragmentSource);
 
 #ifdef __cplusplus
@@ -21,4 +31,4 @@ extern GLuint gl4droidCreateProgram(const char *pVertexSource, const char *pFrag
 
 #endif
 
-#endif //_GL4DROID_H
+#endif

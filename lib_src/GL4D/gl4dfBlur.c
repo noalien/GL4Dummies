@@ -1,4 +1,4 @@
-/*!\file gl4dfBlur.h
+/*!\file gl4dfBlur.c
  *
  * \brief filre réalisant un flou à partir d'une texture ou l'écran
  * vers une texture ou l'écran.

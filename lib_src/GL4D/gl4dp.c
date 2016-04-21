@@ -100,10 +100,10 @@ GLuint gl4dpInitScreenWithDimensions(GLuint w, GLuint h) {
  * viewport OpenGL, le lie à l'identifiant (OpenGL) de texture
  * retourné.
  * 
- * Utilise \param initScreenWithDimensions.
+ * Utilise \ref gl4dpInitScreenWithDimensions.
  *
  * \return l'identifiant (OpenGL) de la texture générée.
- * \see initScreenWithDimensions
+ * \see gl4dpInitScreenWithDimensions
  */
 GLuint gl4dpInitScreen(void) {
   int vp[4];

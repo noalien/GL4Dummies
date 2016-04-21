@@ -1,3 +1,13 @@
+/*!\file gl4dq.c
+ *
+ * \brief fonctions de manipulation de Quaternions
+ *
+ * \author Vincent Boyer boyer@ai.univ-paris8.fr 
+ * \author Sylvia Chalencon chalencon@ai.univ-paris8.fr
+ *
+ * \date 2013-2015
+*/
+
 #include "gl4dq.h"
 #include <math.h>
 
@@ -6,11 +16,11 @@ void gl4dqComputeScalaire(gl4dqQuaternion q){
   q[0] = (t>0.0) ? -sqrt(t) : 0.0;
 }
 
-void gl4dqConjuge(const gl4dqQuaternion q, gl4dqQuaternion conjuge){
-  conjuge[0] = q[0];
-  conjuge[1] = -q[1];
-  conjuge[2] = -q[2];
-  conjuge[3] = -q[3];
+void gl4dqConjugate(const gl4dqQuaternion q, gl4dqQuaternion conjugate){
+  conjugate[0] = q[0];
+  conjugate[1] = -q[1];
+  conjugate[2] = -q[2];
+  conjugate[3] = -q[3];
 }
 
 
@@ -45,13 +55,13 @@ void gl4dqCreatePurFromPoint(float *in, gl4dqQuaternion r){
 }
 
 void gl4dqRotatePoint(const gl4dqQuaternion q, float *in, float *out) {
-  gl4dqQuaternion conjuge, purfromin, r, final;
+  gl4dqQuaternion conjugate, purfromin, r, final;
   
   gl4dqCreatePurFromPoint(in, purfromin);
   //gl4dqNormalize (purfromin);
-  gl4dqConjuge(q, conjuge);
+  gl4dqConjugate(q, conjugate);
   gl4dqMultiply(q, purfromin, r);
-  gl4dqMultiply(r, conjuge, final);
+  gl4dqMultiply(r, conjugate, final);
 
   out[0] = final[1];
   out[1] = final[2];

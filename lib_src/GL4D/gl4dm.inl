@@ -1,4 +1,4 @@
-/*!\file gl4dm.c
+/*!\file gl4dm.inl
  * \brief Fonctions de gestion de matrix (inline).
  * \author Kevin HAVRANEK mzartek@hotmail.fr
  * \date Mars 21, 2015

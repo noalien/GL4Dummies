@@ -1,6 +1,9 @@
-//
-// Created by Farès Belhadj on 02/11/15.
-//
+/*!\file gl4droid.c
+ *
+ * \brief Fonctionnalités spécifiques au système Android. 
+ * \author Farès Belhadj amsi@ai.univ-paris8.fr
+ * \date November 11, 2015
+ */
 
 #include "gl4droid.h"
 
