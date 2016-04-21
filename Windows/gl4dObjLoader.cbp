@@ -7,12 +7,12 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="default">
-				<Option output="../bin/mingw32/gl4dObjLoader" prefix_auto="1" extension_auto="1" />
+				<Option output="../bin/Win32/gl4dObjLoader" prefix_auto="1" extension_auto="1" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
-					<Add directory="../lib_src/" />
+					<Add directory="../lib_src" />
 					<Add directory="dependencies/include/SDL2" />
 					<Add directory="." />
 				</Compiler>
@@ -25,7 +25,7 @@
 					<Add library="mingw32" />
 					<Add library="OpenGL32" />
 					<Add library="GLU32" />
-					<Add directory="../bin/mingw32" />
+					<Add directory="../bin/Win32" />
 					<Add directory="dependencies/lib" />
 				</Linker>
 			</Target>

@@ -1,54 +1,106 @@
-# Project: gl4dObjLoader
+# Project: GL4Dummies
 # Makefile created by Dev-C++ 4.9.9.2
 
 CPP  = g++.exe
 CC   = gcc.exe
 WINDRES = windres.exe
 RES  = 
-OBJ  = ../samples/example03/objLoader.o ../samples/example03/glm/glmimg_sim.o ../samples/example03/glm/glm.o ../samples/example03/glm/glm_util.o ../samples/example03/glm/glmimg.o ../samples/example03/glm/glmimg_devil.o ../samples/example03/glm/glmimg_jpg.o ../samples/example03/glm/glmimg_png.o ../samples/example03/glm/glmimg_sdl.o $(RES)
-LINKOBJ  = ../samples/example03/objLoader.o ../samples/example03/glm/glmimg_sim.o ../samples/example03/glm/glm.o ../samples/example03/glm/glm_util.o ../samples/example03/glm/glmimg.o ../samples/example03/glm/glmimg_devil.o ../samples/example03/glm/glmimg_jpg.o ../samples/example03/glm/glmimg_png.o ../samples/example03/glm/glmimg_sdl.o $(RES)
-LIBS =  -L"C:/Dev-Cpp/lib" -L"C:/LIB/SDL2/i686-w64-mingw32/lib" -L"../bin/mingw32" -L"./dependencies/lib" -mwindows -lmingw32 -lSDL2main -lSDL2 -mwindows -lGL4Dummies -lOpenGL32 -lGLU32  
-INCS =  -I"C:/Dev-Cpp/include"  -I"C:/LIB/SDL2/i686-w64-mingw32/include/SDL2"  -I"./dependencies/include/SDL2"  -I"../lib_src" 
-CXXINCS =  -I"C:/Dev-Cpp/lib/gcc/mingw32/3.4.2/include"  -I"C:/Dev-Cpp/include/c++/3.4.2/backward"  -I"C:/Dev-Cpp/include/c++/3.4.2/mingw32"  -I"C:/Dev-Cpp/include/c++/3.4.2"  -I"C:/Dev-Cpp/include"  -I"./dependencies/include/SDL2"  -I"../lib_src" 
-BIN  = ../bin/mingw32/gl4dObjLoader.exe
-CXXFLAGS = $(CXXINCS)  
-CFLAGS = $(INCS)  
+OBJ  = ../lib_src/GL4D/gl4dummies.o ../lib_src/GL4D/aes.o ../lib_src/GL4D/bin_tree.o ../lib_src/GL4D/gl4dm.o ../lib_src/GL4D/gl4du.o ../lib_src/GL4D/gl4dfBlur.o ../lib_src/GL4D/gl4dfConversion.o ../lib_src/GL4D/gl4dfFocus.o ../lib_src/GL4D/gl4dfFractalPainting.o ../lib_src/GL4D/gl4dfHatching.o ../lib_src/GL4D/gl4dfMedia.o ../lib_src/GL4D/gl4dfMedian.o ../lib_src/GL4D/gl4dfOpticalFlow.o ../lib_src/GL4D/gl4dfScattering.o ../lib_src/GL4D/gl4dfSegmentation.o ../lib_src/GL4D/gl4dfSobel.o ../lib_src/GL4D/gl4dg.o ../lib_src/GL4D/gl4dhAnimeManager.o ../lib_src/GL4D/gl4dp.o ../lib_src/GL4D/gl4dq.o ../lib_src/GL4D/gl4droid.o ../lib_src/GL4D/gl4duw_SDL2.o ../lib_src/GL4D/linked_list.o ../lib_src/GL4D/list.o ../lib_src/GL4D/vector.o $(RES)
+LINKOBJ  = ../lib_src/GL4D/gl4dummies.o ../lib_src/GL4D/aes.o ../lib_src/GL4D/bin_tree.o ../lib_src/GL4D/gl4dm.o ../lib_src/GL4D/gl4du.o ../lib_src/GL4D/gl4dfBlur.o ../lib_src/GL4D/gl4dfConversion.o ../lib_src/GL4D/gl4dfFocus.o ../lib_src/GL4D/gl4dfFractalPainting.o ../lib_src/GL4D/gl4dfHatching.o ../lib_src/GL4D/gl4dfMedia.o ../lib_src/GL4D/gl4dfMedian.o ../lib_src/GL4D/gl4dfOpticalFlow.o ../lib_src/GL4D/gl4dfScattering.o ../lib_src/GL4D/gl4dfSegmentation.o ../lib_src/GL4D/gl4dfSobel.o ../lib_src/GL4D/gl4dg.o ../lib_src/GL4D/gl4dhAnimeManager.o ../lib_src/GL4D/gl4dp.o ../lib_src/GL4D/gl4dq.o ../lib_src/GL4D/gl4droid.o ../lib_src/GL4D/gl4duw_SDL2.o ../lib_src/GL4D/linked_list.o ../lib_src/GL4D/list.o ../lib_src/GL4D/vector.o $(RES)
+LIBS =  -L"C:/Dev-Cpp/lib" -L"./dependencies/lib" --export-all-symbols --add-stdcall-alias -lmingw32 -lOpenGL32 -lSDL2main -lSDL2  
+INCS =  -I"C:/Dev-Cpp/include"  -I"./dependencies/include/SDL2" 
+CXXINCS =  -I"C:/Dev-Cpp/lib/gcc/mingw32/3.4.2/include"  -I"C:/Dev-Cpp/include/c++/3.4.2/backward"  -I"C:/Dev-Cpp/include/c++/3.4.2/mingw32"  -I"C:/Dev-Cpp/include/c++/3.4.2"  -I"C:/Dev-Cpp/include"  -I"./dependencies/include/SDL2" 
+BIN  = ../bin/Win32/GL4Dummies.dll
+CXXFLAGS = $(CXXINCS) -DBUILDING_DLL=1  
+CFLAGS = $(INCS) -DBUILDING_DLL=1  
 RM = rm -f
 
 .PHONY: all all-before all-after clean clean-custom
 
-all: all-before ../bin/mingw32/gl4dObjLoader.exe all-after
+all: all-before ../bin/Win32/GL4Dummies.dll all-after
 
 
 clean: clean-custom
 	${RM} $(OBJ) $(BIN)
 
-$(BIN): $(OBJ)
-	$(CC) $(LINKOBJ) -o "..\bin\mingw32\gl4dObjLoader.exe" $(LIBS)
+DLLWRAP=dllwrap.exe
+DEFFILE=../bin/Win32/libGL4Dummies.def
+STATICLIB=../bin/Win32/libGL4Dummies.a
 
-../samples/example03/objLoader.o: ../samples/example03/objLoader.c
-	$(CC) -c ../samples/example03/objLoader.c -o ../samples/example03/objLoader.o $(CFLAGS)
+$(BIN): $(LINKOBJ)
+	$(DLLWRAP) --output-def $(DEFFILE) --implib $(STATICLIB) $(LINKOBJ) $(LIBS) -o $(BIN)
 
-../samples/example03/glm/glmimg_sim.o: ../samples/example03/glm/glmimg_sim.c
-	$(CC) -c ../samples/example03/glm/glmimg_sim.c -o ../samples/example03/glm/glmimg_sim.o $(CFLAGS)
+../lib_src/GL4D/gl4dummies.o: ../lib_src/GL4D/gl4dummies.c
+	$(CC) -c ../lib_src/GL4D/gl4dummies.c -o ../lib_src/GL4D/gl4dummies.o $(CFLAGS)
 
-../samples/example03/glm/glm.o: ../samples/example03/glm/glm.c
-	$(CC) -c ../samples/example03/glm/glm.c -o ../samples/example03/glm/glm.o $(CFLAGS)
+../lib_src/GL4D/aes.o: ../lib_src/GL4D/aes.c
+	$(CC) -c ../lib_src/GL4D/aes.c -o ../lib_src/GL4D/aes.o $(CFLAGS)
 
-../samples/example03/glm/glm_util.o: ../samples/example03/glm/glm_util.c
-	$(CC) -c ../samples/example03/glm/glm_util.c -o ../samples/example03/glm/glm_util.o $(CFLAGS)
+../lib_src/GL4D/bin_tree.o: ../lib_src/GL4D/bin_tree.c
+	$(CC) -c ../lib_src/GL4D/bin_tree.c -o ../lib_src/GL4D/bin_tree.o $(CFLAGS)
 
-../samples/example03/glm/glmimg.o: ../samples/example03/glm/glmimg.c
-	$(CC) -c ../samples/example03/glm/glmimg.c -o ../samples/example03/glm/glmimg.o $(CFLAGS)
+../lib_src/GL4D/gl4dm.o: ../lib_src/GL4D/gl4dm.c
+	$(CC) -c ../lib_src/GL4D/gl4dm.c -o ../lib_src/GL4D/gl4dm.o $(CFLAGS)
 
-../samples/example03/glm/glmimg_devil.o: ../samples/example03/glm/glmimg_devil.c
-	$(CC) -c ../samples/example03/glm/glmimg_devil.c -o ../samples/example03/glm/glmimg_devil.o $(CFLAGS)
+../lib_src/GL4D/gl4du.o: ../lib_src/GL4D/gl4du.c
+	$(CC) -c ../lib_src/GL4D/gl4du.c -o ../lib_src/GL4D/gl4du.o $(CFLAGS)
 
-../samples/example03/glm/glmimg_jpg.o: ../samples/example03/glm/glmimg_jpg.c
-	$(CC) -c ../samples/example03/glm/glmimg_jpg.c -o ../samples/example03/glm/glmimg_jpg.o $(CFLAGS)
+../lib_src/GL4D/gl4dfBlur.o: ../lib_src/GL4D/gl4dfBlur.c
+	$(CC) -c ../lib_src/GL4D/gl4dfBlur.c -o ../lib_src/GL4D/gl4dfBlur.o $(CFLAGS)
 
-../samples/example03/glm/glmimg_png.o: ../samples/example03/glm/glmimg_png.c
-	$(CC) -c ../samples/example03/glm/glmimg_png.c -o ../samples/example03/glm/glmimg_png.o $(CFLAGS)
+../lib_src/GL4D/gl4dfConversion.o: ../lib_src/GL4D/gl4dfConversion.c
+	$(CC) -c ../lib_src/GL4D/gl4dfConversion.c -o ../lib_src/GL4D/gl4dfConversion.o $(CFLAGS)
 
-../samples/example03/glm/glmimg_sdl.o: ../samples/example03/glm/glmimg_sdl.c
-	$(CC) -c ../samples/example03/glm/glmimg_sdl.c -o ../samples/example03/glm/glmimg_sdl.o $(CFLAGS)
+../lib_src/GL4D/gl4dfFocus.o: ../lib_src/GL4D/gl4dfFocus.c
+	$(CC) -c ../lib_src/GL4D/gl4dfFocus.c -o ../lib_src/GL4D/gl4dfFocus.o $(CFLAGS)
+
+../lib_src/GL4D/gl4dfFractalPainting.o: ../lib_src/GL4D/gl4dfFractalPainting.c
+	$(CC) -c ../lib_src/GL4D/gl4dfFractalPainting.c -o ../lib_src/GL4D/gl4dfFractalPainting.o $(CFLAGS)
+
+../lib_src/GL4D/gl4dfHatching.o: ../lib_src/GL4D/gl4dfHatching.c
+	$(CC) -c ../lib_src/GL4D/gl4dfHatching.c -o ../lib_src/GL4D/gl4dfHatching.o $(CFLAGS)
+
+../lib_src/GL4D/gl4dfMedia.o: ../lib_src/GL4D/gl4dfMedia.c
+	$(CC) -c ../lib_src/GL4D/gl4dfMedia.c -o ../lib_src/GL4D/gl4dfMedia.o $(CFLAGS)
+
+../lib_src/GL4D/gl4dfMedian.o: ../lib_src/GL4D/gl4dfMedian.c
+	$(CC) -c ../lib_src/GL4D/gl4dfMedian.c -o ../lib_src/GL4D/gl4dfMedian.o $(CFLAGS)
+
+../lib_src/GL4D/gl4dfOpticalFlow.o: ../lib_src/GL4D/gl4dfOpticalFlow.c
+	$(CC) -c ../lib_src/GL4D/gl4dfOpticalFlow.c -o ../lib_src/GL4D/gl4dfOpticalFlow.o $(CFLAGS)
+
+../lib_src/GL4D/gl4dfScattering.o: ../lib_src/GL4D/gl4dfScattering.c
+	$(CC) -c ../lib_src/GL4D/gl4dfScattering.c -o ../lib_src/GL4D/gl4dfScattering.o $(CFLAGS)
+
+../lib_src/GL4D/gl4dfSegmentation.o: ../lib_src/GL4D/gl4dfSegmentation.c
+	$(CC) -c ../lib_src/GL4D/gl4dfSegmentation.c -o ../lib_src/GL4D/gl4dfSegmentation.o $(CFLAGS)
+
+../lib_src/GL4D/gl4dfSobel.o: ../lib_src/GL4D/gl4dfSobel.c
+	$(CC) -c ../lib_src/GL4D/gl4dfSobel.c -o ../lib_src/GL4D/gl4dfSobel.o $(CFLAGS)
+
+../lib_src/GL4D/gl4dg.o: ../lib_src/GL4D/gl4dg.c
+	$(CC) -c ../lib_src/GL4D/gl4dg.c -o ../lib_src/GL4D/gl4dg.o $(CFLAGS)
+
+../lib_src/GL4D/gl4dhAnimeManager.o: ../lib_src/GL4D/gl4dhAnimeManager.c
+	$(CC) -c ../lib_src/GL4D/gl4dhAnimeManager.c -o ../lib_src/GL4D/gl4dhAnimeManager.o $(CFLAGS)
+
+../lib_src/GL4D/gl4dp.o: ../lib_src/GL4D/gl4dp.c
+	$(CC) -c ../lib_src/GL4D/gl4dp.c -o ../lib_src/GL4D/gl4dp.o $(CFLAGS)
+
+../lib_src/GL4D/gl4dq.o: ../lib_src/GL4D/gl4dq.c
+	$(CC) -c ../lib_src/GL4D/gl4dq.c -o ../lib_src/GL4D/gl4dq.o $(CFLAGS)
+
+../lib_src/GL4D/gl4droid.o: ../lib_src/GL4D/gl4droid.c
+	$(CC) -c ../lib_src/GL4D/gl4droid.c -o ../lib_src/GL4D/gl4droid.o $(CFLAGS)
+
+../lib_src/GL4D/gl4duw_SDL2.o: ../lib_src/GL4D/gl4duw_SDL2.c
+	$(CC) -c ../lib_src/GL4D/gl4duw_SDL2.c -o ../lib_src/GL4D/gl4duw_SDL2.o $(CFLAGS)
+
+../lib_src/GL4D/linked_list.o: ../lib_src/GL4D/linked_list.c
+	$(CC) -c ../lib_src/GL4D/linked_list.c -o ../lib_src/GL4D/linked_list.o $(CFLAGS)
+
+../lib_src/GL4D/list.o: ../lib_src/GL4D/list.c
+	$(CC) -c ../lib_src/GL4D/list.c -o ../lib_src/GL4D/list.o $(CFLAGS)
+
+../lib_src/GL4D/vector.o: ../lib_src/GL4D/vector.c
+	$(CC) -c ../lib_src/GL4D/vector.c -o ../lib_src/GL4D/vector.o $(CFLAGS)

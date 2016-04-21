@@ -2,7 +2,7 @@
  *
  * \brief Sample d'utilisation de la bibliothèque GL4Dummies avec SDL2
  * et en OpenGL 3.3+ , génération et affichage d'un maillage de terrain.
- * 
+ *
  * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
  *
  * \date October 30 2014
@@ -114,7 +114,7 @@ int main(int argc, char ** argv) {
     _pId = gl4duCreateProgram("<vs>../share/GL4Dummies/shaders/basic.vs", "<fs>../share/GL4Dummies/shaders/basic.fs", NULL);
     initData();
     loop(_win);
-  } else 
+  } else
     fprintf(stderr, "Erreur lors de la creation de la fenetre\n");
   return 0;
 }
@@ -162,8 +162,8 @@ static SDL_Window * initWindow(int w, int h, SDL_GLContext * poglContext) {
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-  if( (win = SDL_CreateWindow("Fenetre GL", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
-			      w, h, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | 
+  if( (win = SDL_CreateWindow("Fenetre GL", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+			      w, h, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE |
 			      SDL_WINDOW_SHOWN)) == NULL )
     return NULL;
   if( (*poglContext = SDL_GL_CreateContext(win)) == NULL ) {
@@ -171,7 +171,7 @@ static SDL_Window * initWindow(int w, int h, SDL_GLContext * poglContext) {
     return NULL;
   }
   fprintf(stderr, "Version d'OpenGL : %s\n", glGetString(GL_VERSION));
-  fprintf(stderr, "Version de shaders supportes : %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));  
+  fprintf(stderr, "Version de shaders supportes : %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
   atexit(quit);
   return win;
 }
@@ -193,7 +193,7 @@ static void tnormale(GLfloat * triangle, GLfloat * n) {
   GLfloat * u = triangle;
   GLfloat * v = &triangle[3];
   GLfloat * w = &triangle[6];
-  GLfloat uv[3] = {v[0] - u[0], v[1] - u[1], v[2] - u[2]}, vw[3] = {w[0] - v[0], w[1] - v[1], w[2] - v[2]}; 
+  GLfloat uv[3] = {v[0] - u[0], v[1] - u[1], v[2] - u[2]}, vw[3] = {w[0] - v[0], w[1] - v[1], w[2] - v[2]};
   MVEC3CROSS(n, uv, vw);
   MVEC3NORMALIZE(n);
 }
@@ -226,7 +226,7 @@ static void normale(Uint8 * pixels, int x, int z, GLfloat * n, int w, int h) {
     {-1, -1}
   }, i, k;
   GLfloat t[9], tn[3];
-  
+
   n[0] = n[1] = n[2] = 0;
   for(i = 0; i < 6; i++) {
     int x1 = x + dir[2 * i][0], z1 = z + dir[2 * i][1],
@@ -326,7 +326,7 @@ static void initData(void) {
   glGenBuffers(1, &_buffer);
   glBindBuffer(GL_ARRAY_BUFFER, _buffer);
   glBufferData(GL_ARRAY_BUFFER, (w - 1) * (h - 1) * 6 * 8 * sizeof *data, data, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof *data, (const void *)0);  
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof *data, (const void *)0);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE,  8 * sizeof *data, (const void *)(3 * sizeof *data));
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof *data, (const void *)(6 * sizeof *data));
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -406,7 +406,7 @@ static void loop(SDL_Window * win) {
  */
 static void manageEvents(SDL_Window * win) {
   SDL_Event event;
-  while(SDL_PollEvent(&event)) 
+  while(SDL_PollEvent(&event))
     switch (event.type) {
     case SDL_KEYDOWN:
       switch(event.key.keysym.sym) {

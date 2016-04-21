@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="default">
-				<Option output="../bin/mingw32/GL4Dummies" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
+				<Option output="../bin/Win32/GL4Dummies" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -46,10 +46,58 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../lib_src/GL4D/bin_tree.h" />
+		<Unit filename="../lib_src/GL4D/gl4dfBlur.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lib_src/GL4D/gl4dfConversion.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lib_src/GL4D/gl4dfFocus.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lib_src/GL4D/gl4dfFractalPainting.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lib_src/GL4D/gl4dfHatching.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lib_src/GL4D/gl4dfMedia.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lib_src/GL4D/gl4dfMedian.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lib_src/GL4D/gl4dfOpticalFlow.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lib_src/GL4D/gl4dfScattering.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lib_src/GL4D/gl4dfSegmentation.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lib_src/GL4D/gl4dfSobel.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lib_src/GL4D/gl4dg.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lib_src/GL4D/gl4dhAnimeManager.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../lib_src/GL4D/gl4dm.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../lib_src/GL4D/gl4dm.h" />
+		<Unit filename="../lib_src/GL4D/gl4dp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lib_src/GL4D/gl4dq.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lib_src/GL4D/gl4droid.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../lib_src/GL4D/gl4du.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -58,7 +106,13 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../lib_src/GL4D/gl4dummies.h" />
+		<Unit filename="../lib_src/GL4D/gl4duw_SDL2.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../lib_src/GL4D/gl4wdummies.h" />
+		<Unit filename="../lib_src/GL4D/linked_list.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Extensions>
 			<code_completion />
 			<envvars />
