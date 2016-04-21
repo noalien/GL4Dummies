@@ -84,10 +84,10 @@ GLuint gl4dpInitScreenWithDimensions(GLuint w, GLuint h) {
   assert(w * h);
   addScreen(w, h);
   glBindTexture(GL_TEXTURE_2D, (*_cur_screen)->tId);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); /* ICI */
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   if(_pId == 0) {
     _quadId = gl4dgGenQuadf();
     _pId = gl4duCreateProgram(imvs, imfs, NULL);
@@ -384,8 +384,8 @@ void gl4dpCopyFromSDLSurfaceWithTransforms(SDL_Surface * s, const GLfloat scale[
   glBindTexture(GL_TEXTURE_2D, id);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, d->w, d->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, d->pixels);
   SDL_FreeSurface(d);
   /* RECUPERER L'ID DE LA DERNIERE TEXTURE ATTACHEE AU FRAMEBUFFER */
@@ -398,31 +398,6 @@ void gl4dpCopyFromSDLSurfaceWithTransforms(SDL_Surface * s, const GLfloat scale[
   (*_cur_screen)->isCPUToDate = 0;
 
   drawTex((*_cur_screen)->tId, s0, t0);
-}
-
-/*!\brief convertie une surface SDL en un tableau de luminances
- * comprises entre 0 et 1 (L = 0.299 * R + 0.587 * G + 0.114 * B). Le
- * repère des y est remis vers le haut pour un usage GL.
- *
- * \param s La surface SDL à convertir
- * \return le pointeur vers le tableau de luminances (à libérer avec free).
- */
-GLfloat * gl4dpSDLSurfaceToLuminanceMap(SDL_Surface * s) {
-  int x, y, yw, wh = s->w * s->h;
-  Uint32 * p;
-  Uint8 r, g, b;
-  SDL_Surface * d = SDL_ConvertSurfaceFormat(s, SDL_PIXELFORMAT_ABGR8888, 0);
-  GLfloat * wm = malloc(wh * sizeof *wm);
-  assert(wm);
-  for(y = d->h -1, p = d->pixels; y >= 0; y--) {
-    yw = y * d->w;
-    for(x = 0; x < d->w; x++) {
-      SDL_GetRGB(*p++, d->format, &r, &g, &b);
-      wm[yw + x] = (0.299f * r) / 255.0f + (0.587f * g) / 255.0f + (0.114f * b) / 255.0f;
-    }
-  }
-  SDL_FreeSurface(d);
-  return wm;
 }
 
 /*!\brief copie la surface SDL vers l'écran en cours en prenant 100% de l'écran.
@@ -499,8 +474,8 @@ void gl4dpMap(GLuint dstSId, GLuint srcSId, const GLfloat pRect[4], const GLfloa
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
   glDisable(GL_BLEND);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,  fboTId,  0);
   if(vao)
