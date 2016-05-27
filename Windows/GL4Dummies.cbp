@@ -79,6 +79,9 @@
 		<Unit filename="../lib_src/GL4D/gl4dfSobel.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../lib_src/GL4D/gl4dfCommon.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../lib_src/GL4D/gl4dg.c">
 			<Option compilerVar="CC" />
 		</Unit>

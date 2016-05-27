@@ -15,8 +15,8 @@
 #include "gl4df.h"
 #include "gl4dfCommon.h"
 
-static GLfloat _mixFactor = 0.5f;
-static GLuint _sobelPId = 0, _width = 0, _height = 0, _tempTId[2] = {0}, _plan = 0, _fbo = 0, _mixMode = 0 /* none */;
+static GLfloat _mixFactor = 0.5f/* , _color[4] = {1, 1, 1, 1} */;
+static GLuint _sobelPId = 0, _mixMode = 0 /* none */;
 static GLboolean _isLuminance = GL_TRUE, _isInvert = GL_TRUE;
 
 static void init(void);
@@ -29,6 +29,10 @@ static void (*sobelfptr)(GLuint, GLuint, GLboolean) = sobelfinit;
 void gl4dfSobel(GLuint in, GLuint out, GLboolean flipV) {
   sobelfptr(in, out, flipV);
 }
+
+/* void gl4dfSobelSetColor(GLfloat * vec4Color) { */
+/*   _color[0] = vec4Color[0]; _color[1] = vec4Color[1]; _color[2] = vec4Color[2]; _color[3] = vec4Color[3];  */
+/* } */
 
 void gl4dfSobelSetResultMode(GL4DFenum mode) {
   switch(mode) {
@@ -75,7 +79,6 @@ void gl4dfSobelSetMixFactor(GLfloat factor) {
   _mixFactor = factor;
 }
 
-
 /* appelée la première fois */
 static void sobelfinit(GLuint in, GLuint out, GLboolean flipV) {
   init();
@@ -88,7 +91,7 @@ static void sobelfsobel(GLuint in, GLuint out, GLboolean flipV) {
   int n;
   GLint vp[4], w, h;
   GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND);
-  GLuint rin = in, cfbo, rout = out ? out : _tempTId[1];
+  GLuint rin = in, cfbo, rout = out ? out : fcommGetTempTex(1);
   GLint polygonMode[2];
   glGetIntegerv(GL_POLYGON_MODE, polygonMode);
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -96,13 +99,13 @@ static void sobelfsobel(GLuint in, GLuint out, GLboolean flipV) {
   glGetIntegerv(GL_FRAMEBUFFER_BINDING, &n);
   cfbo = n;
   if(in == 0) { /* Pas d'entrée, donc l'entrée est le dernier draw */
-    glUseProgram(0);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _tempTId[0],  0);
-    glBindTexture(GL_TEXTURE_2D, _tempTId[0]);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, vp[2] - vp[0], vp[3] - vp[1], 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    glBlitFramebuffer(vp[0], vp[1], vp[2], vp[3], 0, 0, _width, _height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-    rin = _tempTId[0];
+    /* glUseProgram(0); */
+    /* glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fcommGetFBO()); */
+    /* glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fcommGetTempTex(0),  0); */
+    /* glBindTexture(GL_TEXTURE_2D, fcommGetTempTex(0)); */
+    /* glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, vp[2] - vp[0], vp[3] - vp[1], 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); */
+    /* glBlitFramebuffer(vp[0], vp[1], vp[2], vp[3], 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST); */
+    gl4dfConvFrame2Tex(&rin);
   } 
   if(out == 0) { /* Pas de sortie, donc sortie aux dimensions du viewport */
     w = vp[2] - vp[0]; 
@@ -112,21 +115,19 @@ static void sobelfsobel(GLuint in, GLuint out, GLboolean flipV) {
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
   }
-  if(w != _width || h != _height) {
-    _width  = w; _height = h;
-    glBindTexture(GL_TEXTURE_2D, _tempTId[1]);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);  
-  }
-  glViewport(0, 0, _width, _height);
-  glBindFramebuffer(GL_FRAMEBUFFER, _fbo); {
-    GLfloat step[] = {1.0f / (GLfloat)_width, 1.0f / (GLfloat)_height};
+  glBindTexture(GL_TEXTURE_2D, fcommGetTempTex(1));
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);  
+  glViewport(0, 0, w, h);
+  glBindFramebuffer(GL_FRAMEBUFFER, fcommGetFBO()); {
+    GLfloat step[] = {1.0f / (GLfloat)w, 1.0f / (GLfloat)h};
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, rout,  0);
     glUseProgram(_sobelPId);
     glUniform1i(glGetUniformLocation(_sobelPId,  "myTexture"), 0);
     glUniform1i(glGetUniformLocation(_sobelPId,  "inv"), flipV);
-    glUniform1i(glGetUniformLocation(_sobelPId,  "width"), _width);
-    glUniform1i(glGetUniformLocation(_sobelPId,  "height"), _height);
+    glUniform1i(glGetUniformLocation(_sobelPId,  "width"), w);
+    glUniform1i(glGetUniformLocation(_sobelPId,  "height"), h);
     glUniform2fv(glGetUniformLocation(_sobelPId,  "step"), 1, step);
+    /* glUniform4fv(glGetUniformLocation(_sobelPId,  "color"), 1, _color); */
     glUniform1i(glGetUniformLocation(_sobelPId,  "invResult"), _isInvert);
     glUniform1i(glGetUniformLocation(_sobelPId,  "luminance"), _isLuminance);
     glUniform1i(glGetUniformLocation(_sobelPId,  "mixMode"), _mixMode);
@@ -135,13 +136,13 @@ static void sobelfsobel(GLuint in, GLuint out, GLboolean flipV) {
     if(bl) glDisable(GL_BLEND);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, rin);
-    gl4dgDraw(_plan);
+    gl4dgDraw(fcommGetPlane());
     glBindTexture(GL_TEXTURE_2D, 0);
   }
   if(!out) { /* Copier à l'écran en cas de out nul */
     glUseProgram(0);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, cfbo);
-    glBlitFramebuffer(0, 0, _width, _height, vp[0], vp[1], vp[2], vp[3], GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    glBlitFramebuffer(0, 0, w, h, vp[0], vp[1], vp[2], vp[3], GL_COLOR_BUFFER_BIT, GL_LINEAR);
   }
   glViewport(vp[0], vp[1], vp[2], vp[3]);
   glBindFramebuffer(GL_FRAMEBUFFER, cfbo);
@@ -151,8 +152,6 @@ static void sobelfsobel(GLuint in, GLuint out, GLboolean flipV) {
 }
 
 static void init(void) {
-  GLint vp[4];
-  glGetIntegerv(GL_VIEWPORT, vp);
   if(!_sobelPId) {
     const char * imfs =
       "<imfs>gl4df_sobel1D.fs</imfs>\n\
@@ -196,35 +195,9 @@ static void init(void) {
        }";
     _sobelPId = gl4duCreateProgram(gl4dfBasicVS, imfs, NULL);
   }
-  if(!_plan) {
-    _plan = gl4dgGenQuadf();
-  }
-  if(!_fbo) {
-    glGenFramebuffers(1, &_fbo);
-  }
-  if(!_tempTId[0]) {
-    int i;
-    glGenTextures(2, _tempTId);
-    for(i = 0; i < 2; i++) {
-      glBindTexture(GL_TEXTURE_2D, _tempTId[i]);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    }
-    glBindTexture(GL_TEXTURE_2D, 0);
-    gl4duAtExit(quit);
-  }
+  gl4duAtExit(quit);
 }
 
 static void quit(void) {
-  if(_tempTId[0]) {
-    glDeleteTextures(2, _tempTId);
-    _tempTId[0] = _tempTId[1] = 0;
-  }
-  if(_fbo) {
-    glDeleteFramebuffers(1, &_fbo);
-    _fbo = 0;
-  }
   sobelfptr = sobelfinit;
 }

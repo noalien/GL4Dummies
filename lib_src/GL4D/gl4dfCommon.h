@@ -2,6 +2,8 @@
  *
  * \brief The GL4Dummies filters : éléments communs pour les fichiers gl4dfxxx.c
  *
+ * A usage interne à la lib.
+ *
  * \author Farès BELHADJ amsi@ai.univ-paris8.fr
  * \date April 14, 2016
  * 
@@ -28,6 +30,10 @@ extern "C" {
        else\n								\
          vsoTexCoord = vec2(vsiTexCoord.s, vsiTexCoord.t);\n		\
      }";
+
+  extern GLuint fcommGetTempTex(GLuint i);
+  extern GLuint fcommGetPlane(void);
+  extern GLuint fcommGetFBO(void);
 
 #ifdef __cplusplus
 }

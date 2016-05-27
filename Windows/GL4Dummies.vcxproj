@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -113,6 +113,7 @@
     <ClCompile Include="..\lib_src\GL4D\gl4dfScattering.c" />
     <ClCompile Include="..\lib_src\GL4D\gl4dfSegmentation.c" />
     <ClCompile Include="..\lib_src\GL4D\gl4dfSobel.c" />
+    <ClCompile Include="..\lib_src\GL4D\gl4dfCommon.c" />
     <ClCompile Include="..\lib_src\GL4D\gl4dg.c" />
     <ClCompile Include="..\lib_src\GL4D\gl4dhAnimeManager.c" />
     <ClCompile Include="..\lib_src\GL4D\gl4dm.c" />

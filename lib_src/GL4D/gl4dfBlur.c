@@ -16,8 +16,8 @@
 #include "gl4dfCommon.h"
 #include "gl4dfBlurWeights.h"
 
-static GLuint _blurPId = 0, _width = 1, _height = 1, _tempTId[3] = {0}, _plan = 0, _fbo = 0;
-static GLfloat _offsetV[BLUR_MAX_RADIUS << 1], _offsetH[BLUR_MAX_RADIUS << 1];
+static GLuint _blurPId = 0, _width = 1, _height = 1, _tempTId[3] = {0}, _plan = 0, _fbo = 0, _weightMapComponent = 0;
+static GLfloat _offsetV[BLUR_MAX_RADIUS << 1], _offsetH[BLUR_MAX_RADIUS << 1], _weightMapTranslate = 0, _weightMapScale = 1;
 
 static void init(void);
 static void setDimensions(GLuint w, GLuint h);
@@ -26,6 +26,18 @@ static void quit(void);
 static void blurfinit(GLuint, GLuint, GLuint, GLuint, GLuint, GLboolean);
 static void blurfblur(GLuint, GLuint, GLuint, GLuint, GLuint, GLboolean);
 static void (*blurfptr)(GLuint, GLuint, GLuint, GLuint, GLuint, GLboolean) = blurfinit;
+
+void gl4dfBlurSetWeightMapComponent(GLuint weightMapComponent) {
+  _weightMapComponent = weightMapComponent % 4;
+}
+
+void gl4dfBlurSetWeightMapTranslate(GLfloat weightMapTranslate) {
+  _weightMapTranslate = weightMapTranslate;
+}
+
+void gl4dfBlurSetWeightMapScale(GLfloat weightMapScale) {
+  _weightMapScale = weightMapScale;
+}
 
 void gl4dfBlur(GLuint in, GLuint out, GLuint radius, GLuint nb_iterations, GLuint weight, GLboolean flipV) {
   blurfptr(in, out, radius, nb_iterations, weight, flipV);
@@ -80,6 +92,9 @@ static void blurfblur(GLuint in, GLuint out, GLuint radius, GLuint nb_iterations
       glUniform1i(glGetUniformLocation(_blurPId,  "myTexture"), 0);
       glUniform1i(glGetUniformLocation(_blurPId,  "myWeights"), 1);
       glUniform1i(glGetUniformLocation(_blurPId,  "useWeightMap"), weight ? 1 : 0);
+      glUniform1i(glGetUniformLocation(_blurPId,  "weightMapComponent"), _weightMapComponent);
+      glUniform1f(glGetUniformLocation(_blurPId,  "weightMapTranslate"), _weightMapTranslate);
+      glUniform1f(glGetUniformLocation(_blurPId,  "weightMapScale"), _weightMapScale);
       glUniform1i(glGetUniformLocation(_blurPId,  "inv"), i ? flipV : 0);
       glUniform1fv(glGetUniformLocation(_blurPId, "weight"), BLUR_MAX_RADIUS, &weights[(radius * (radius - 1)) >> 1]);
       glUniform2fv(glGetUniformLocation(_blurPId, "offset"), BLUR_MAX_RADIUS, (i % 2) ? _offsetH : _offsetV);
@@ -116,14 +131,14 @@ static void init(void) {
   if(!_blurPId) {
     const char * imfs =
       "<imfs>gl4df_blur1D.fs</imfs>\n\
-       #version 330\n				\
-       uniform sampler2D myTexture;\n		\
-       uniform sampler2D myWeights;\n		\
-       uniform int nweights, useWeightMap;\n	\
-       uniform float weight[128];\n		\
-       uniform vec2 offset[128];\n		\
-       in  vec2 vsoTexCoord;\n			\
-       out vec4 fragColor;\n			\
+       #version 330\n							\
+       uniform sampler2D myTexture;\n					\
+       uniform sampler2D myWeights;\n					\
+       uniform int nweights, useWeightMap, weightMapComponent;\n	\
+       uniform float weight[128], weightMapTranslate, weightMapScale;\n	\
+       uniform vec2 offset[128];\n					\
+       in  vec2 vsoTexCoord;\n						\
+       out vec4 fragColor;\n						\
        vec4 uniformBlur(void) {\n					\
          vec4 c = texture(myTexture, vsoTexCoord.st) * weight[0];\n	\
          for (int i = 1; i < nweights; i++) {\n				\
@@ -133,8 +148,8 @@ static void init(void) {
          return c;\n							\
        }\n								\
        vec4 weightedBlur(void) {\n					\
-         float w;\n							\
-         int sub_nweights = 1 + int(float(nweights) * texture(myWeights, vsoTexCoord.st).r);\n \
+         float w = texture(myWeights, vsoTexCoord.st)[weightMapComponent];\n							\
+         int sub_nweights = 1 + int(float(nweights) * clamp(weightMapScale * (w + weightMapTranslate), 0, 1));\n \
          vec4 c = texture(myTexture, vsoTexCoord.st) * (w = weight[0]);\n \
          for (int i = 1; i < sub_nweights; i++) {\n			\
            w += 2.0 * weight[i];\n					\

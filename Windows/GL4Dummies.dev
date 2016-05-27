@@ -1,7 +1,7 @@
 [Project]
 FileName=GL4Dummies.dev
 Name=GL4Dummies
-UnitCount=25
+UnitCount=26
 Type=3
 Ver=1
 ObjFiles=
@@ -289,6 +289,16 @@ BuildCmd=
 
 [Unit25]
 FileName=..\lib_src\GL4D\vector.c
+CompileCpp=0
+Folder=GL4Dummies
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit26]
+FileName=..\lib_src\GL4D\gl4dfCommon.c
 CompileCpp=0
 Folder=GL4Dummies
 Compile=1

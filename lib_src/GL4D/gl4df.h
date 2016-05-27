@@ -30,8 +30,46 @@ extern "C" {
     GL4DF_SOBEL_MIX_ADD,
     GL4DF_SOBEL_MIX_MULT
   };
-
+  /* Dans gl4dConversion.c */
+  /*!\brief Envoie le framebuffer actif (ou l'écran) vers une texture.
+   *
+   *\param out pointeur vers la variable contenant l'identifiant de
+   * texture dans laquelle le framebuffer (ou l'écran) sera copié. Si
+   * cette identifiant est nul (0), copie le framebuffer (ou l'écran)
+   * vers un identifiant temporaire (donc pouvant etre écrasé par un
+   * autre appel à cette fonction ou une autre) qui est inscrit dans
+   * \a out.
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfConvFrame2Tex(GLuint * out);
+  /*!\brief Envoie une texture identifiée par \a in vers le framebuffer actif (ou écran).
+   *
+   *\param in identifiant OpenGL de la texture à copier dans le framebuffer (ou l'écran).
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfConvTex2Frame(GLuint in);
+  /*!\brief Indique le filtre à utiliser en cas d'interpolation du
+   * Blit. Le filtre par défaut est GL_NEAREST.
+   *
+   *\param filter est le filtre d'interpolation (GL_LINEAR ou GL_NEAREST).
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfConvSetFilter(GLenum filter);
   /* Dans gl4dfBlur.c */
+  /*!\brief Indique la composante R (=0), G (=1), B (=2) ou A (=3) à
+   * utiliser dans la weight map.
+   *
+   *\param weightMapComponent le numéro de la composante : 0, 1, 2 ou
+   *3. La valeur par défaut est 0.
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfBlurSetWeightMapComponent(GLuint weightMapComponent);
+  /*!\brief Indique la translation de la valeur appliquée depuis la weight map.
+   *
+   *\param weightMapTranslate la translation à appliquer.
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfBlurSetWeightMapTranslate(GLfloat weightMapTranslate);
+  /*!\brief Indique le scale de la valeur appliquée depuis la weight map.
+   *
+   *\param weightMapScale le scale à appliquer.
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfBlurSetWeightMapScale(GLfloat weightMapScale);
   /*!\brief Filtre 2D de flou Gaussien 
    *
    *\param in identifiant de texture source. Si 0, le framebuffer écran est pris à la place.
@@ -50,6 +88,11 @@ extern "C" {
    *\param flipV indique s'il est nécessaire d'effectuer un mirroir vertical du résultat.
    */
   GL4DAPI void GL4DAPIENTRY gl4dfSobel(GLuint in, GLuint out, GLboolean flipV);
+  /*!\brief Indique la couleur multiplicative du Sobel. Par défaut blanc ({1, 1, 1, 1}) est utilisé. 
+   *
+   *\param vec4Color la couleur multiplicative (tableau de 4 flottants).
+   */
+  /* GL4DAPI void GL4DAPIENTRY gl4dfSobelSetColor(GLfloat * vec4Color); */
   /*!\brief Fonction liée au filtre Sobel. Méthode de calcul du résultat final du Sobel
    *
    *\param mode indique les différents modes possibles. Plusieurs
