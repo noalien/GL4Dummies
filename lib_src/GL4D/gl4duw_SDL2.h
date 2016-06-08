@@ -16,16 +16,17 @@
 extern "C" {
 #endif
   
-GL4DAPI void       GL4DAPIENTRY gl4duwSetGLAttributes(int glMajorVersion, int glMinorVersion, int glProfileMask, int glDoubleBuffer, int glDepthSize);
-GL4DAPI GLboolean  GL4DAPIENTRY gl4duwCreateWindow(int argc, char ** argv, const char * title, int x, int y, int width, int height, Uint32 wflags);
-GL4DAPI GLboolean  GL4DAPIENTRY gl4duwBindWindow(const char * title);
-GL4DAPI void       GL4DAPIENTRY gl4duwMainLoop(void);
-GL4DAPI void       GL4DAPIENTRY gl4duwResizeFunc(void (*func)(int, int));
-GL4DAPI void       GL4DAPIENTRY gl4duwKeyDownFunc(void (*func)(int));
-GL4DAPI void       GL4DAPIENTRY gl4duwKeyUpFunc(void (*func)(int));
-GL4DAPI void       GL4DAPIENTRY gl4duwIdleFunc(void (*func)(void));
-GL4DAPI void       GL4DAPIENTRY gl4duwDisplayFunc(void (*func)(void));
-
+  GL4DAPI void       GL4DAPIENTRY gl4duwSetGLAttributes(int glMajorVersion, int glMinorVersion, int glProfileMask, int glDoubleBuffer, int glDepthSize);
+  GL4DAPI GLboolean  GL4DAPIENTRY gl4duwCreateWindow(int argc, char ** argv, const char * title, int x, int y, int width, int height, Uint32 wflags);
+  GL4DAPI GLboolean  GL4DAPIENTRY gl4duwBindWindow(const char * title);
+  GL4DAPI void       GL4DAPIENTRY gl4duwGetWindowSize(int * w, int * h);
+  GL4DAPI void       GL4DAPIENTRY gl4duwMainLoop(void);
+  GL4DAPI void       GL4DAPIENTRY gl4duwResizeFunc(void (*func)(int, int));
+  GL4DAPI void       GL4DAPIENTRY gl4duwKeyDownFunc(void (*func)(int));
+  GL4DAPI void       GL4DAPIENTRY gl4duwKeyUpFunc(void (*func)(int));
+  GL4DAPI void       GL4DAPIENTRY gl4duwIdleFunc(void (*func)(void));
+  GL4DAPI void       GL4DAPIENTRY gl4duwDisplayFunc(void (*func)(void));
+  
 #ifdef __cplusplus
 }
 #endif

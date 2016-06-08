@@ -291,6 +291,10 @@ static inline void resize(window_t * win) {
   win->resize(w, h);
 }
 
+void gl4duwGetWindowSize(int * w, int * h) {
+  SDL_GetWindowSize(_curWindow->window, w, h);
+}
+
 /*!\brief dispatche les événement selon le type en utilisant les
  *  callbacks de la fenêtre ayant le focus.
  */
