@@ -1,0 +1,23 @@
+CC = gcc
+CFLAGS = -I/opt/local/include/ -W -Wall -O0 -g
+LDFLAGS = -L/usr/lib -L/usr/X11R6/lib -L/usr/lib/x86_64-linux-gnu -lGL4Dummies -lm -lpng -lSDL2 -lGLU -lGL
+
+PROGNAME = heightmap_system
+PACKAGE = $(PROGNAME)
+#GL4D/gl4dhAnimeManager.c GL4D/linked_list.c GL4D/bin_tree.c GL4D/aes.c GL4D/gl4dg.c GL4D/gl4du.c GL4D/gl4dummies.c 
+SOURCES = png_export.c hm_view.c dsquare.c
+OBJ = $(SOURCES:.c=.o)
+
+all: $(PROGNAME)
+
+$(PROGNAME): $(OBJ)
+	$(CC) $(OBJ) $(LDFLAGS) -o $(PROGNAME)
+	@echo ''
+	@echo 'Make done!'
+
+%.o: %.cpp
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm *.o -f
+	rm realGL -f
