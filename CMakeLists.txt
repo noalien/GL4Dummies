@@ -94,12 +94,6 @@ file(GLOB_RECURSE example04_source_files
 add_executable(gl4dContainer ${example04_source_files})
 target_link_libraries(gl4dContainer GL4Dummies)
 
-# landscape_mutlitex
-file(GLOB_RECURSE landscape_multitex_source_files 
-  samples/landscape_multitex/*.h samples/landscape_mutlitex/*.c)
-add_executable(landscape_multitex) ${landscape_multitex_source_files})
-target_link_libraries(landscape_multitex GL4Dummies)
-
 # Example05
 #file(GLOB_RECURSE example05_source_files 
 #  samples/example05/*.h samples/example05/*.c)
