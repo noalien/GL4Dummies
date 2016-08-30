@@ -100,6 +100,11 @@ target_link_libraries(gl4dContainer GL4Dummies)
 #add_executable(example5 ${example05_source_files})
 #target_link_libraries(example5 GL4Dummies)
 
+# Landscape Multitexturing
+file(GLOB_RECURSE landscape_multitex_source_files 
+  samples/landscape_multitex/*.h samples/landscape_mutlitex/*.c)
+add_executable(landscape_multitex ${landscape_multitex_source_files})
+target_link_libraries(landscape_multitex GL4Dummies)
 
 if(UNIX OR APPLE OR MINGW)
   set_target_properties(gl4dContainer PROPERTIES COMPILE_FLAGS "-std=c99")
