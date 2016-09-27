@@ -97,8 +97,8 @@ float pix (float ** tab, int x, int y, float min_height, float max_height) {
 void export (const char* filename, float** tab, int taille, float min_height, float max_height) {
 
 	bitmap_t image;
-	uint x;
-	uint y;
+	uint32_t x;
+	uint32_t y;
 
 	image.width = taille;
 	image.height = taille;

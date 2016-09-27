@@ -5,9 +5,9 @@
  * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
  * \date April 29 2014
  */
-#ifndef _DEMO_HELPER_ANIME_MANAGER_H
+#ifndef _GL4DH_ANIME_MANAGER_H
 
-#define _DEMO_HELPER_ANIME_MANAGER_H
+#define _GL4DH_ANIME_MANAGER_H
 
 #include "gl4du.h"
 
