@@ -1151,7 +1151,7 @@ void gl4duPerspectivef(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble 
 void gl4duPerspectived(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar){
   GLdouble perspective[16];
   MPERSPECTIVE(perspective, fovy, aspect, zNear, zFar);
-  gl4duMultMatrixf(perspective);
+  gl4duMultMatrixd(perspective);
 }
 
 /*!\brief Chargement d'une matrice identité dans la matrice en cours.
