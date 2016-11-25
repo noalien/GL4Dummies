@@ -72,6 +72,10 @@ extern "C" {
   GL4DAPI void      GL4DAPIENTRY gl4duFrustumd(GLdouble l, GLdouble r, GLdouble b, GLdouble t, GLdouble n, GLdouble f);
   GL4DAPI void      GL4DAPIENTRY gl4duOrthof(GLfloat  l, GLfloat  r, GLfloat  b, GLfloat  t, GLfloat  n, GLfloat  f);
   GL4DAPI void      GL4DAPIENTRY gl4duOrthod(GLdouble l, GLdouble r, GLdouble b, GLdouble t, GLdouble n, GLdouble f);
+/* Vince */
+  GL4DAPI void      GL4DAPIENTRY gl4duPerspectivef(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar);
+  GL4DAPI void      GL4DAPIENTRY gl4duPerspectived(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar);
+/* Vince */
   GL4DAPI void      GL4DAPIENTRY gl4duLoadIdentityf(void);
   GL4DAPI void      GL4DAPIENTRY gl4duLoadIdentityd(void);
   GL4DAPI void      GL4DAPIENTRY gl4duLoadMatrixf(const GLfloat * matrix);

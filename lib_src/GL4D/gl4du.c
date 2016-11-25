@@ -11,6 +11,9 @@
  *
  * \todo ajouter, pour pas mal de fonctions, une gestion des erreurs à
  * la errno ...
+ * 
+ * \todo la macro PI_180 a été ajoutée et le code antérieur n'a pas été 
+ * modifié par manque de temps sur les tests de non regression.
  */
 
 #include "gl4du.h"
@@ -1119,6 +1122,36 @@ void gl4duOrthod(GLdouble  l, GLdouble  r, GLdouble  b, GLdouble  t, GLdouble  n
   GLdouble ortho[16];
   MORTHO(ortho, l, r, b, t, n, f);
   gl4duMultMatrixd(ortho);
+}
+
+/*!\brief Création d'une matrice de projection perspective selon
+ * l'ancienne fonction gluPerspective et la multiplie dans la matrice en
+ * cours.
+ *
+ * La matrice en cours doit être de type GLfloat sinon utiliser \a
+ * gl4duPerspectived si le type est GLdouble.
+ *
+ * \see gl4duPerspectived
+ */
+void gl4duPerspectivef(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar){
+  GLfloat perspective[16];
+  MPERSPECTIVE(perspective, fovy, aspect, zNear, zFar);
+  gl4duMultMatrixf(perspective);
+}
+
+/*!\brief Création d'une matrice de projection perspective selon
+ * l'ancienne fonction gluPerspective et la multiplie dans la matrice en
+ * cours.
+ *
+ * La matrice en cours doit être de type GLdouble sinon utiliser \a
+ * gl4duPerspectivef si le type est GLfloat.
+ *
+ * \see gl4duPerspectivef
+ */
+void gl4duPerspectived(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar){
+  GLdouble perspective[16];
+  MPERSPECTIVE(perspective, fovy, aspect, zNear, zFar);
+  gl4duMultMatrixf(perspective);
 }
 
 /*!\brief Chargement d'une matrice identité dans la matrice en cours.

@@ -353,7 +353,9 @@ static void resizeGL(SDL_Window * win) {
   glViewport(0, 0, _windowWidth, _windowHeight);
   gl4duBindMatrix("projectionMatrix");
   gl4duLoadIdentityf();
-  gl4duFrustumf(-0.5, 0.5, -0.5 * _windowHeight / _windowWidth, 0.5 * _windowHeight / _windowWidth, 1.0, 1000.0);
+  gl4duPerspectivef(60.0, _windowWidth / (GLfloat) _windowHeight, 1.0, 1000.0);
+
+  //  gl4duFrustumf(-0.5, 0.5, -0.5 * _windowHeight / _windowWidth, 0.5 * _windowHeight / _windowWidth, 1.0, 1000.0);
 }
 
 /*!\brief Boucle infinie principale : gère les évènements, dessine,

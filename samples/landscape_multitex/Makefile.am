@@ -1,5 +1,9 @@
-AM_CPPFLAGS = -O0 -g -I/opt/local/include/ -I../../lib_src  $(SDL_CFLAGS) 
-AM_LDFLAGS  = -L/usr/lib -L/usr/X11R6/lib -L/usr/lib/x86_64-linux-gnu -L$(top_builddir)/bin -lGL4Dummies -lm -lpng $(SDL_LIBS) -lGLU -lGL
+AM_CPPFLAGS = -I../../lib_src  $(SDL_CFLAGS)
+AM_LDFLAGS  = -L$(top_builddir)/bin -lGL4Dummies $(SDL_LIBS) -lpng
+
+#Ancienne version
+#AM_CPPFLAGS = -O0 -g -I/opt/local/include/ -I../../lib_src  $(SDL_CFLAGS) 
+#AM_LDFLAGS  = -L$(top_builddir)/bin -lGL4Dummies -lm -lpng $(SDL_LIBS) -lGLU -lGL
 
 bin_PROGRAMS = $(top_builddir)/bin/landscape_multitex
 

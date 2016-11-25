@@ -27,6 +27,7 @@
 #define GL4DM_PI		3.14159265358979323846
 #define GL4DM_PI_2		1.57079632679489661923
 #define GL4DM_PI_4		0.78539816339744830962
+#define GL4DM_PI_180		0.01745329251994329576
 #define GL4DM_1_PI		0.31830988618379067154
 #define GL4DM_2_PI		0.63661977236758134308
 #define GL4DM_2_SQRTPI	        1.12837916709551257390
@@ -307,6 +308,21 @@
     (mat)[14] = 0.0;					\
     (mat)[15] = 1.0;					\
   } while(0)
+
+
+
+/*!\brief Création d'une matrice de projection en perspective selon
+ * l'ancienne fonction gluPerspective.
+ */
+#define MPERSPECTIVE(mat, fovy, aspect, zNear, zFar) do {		\
+  memset((perspective), 0, sizeof(perspective));                        \
+  (perspective)[0]  = (1.0/tan((fovy) * GL4DM_PI_180 / 2.0))/(aspect);  \
+  (perspective)[5]  = 1.0/tan((fovy) * GL4DM_PI_180 / 2.0);		\
+  (perspective)[10] = ((zFar)+(zNear)) / ((zNear)-(zFar));		\
+  (perspective)[11] = 2*(zFar)*(zNear)/((zNear)-(zFar));		\
+  (perspective)[14] = -1;                                               \
+  } while(0)
+
 
 /*!\brief Chargement d'une matrice identitéé dans \a m. */
 #define MIDENTITY(m) do {						\
