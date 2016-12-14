@@ -5,8 +5,8 @@ CPP  = g++.exe
 CC   = gcc.exe
 WINDRES = windres.exe
 RES  = 
-OBJ  = ../lib_src/GL4D/gl4dummies.o ../lib_src/GL4D/aes.o ../lib_src/GL4D/bin_tree.o ../lib_src/GL4D/gl4dm.o ../lib_src/GL4D/gl4du.o ../lib_src/GL4D/gl4dfBlur.o ../lib_src/GL4D/gl4dfConversion.o ../lib_src/GL4D/gl4dfFocus.o ../lib_src/GL4D/gl4dfFractalPainting.o ../lib_src/GL4D/gl4dfHatching.o ../lib_src/GL4D/gl4dfMedia.o ../lib_src/GL4D/gl4dfMedian.o ../lib_src/GL4D/gl4dfOpticalFlow.o ../lib_src/GL4D/gl4dfScattering.o ../lib_src/GL4D/gl4dfSegmentation.o ../lib_src/GL4D/gl4dfSobel.o ../lib_src/GL4D/gl4dfCommon.o ../lib_src/GL4D/gl4dg.o ../lib_src/GL4D/gl4dhAnimeManager.o ../lib_src/GL4D/gl4dp.o ../lib_src/GL4D/gl4dq.o ../lib_src/GL4D/gl4droid.o ../lib_src/GL4D/gl4duw_SDL2.o ../lib_src/GL4D/linked_list.o ../lib_src/GL4D/list.o ../lib_src/GL4D/vector.o $(RES)
-LINKOBJ  = ../lib_src/GL4D/gl4dummies.o ../lib_src/GL4D/aes.o ../lib_src/GL4D/bin_tree.o ../lib_src/GL4D/gl4dm.o ../lib_src/GL4D/gl4du.o ../lib_src/GL4D/gl4dfBlur.o ../lib_src/GL4D/gl4dfConversion.o ../lib_src/GL4D/gl4dfFocus.o ../lib_src/GL4D/gl4dfFractalPainting.o ../lib_src/GL4D/gl4dfHatching.o ../lib_src/GL4D/gl4dfMedia.o ../lib_src/GL4D/gl4dfMedian.o ../lib_src/GL4D/gl4dfOpticalFlow.o ../lib_src/GL4D/gl4dfScattering.o ../lib_src/GL4D/gl4dfSegmentation.o ../lib_src/GL4D/gl4dfSobel.o ../lib_src/GL4D/gl4dfCommon.o ../lib_src/GL4D/gl4dg.o ../lib_src/GL4D/gl4dhAnimeManager.o ../lib_src/GL4D/gl4dp.o ../lib_src/GL4D/gl4dq.o ../lib_src/GL4D/gl4droid.o ../lib_src/GL4D/gl4duw_SDL2.o ../lib_src/GL4D/linked_list.o ../lib_src/GL4D/list.o ../lib_src/GL4D/vector.o $(RES)
+OBJ  = ../lib_src/GL4D/gl4dummies.o ../lib_src/GL4D/aes.o ../lib_src/GL4D/bin_tree.o ../lib_src/GL4D/gl4dm.o ../lib_src/GL4D/gl4du.o ../lib_src/GL4D/gl4dfBlur.o ../lib_src/GL4D/gl4dfConversion.o ../lib_src/GL4D/gl4dfFocus.o ../lib_src/GL4D/gl4dfFractalPainting.o ../lib_src/GL4D/gl4dfHatching.o ../lib_src/GL4D/gl4dfMedia.o ../lib_src/GL4D/gl4dfMedian.o ../lib_src/GL4D/gl4dfOpticalFlow.o ../lib_src/GL4D/gl4dfScattering.o ../lib_src/GL4D/gl4dfSegmentation.o ../lib_src/GL4D/gl4dfSobel.o ../lib_src/GL4D/gl4dg.o ../lib_src/GL4D/gl4dhAnimeManager.o ../lib_src/GL4D/gl4dp.o ../lib_src/GL4D/gl4dq.o ../lib_src/GL4D/gl4droid.o ../lib_src/GL4D/gl4duw_SDL2.o ../lib_src/GL4D/linked_list.o ../lib_src/GL4D/list.o ../lib_src/GL4D/vector.o ../lib_src/GL4D/gl4dfCommon.o ../lib_src/GL4D/fixed_heap.o $(RES)
+LINKOBJ  = ../lib_src/GL4D/gl4dummies.o ../lib_src/GL4D/aes.o ../lib_src/GL4D/bin_tree.o ../lib_src/GL4D/gl4dm.o ../lib_src/GL4D/gl4du.o ../lib_src/GL4D/gl4dfBlur.o ../lib_src/GL4D/gl4dfConversion.o ../lib_src/GL4D/gl4dfFocus.o ../lib_src/GL4D/gl4dfFractalPainting.o ../lib_src/GL4D/gl4dfHatching.o ../lib_src/GL4D/gl4dfMedia.o ../lib_src/GL4D/gl4dfMedian.o ../lib_src/GL4D/gl4dfOpticalFlow.o ../lib_src/GL4D/gl4dfScattering.o ../lib_src/GL4D/gl4dfSegmentation.o ../lib_src/GL4D/gl4dfSobel.o ../lib_src/GL4D/gl4dg.o ../lib_src/GL4D/gl4dhAnimeManager.o ../lib_src/GL4D/gl4dp.o ../lib_src/GL4D/gl4dq.o ../lib_src/GL4D/gl4droid.o ../lib_src/GL4D/gl4duw_SDL2.o ../lib_src/GL4D/linked_list.o ../lib_src/GL4D/list.o ../lib_src/GL4D/vector.o ../lib_src/GL4D/gl4dfCommon.o ../lib_src/GL4D/fixed_heap.o $(RES)
 LIBS =  -L"C:/Dev-Cpp/lib" -L"./dependencies/lib" --export-all-symbols --add-stdcall-alias -lmingw32 -lOpenGL32 -lSDL2main -lSDL2  
 INCS =  -I"C:/Dev-Cpp/include"  -I"./dependencies/include/SDL2" 
 CXXINCS =  -I"C:/Dev-Cpp/lib/gcc/mingw32/3.4.2/include"  -I"C:/Dev-Cpp/include/c++/3.4.2/backward"  -I"C:/Dev-Cpp/include/c++/3.4.2/mingw32"  -I"C:/Dev-Cpp/include/c++/3.4.2"  -I"C:/Dev-Cpp/include"  -I"./dependencies/include/SDL2" 
@@ -78,9 +78,6 @@ $(BIN): $(LINKOBJ)
 ../lib_src/GL4D/gl4dfSobel.o: ../lib_src/GL4D/gl4dfSobel.c
 	$(CC) -c ../lib_src/GL4D/gl4dfSobel.c -o ../lib_src/GL4D/gl4dfSobel.o $(CFLAGS)
 
-../lib_src/GL4D/gl4dfCommon.o: ../lib_src/GL4D/gl4dfCommon.c
-	$(CC) -c ../lib_src/GL4D/gl4dfCommon.c -o ../lib_src/GL4D/gl4dfCommon.o $(CFLAGS)
-
 ../lib_src/GL4D/gl4dg.o: ../lib_src/GL4D/gl4dg.c
 	$(CC) -c ../lib_src/GL4D/gl4dg.c -o ../lib_src/GL4D/gl4dg.o $(CFLAGS)
 
@@ -107,3 +104,9 @@ $(BIN): $(LINKOBJ)
 
 ../lib_src/GL4D/vector.o: ../lib_src/GL4D/vector.c
 	$(CC) -c ../lib_src/GL4D/vector.c -o ../lib_src/GL4D/vector.o $(CFLAGS)
+
+../lib_src/GL4D/gl4dfCommon.o: ../lib_src/GL4D/gl4dfCommon.c
+	$(CC) -c ../lib_src/GL4D/gl4dfCommon.c -o ../lib_src/GL4D/gl4dfCommon.o $(CFLAGS)
+
+../lib_src/GL4D/fixed_heap.o: ../lib_src/GL4D/fixed_heap.c
+	$(CC) -c ../lib_src/GL4D/fixed_heap.c -o ../lib_src/GL4D/fixed_heap.o $(CFLAGS)
