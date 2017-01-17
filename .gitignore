@@ -9,6 +9,7 @@
 *.vcxproj.user
 *.dir
 
+.DS_Store
 .deps
 .dirstamp
 
@@ -38,3 +39,5 @@ install-sh
 libtool
 ltmain.sh
 missing
+bin/
+m4/

@@ -24,6 +24,9 @@ struct window_t {
   void (*resize)(int w, int h);
   void (*keydown)(int keycode);
   void (*keyup)(int keycode);
+  void (*mousebutton)(int button, int state, int x, int y);
+  void (*mousemotion)(int x, int y);
+  void (*passivemousemotion)(int, int y);
   void (*idle)(void);
   void (*display)(void);
 };
@@ -56,6 +59,12 @@ static inline void fake_resize(int w, int h) {}
 static inline void fake_keydown(int keycode) {}
 /*!\brief fonction fictive liée au callback de touche clavier relachée. */
 static inline void fake_keyup(int keycode) {}
+/*!\brief fonction fictive liée au callback d'un bouton de souris enfoncé ou relaché. */
+static inline void fake_mousebutton(int button, int state, int x, int y) {}
+/*!\brief fonction fictive liée au callback du mouvement de la souris avec bouton enfoncé. */
+static inline void fake_mousemotion(int x, int y) {}
+/*!\brief fonction fictive liée au callback du mouvement de la souris sans bouton enfoncé. */
+static inline void fake_passivemousemotion(int x, int y) {}
 /*!\brief fonction fictive liée au callback de l'état idle de la fenêtre. */
 static inline void fake_idle(void) {}
 /*!\brief fonction fictive liée au callback de display. */
@@ -194,6 +203,21 @@ void gl4duwKeyUpFunc(void (*func)(int)) {
   _curWindow->keyup = func ? func : fake_keyup;
 }
 
+/*!\brief affecte la fonction appelée lorsqu'un utilisateur appuie ou relache un bouton de la souris dans la fenêtre*/
+void gl4duwMouseFunc(void (*func)(int, int, int, int )) {
+  _curWindow->mousebutton = func ? func : fake_mousebutton;
+}
+
+/*!\brief affecte la fonction appelée lorsqu'un utilisateur déplace la souris dans la fenêtre tout en ayant un ou plusieurs boutons enfoncés*/
+void gl4duwMotionFunc(void (*func)(int, int )) {
+  _curWindow->mousemotion = func ? func : fake_mousemotion;
+}
+
+/*!\brief affecte la fonction appelée lorsqu'un utilisateur déplace la souris dans la fenêtre sans qu'aucun bouton ne soit enfoncé*/
+void gl4duwPassiveMotionFunc(void (*func)(int, int )) {
+  _curWindow->passivemousemotion = func ? func : fake_passivemousemotion;
+}
+
 /*!\brief affecte la fonction appelée lors de l'idle (calcul/simulation avant affichage) */
 void gl4duwIdleFunc(void (*func)(void)) {
   _curWindow->idle = func ? func : fake_idle;
@@ -240,6 +264,9 @@ static inline window_t * newWindow(const char * name, SDL_Window * win, SDL_GLCo
   w->resize = fake_resize;
   w->keydown = fake_keydown;
   w->keyup = fake_keyup;
+  w->mousebutton = fake_mousebutton;
+  w->mousemotion = fake_mousemotion;
+  w->passivemousemotion = fake_passivemousemotion;
   w->idle = fake_idle;
   w->display = fake_display;
   return w;
@@ -309,6 +336,19 @@ static inline void manageEvents(void) {
     case SDL_KEYUP:
       if(_focusedWindow)
 	_focusedWindow->keyup(event.key.keysym.sym);
+      break;
+    case SDL_MOUSEBUTTONDOWN:
+    case SDL_MOUSEBUTTONUP:
+      if(_focusedWindow)
+	_focusedWindow->mousebutton(event.button.button, event.button.state, event.button.x, event.button.y);
+      break;
+    case SDL_MOUSEMOTION:
+      if (_focusedWindow){
+        if (event.motion.state & (SDL_BUTTON_LMASK | SDL_BUTTON_MMASK | SDL_BUTTON_RMASK))
+          _focusedWindow->mousemotion(event.motion.x, event.motion.y);
+        else
+          _focusedWindow->passivemousemotion(event.motion.x, event.motion.y);
+      }
       break;
     case SDL_WINDOWEVENT: {
       SDL_Window * focusedw = SDL_GetWindowFromID(event.window.windowID);

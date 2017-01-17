@@ -24,6 +24,9 @@ extern "C" {
   GL4DAPI void       GL4DAPIENTRY gl4duwResizeFunc(void (*func)(int, int));
   GL4DAPI void       GL4DAPIENTRY gl4duwKeyDownFunc(void (*func)(int));
   GL4DAPI void       GL4DAPIENTRY gl4duwKeyUpFunc(void (*func)(int));
+  GL4DAPI void       GL4DAPIENTRY gl4duwMouseFunc(void (*func)(int, int, int, int));
+  GL4DAPI void       GL4DAPIENTRY gl4duwMotionFunc(void (*func)(int, int));
+  GL4DAPI void       GL4DAPIENTRY gl4duwPassiveMotionFunc(void (*func)(int, int));
   GL4DAPI void       GL4DAPIENTRY gl4duwIdleFunc(void (*func)(void));
   GL4DAPI void       GL4DAPIENTRY gl4duwDisplayFunc(void (*func)(void));
   
