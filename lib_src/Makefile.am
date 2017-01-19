@@ -10,7 +10,7 @@ __top_builddir__bin_libGL4Dummiesinclude_HEADERS = GL4D/aes.h		\
 	GL4D/gl4wdummies.h GL4D/gl4droid.h GL4D/gl4duw_SDL2.h		\
 	GL4D/list.h GL4D/vector.h GL4D/gl4dm.inl			\
 	GL4D/gl4dhAnimeManager.h GL4D/gl4dh.h GL4D/gl4dp.h		\
-	GL4D/gl4dq.h GL4D/gl4dfBlurWeights.h GL4D/gl4df.h
+	GL4D/gl4dq.h GL4D/gl4dfBlurWeights.h GL4D/gl4df.h GL4D/gl4da.h
 
 __top_builddir__bin_libGL4Dummies_la_SOURCES = GL4D/aes.c GL4D/aes.h	\
 	GL4D/bin_tree.c GL4D/bin_tree.h GL4D/fixed_heap.h		\
@@ -27,7 +27,8 @@ __top_builddir__bin_libGL4Dummies_la_SOURCES = GL4D/aes.c GL4D/aes.h	\
 	GL4D/gl4dfScattering.c GL4D/gl4dfFocus.c			\
 	GL4D/gl4dfConversion.c GL4D/gl4dfMedia.c			\
 	GL4D/gl4dfFractalPainting.c GL4D/gl4dfHatching.c		\
-	GL4D/gl4dfSegmentation.c GL4D/gl4dfOpticalFlow.c
+	GL4D/gl4dfSegmentation.c GL4D/gl4dfOpticalFlow.c                \
+        GL4D/gl4da.c GL4D/gl4da.h 
 
 if USE_VERSION_RC
 __top_builddir__bin_libGL4Dummies_la_LDFLAGS =      \

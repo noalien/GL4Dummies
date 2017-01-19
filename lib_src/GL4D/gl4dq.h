@@ -80,6 +80,7 @@ extern "C" {
      \param mat la matrice de rotation
   */
   void gl4dqQuaternionToMatrix (const gl4dqQuaternion q, float * mat);
+
 #ifdef __cplusplus
 }
 #endif
