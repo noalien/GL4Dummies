@@ -43,9 +43,9 @@ static void init(void) {
     glBindTexture(GL_TEXTURE_2D, 0);
     gl4duAtExit(quit);
   }
-  temptexptr = temptexffunc;
-  planeptr = planeffunc;
-  fboptr = fboffunc;
+  temptexfptr = temptexffunc;
+  planefptr = planeffunc;
+  fbofptr = fboffunc;
 }
 
 static void quit(void) {
@@ -59,36 +59,36 @@ static void quit(void) {
     glDeleteFramebuffers(1, &_fbo);
     _fbo = 0;
   }
-  temptexptr = temptexfinit;
-  planeptr = planefinit;
-  fboptr = fbofinit;
+  temptexfptr = temptexfinit;
+  planefptr = planefinit;
+  fbofptr = fbofinit;
 }
 
 GLuint fcommGetTempTex(GLuint i) {
-  return temptexptr(i);
+  return temptexfptr(i);
 }
 
 GLuint fcommGetPlane(void) {
-  return planeptr();
+  return planefptr();
 }
 
 GLuint fcommGetFBO(void) {
-  return fboptr();
+  return fbofptr();
 }
 
 static GLuint temptexfinit(GLuint i) {
   init();
-  return temptexptr(i);
+  return temptexfptr(i);
 }
 
 static GLuint planefinit(void) {
   init();
-  return planeptr();
+  return planefptr();
 }
 
 static GLuint fbofinit(void) {
   init();
-  return fboptr();
+  return fbofptr();
 }
 
 static GLuint temptexffunc(GLuint i) {

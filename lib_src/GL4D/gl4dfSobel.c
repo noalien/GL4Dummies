@@ -22,9 +22,7 @@ static GLboolean _isLuminance = GL_TRUE, _isInvert = GL_TRUE;
 static void init(void);
 static void quit(void);
 
-static void sobelfinit(GLuint, GLuint, GLboolean);
-static void sobelfsobel(GLuint, GLuint, GLboolean);
-static void (*sobelfptr)(GLuint, GLuint, GLboolean) = sobelfinit;
+MKFWINIT3(sobel, void, GLuint, GLuint, GLboolean);
 
 void gl4dfSobel(GLuint in, GLuint out, GLboolean flipV) {
   sobelfptr(in, out, flipV);
@@ -82,29 +80,24 @@ void gl4dfSobelSetMixFactor(GLfloat factor) {
 /* appelée la première fois */
 static void sobelfinit(GLuint in, GLuint out, GLboolean flipV) {
   init();
-  sobelfptr = sobelfsobel;
+  sobelfptr = sobelffunc;
   sobelfptr(in, out, flipV);
 }
 
 /* appelée les autres fois (après la première qui lance init) */
-static void sobelfsobel(GLuint in, GLuint out, GLboolean flipV) {
+static void sobelffunc(GLuint in, GLuint out, GLboolean flipV) {
   int n;
   GLint vp[4], w, h;
   GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND);
   GLuint rin = in, cfbo, rout = out ? out : fcommGetTempTex(1);
-  GLint polygonMode[2];
+  GLint polygonMode[2], cpId = 0;
   glGetIntegerv(GL_POLYGON_MODE, polygonMode);
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   glGetIntegerv(GL_VIEWPORT, vp);
   glGetIntegerv(GL_FRAMEBUFFER_BINDING, &n);
   cfbo = n;
+  glGetIntegerv(GL_CURRENT_PROGRAM, &cpId);
   if(in == 0) { /* Pas d'entrée, donc l'entrée est le dernier draw */
-    /* glUseProgram(0); */
-    /* glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fcommGetFBO()); */
-    /* glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fcommGetTempTex(0),  0); */
-    /* glBindTexture(GL_TEXTURE_2D, fcommGetTempTex(0)); */
-    /* glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, vp[2] - vp[0], vp[3] - vp[1], 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); */
-    /* glBlitFramebuffer(vp[0], vp[1], vp[2], vp[3], 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST); */
     gl4dfConvFrame2Tex(&rin);
   } 
   if(out == 0) { /* Pas de sortie, donc sortie aux dimensions du viewport */
@@ -146,6 +139,7 @@ static void sobelfsobel(GLuint in, GLuint out, GLboolean flipV) {
   }
   glViewport(vp[0], vp[1], vp[2], vp[3]);
   glBindFramebuffer(GL_FRAMEBUFFER, cfbo);
+  glUseProgram(cpId);
   glPolygonMode(GL_FRONT_AND_BACK, polygonMode[0]);
   if(dt) glEnable(GL_DEPTH_TEST);
   if(bl) glEnable(GL_BLEND);
@@ -154,7 +148,7 @@ static void sobelfsobel(GLuint in, GLuint out, GLboolean flipV) {
 static void init(void) {
   if(!_sobelPId) {
     const char * imfs =
-      "<imfs>gl4df_sobel1D.fs</imfs>\n\
+      "<imfs>gl4df_sobel.fs</imfs>\n\
        #version 330\n		      \
        uniform sampler2D myTexture;\n \
        uniform vec2 step;\n	      \
@@ -194,8 +188,8 @@ static void init(void) {
            fragColor = vec4(c.rgb * r, c.a);\n				\
        }";
     _sobelPId = gl4duCreateProgram(gl4dfBasicVS, imfs, NULL);
+    gl4duAtExit(quit);
   }
-  gl4duAtExit(quit);
 }
 
 static void quit(void) {

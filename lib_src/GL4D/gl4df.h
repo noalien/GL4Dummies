@@ -10,6 +10,10 @@
  * GL4D/gl4dfScattering.c GL4D/gl4dfFocus.c GL4D/gl4dfConversion.c
  * GL4D/gl4dfMedia.c GL4D/gl4dfFractalPainting.c GL4D/gl4dfHatching.c
  * GL4D/gl4dfSegmentation.c GL4D/gl4dfOpticalFlow.c
+ *
+ * \todo en l'état, ses fonctionnalités ne sont pas designées pour
+ * être ni thread-safe ni fonctionnant avec plusieurs contextes
+ * OpenGL.
  */
 #ifndef _GL4DF_H
 #define _GL4DF_H
@@ -80,6 +84,30 @@ extern "C" {
    *\param flipV indique s'il est nécessaire d'effectuer un mirroir vertical du résultat.
    */
   GL4DAPI void GL4DAPIENTRY gl4dfBlur(GLuint in, GLuint out, GLuint radius, GLuint nb_iterations, GLuint weight, GLboolean flipV);
+  /* Dans gl4dfMedian.c */
+  /*!\brief Filtre 2D médian 3x3.
+   *
+   *\param in identifiant de texture source. Si 0, le framebuffer écran est pris à la place.
+   *\param out identifiant de texture destination. Si 0, la sortie s'effectuera à l'écran.
+   *\param nb_iterations le nombre d'itérations de filtre médian.
+   *\param flipV indique s'il est nécessaire d'effectuer un mirroir vertical du résultat.
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfMedian(GLuint in, GLuint out, GLuint nb_iterations, GLboolean flipV);
+  /* Dans gl4dfScattering.c */
+  /*!\brief Filtre 2D de mélange de pixels (éparpillement) 
+   *
+   *\param in identifiant de texture source. Si 0, le framebuffer écran est pris à la place.
+   *\param out identifiant de texture destination. Si 0, la sortie s'effectuera à l'écran.
+   *\param radius rayon de l'éparpillement autour de chaque pixel.
+   *\param displacementmap identifiant de texture (niveaux de gris) à
+   * utiliser pour le suivi du bruit (éviter le showerdoor effect). Si
+   * 0, aucune texture de deplacement n'est utilisée.
+   *\param weightmap identifiant de texture (niveaux de gris) à utiliser pour pondérer le rayon d'éparpillement. Si 0, aucune pondération n'est appliquée.
+   *\param flipV indique s'il est nécessaire d'effectuer un mirroir vertical du résultat.
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfScattering(GLuint in, GLuint out, GLuint radius, GLuint displacementmap, GLuint weightmap, GLboolean flipV);
+  /*!\brief Force le changement de la carte de mélange (éparpillement) utilisée. */
+  GL4DAPI void GL4DAPIENTRY gl4dfScatteringChange(void);
   /* Dans gl4dfSobel.c */
   /*!\brief Filtre 2D Sobel (détection des contours) 
    *
@@ -88,9 +116,9 @@ extern "C" {
    *\param flipV indique s'il est nécessaire d'effectuer un mirroir vertical du résultat.
    */
   GL4DAPI void GL4DAPIENTRY gl4dfSobel(GLuint in, GLuint out, GLboolean flipV);
-  /*!\brief Indique la couleur multiplicative du Sobel. Par défaut blanc ({1, 1, 1, 1}) est utilisé. 
+  /* brief Indique la couleur multiplicative du Sobel. Par défaut blanc ({1, 1, 1, 1}) est utilisé. 
    *
-   *\param vec4Color la couleur multiplicative (tableau de 4 flottants).
+   * param vec4Color la couleur multiplicative (tableau de 4 flottants).
    */
   /* GL4DAPI void GL4DAPIENTRY gl4dfSobelSetColor(GLfloat * vec4Color); */
   /*!\brief Fonction liée au filtre Sobel. Méthode de calcul du résultat final du Sobel

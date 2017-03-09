@@ -26,7 +26,7 @@ struct window_t {
   void (*keyup)(int keycode);
   void (*mousebutton)(int button, int state, int x, int y);
   void (*mousemotion)(int x, int y);
-  void (*passivemousemotion)(int, int y);
+  void (*passivemousemotion)(int x, int y);
   void (*idle)(void);
   void (*display)(void);
 };
@@ -70,24 +70,6 @@ static inline void fake_idle(void) {}
 /*!\brief fonction fictive liée au callback de display. */
 static inline void fake_display(void) {}
 
-/*!\brief modifie les paramètre par défaut du contexte OpenGL.
- *
- * Cette fonction est à appeler avant \ref gl4duwCreateWindow si vous
- * souhaitez que ses paramètres soient pris en compte. Si vous
- * souhaitez modifier plus de paramètres voir la fonction
- * SDL_GL_SetAttribute.
- *
- * \param glMajorVersion version majeure d'OpenGL, par défaut vaut 3.
- * \param glMinorVersion version mineure d'OpenGL, par défaut vaut 2.
- * \param glProfileMask modifie le profile d'OpenGL, par défaut vaut
- * SDL_GL_CONTEXT_PROFILE_CORE mais peut aussi prendre
- * SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, SDL_GL_CONTEXT_PROFILE_ES.
- * \param glDoubleBuffer modifie l'état actif ou non du double buffer,
- * par défaut vaut 1 (vrai).
- * \param glDepthSize modifie la dimension (nombre de bits utilisés)
- * du buffer de profondeur, par défaut vaut 16.
- * \see gl4duwCreateWindow
- */
 void gl4duwSetGLAttributes(int glMajorVersion, int glMinorVersion, int glProfileMask, int glDoubleBuffer, int glDepthSize) {
   _glMajorVersion = glMajorVersion;
   _glMinorVersion = glMinorVersion;
@@ -96,28 +78,6 @@ void gl4duwSetGLAttributes(int glMajorVersion, int glMinorVersion, int glProfile
   _glDepthSize    = glDepthSize;
 }
 
-/*!\brief créé une fenêtre SDL avec un contexte OpenGL.
- *
- * Pour modifier les valeurs utilisée par le contexte OpenGL, utiliser
- * la fonction \ref gl4duwSetGLAttributes.
- *
- * \param argc nombre d'arguments passés au programme (premier argument de la fonction main).
- * \param argv liste des arguments passés au programme (second argument de la fonction main).
- * \param title titre de la fenêtre SDL à créer.
- * \param x la postion x de la fenêtre à créer ou SDL_WINDOWPOS_CENTERED, ou SDL_WINDOWPOS_UNDEFINED.
- * \param y la postion y de la fenêtre à créer ou SDL_WINDOWPOS_CENTERED, ou SDL_WINDOWPOS_UNDEFINED.
- * \param width la largeur de la fenêtre à créer.
- * \param height la hauteur de la fenêtre à créer.
- * \param wflags des options sur la fenêtre à créer. Peut être 0 ou
- * une ou toute combinaison (via OR "|") de : SDL_WINDOW_FULLSCREEN,
- * SDL_WINDOW_FULLSCREEN_DESKTOP, SDL_WINDOW_OPENGL,
- * SDL_WINDOW_HIDDEN, SDL_WINDOW_BORDERLESS, SDL_WINDOW_RESIZABLE,
- * SDL_WINDOW_MINIMIZED, SDL_WINDOW_MAXIMIZED,
- * SDL_WINDOW_INPUT_GRABBED, SDL_WINDOW_ALLOW_HIGHDPI.
- * \return GL_TRUE en cas de réussite, GL_FALSE en cas d'échec.
- * \see gl4duwSetGLAttributes
- * \see SDL_CreateWindow
- */
 GLboolean gl4duwCreateWindow(int argc, char ** argv, const char * title, int x, int y, 
 		       int width, int height, Uint32 wflags) {
   SDL_Window * win = NULL;
@@ -137,8 +97,8 @@ GLboolean gl4duwCreateWindow(int argc, char ** argv, const char * title, int x, 
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, _glProfileMask);
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, _glDoubleBuffer);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, _glDepthSize);
-  if( (win = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
-			      width, height, SDL_WINDOW_OPENGL | wflags)) == NULL ) {
+  if( (win = SDL_CreateWindow(title, GL4DW_POS_CENTERED, GL4DW_POS_CENTERED, 
+			      width, height, GL4DW_OPENGL | wflags)) == NULL ) {
     fprintf(stderr, "%s (%d): %s:\n\tErreur lors de la creation de la fenetre SDL : %s", 
 	    __FILE__, __LINE__, __func__, SDL_GetError());
     return GL_FALSE;
@@ -159,15 +119,6 @@ GLboolean gl4duwCreateWindow(int argc, char ** argv, const char * title, int x, 
   return GL_TRUE;
 }
 
-/*!\brief recherche et positionne "courant" une fenêtre en fonction de son titre.
- *
- * La fenêtre courante est celle qui est affectée par les appelles des
- * fonctions telles que \ref gl4duwResizeFunc, \ref gl4duwKeyDownFunc,
- * \ref gl4duwKeyUpFunc, \ref gl4duwIdleFunc, \ref gl4duwDisplayFunc.
- *
- * \param title titre de la fenêtre SDL recherchée.
- * \return GL_TRUE en cas de réussite, GL_FALSE en cas d'échec.
- */
 GLboolean gl4duwBindWindow(const char * title) {
   window_t wt = { (char *)title, NULL };
   pair_t pair;
@@ -178,7 +129,6 @@ GLboolean gl4duwBindWindow(const char * title) {
   return GL_TRUE;
 }
 
-/*!\brief boucle principale événement/simulation/affichage */
 void gl4duwMainLoop(void) {
   for(;;) {
     manageEvents();
@@ -188,42 +138,34 @@ void gl4duwMainLoop(void) {
   }
 }
 
-/*!\brief affecte la fonction appelée lors du resize */
-void gl4duwResizeFunc(void (*func)(int, int)) {
+void gl4duwResizeFunc(void (*func)(int width, int height)) {
   _curWindow->resize = func ? func : fake_resize;
 }
 
-/*!\brief affecte la fonction appelée lors de l'événement key down */
-void gl4duwKeyDownFunc(void (*func)(int)) {
+void gl4duwKeyDownFunc(void (*func)(int keycode)) {
   _curWindow->keydown = func ? func : fake_keydown;
 }
 
-/*!\brief affecte la fonction appelée lors de l'événement key up */
-void gl4duwKeyUpFunc(void (*func)(int)) {
+void gl4duwKeyUpFunc(void (*func)(int keycode)) {
   _curWindow->keyup = func ? func : fake_keyup;
 }
 
-/*!\brief affecte la fonction appelée lorsqu'un utilisateur appuie ou relache un bouton de la souris dans la fenêtre*/
-void gl4duwMouseFunc(void (*func)(int, int, int, int )) {
+void gl4duwMouseFunc(void (*func)(int button, int state, int x, int y)) {
   _curWindow->mousebutton = func ? func : fake_mousebutton;
 }
 
-/*!\brief affecte la fonction appelée lorsqu'un utilisateur déplace la souris dans la fenêtre tout en ayant un ou plusieurs boutons enfoncés*/
-void gl4duwMotionFunc(void (*func)(int, int )) {
+void gl4duwMotionFunc(void (*func)(int x, int y)) {
   _curWindow->mousemotion = func ? func : fake_mousemotion;
 }
 
-/*!\brief affecte la fonction appelée lorsqu'un utilisateur déplace la souris dans la fenêtre sans qu'aucun bouton ne soit enfoncé*/
-void gl4duwPassiveMotionFunc(void (*func)(int, int )) {
+void gl4duwPassiveMotionFunc(void (*func)(int x, int y)) {
   _curWindow->passivemousemotion = func ? func : fake_passivemousemotion;
 }
 
-/*!\brief affecte la fonction appelée lors de l'idle (calcul/simulation avant affichage) */
 void gl4duwIdleFunc(void (*func)(void)) {
   _curWindow->idle = func ? func : fake_idle;
 }
 
-/*!\brief affecte la fonction appelée lors de l'affichage */
 void gl4duwDisplayFunc(void (*func)(void)) {
   _curWindow->display = func ? func : fake_display;
 }

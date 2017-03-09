@@ -149,51 +149,51 @@ GL4DAPI char *    GL4DAPIENTRY filenameOf(const char * path);
 #define MKFWINIT0(prefix, ret)	  \
 static ret prefix ## finit(void); \
 static ret prefix ## ffunc(void); \
-static ret (*prefix ## ptr) (void) = prefix ## finit
+static ret (*prefix ## fptr) (void) = prefix ## finit
 
 #define MKFWINIT1(prefix, ret, t1) \
 static ret prefix ## finit(t1); \
 static ret prefix ## ffunc(t1); \
-static ret (*prefix ## ptr) (t1) = prefix ## finit
+static ret (*prefix ## fptr) (t1) = prefix ## finit
   
 #define MKFWINIT2(prefix, ret, t1, t2) \
 static ret prefix ## finit(t1, t2); \
 static ret prefix ## ffunc(t1, t2); \
-static ret (*prefix ## ptr) (t1, t2) = prefix ## finit
+static ret (*prefix ## fptr) (t1, t2) = prefix ## finit
   
 #define MKFWINIT3(prefix, ret, t1, t2, t3) \
 static ret prefix ## finit(t1, t2, t3); \
 static ret prefix ## ffunc(t1, t2, t3); \
-static ret (*prefix ## ptr) (t1, t2, t3) = prefix ## finit  
+static ret (*prefix ## fptr) (t1, t2, t3) = prefix ## finit  
 
 #define MKFWINIT4(prefix, ret, t1, t2, t3, t4) \
 static ret prefix ## finit(t1, t2, t3, t4); \
 static ret prefix ## ffunc(t1, t2, t3, t4); \
-static ret (*prefix ## ptr) (t1, t2, t3, t4) = prefix ## finit  
+static ret (*prefix ## fptr) (t1, t2, t3, t4) = prefix ## finit  
 
 #define MKFWINIT5(prefix, ret, t1, t2, t3, t4, t5) \
 static ret prefix ## finit(t1, t2, t3, t4, t5); \
 static ret prefix ## ffunc(t1, t2, t3, t4, t5); \
-static ret (*prefix ## ptr) (t1, t2, t3, t4, t5) = prefix ## finit  
+static ret (*prefix ## fptr) (t1, t2, t3, t4, t5) = prefix ## finit  
 
 #define MKFWINIT6(prefix, ret, t1, t2, t3, t4, t5, t6) \
 static ret prefix ## finit(t1, t2, t3, t4, t5, t6); \
 static ret prefix ## ffunc(t1, t2, t3, t4, t5, t6); \
-static ret (*prefix ## ptr) (t1, t2, t3, t4, t5, t6) = prefix ## finit  
+static ret (*prefix ## fptr) (t1, t2, t3, t4, t5, t6) = prefix ## finit  
 
 #define MKFWINIT7(prefix, ret, t1, t2, t3, t4, t5, t6, t7) \
 static ret prefix ## finit(t1, t2, t3, t4, t5, t6, t7); \
 static ret prefix ## ffunc(t1, t2, t3, t4, t5, t6, t7); \
-static ret (*prefix ## ptr) (t1, t2, t3, t4, t5, t6, t7) = prefix ## finit  
+static ret (*prefix ## fptr) (t1, t2, t3, t4, t5, t6, t7) = prefix ## finit  
 
 #define MKFWINIT8(prefix, ret, t1, t2, t3, t4, t5, t6, t7, t8) \
 static ret prefix ## finit(t1, t2, t3, t4, t5, t6, t7, t8); \
 static ret prefix ## ffunc(t1, t2, t3, t4, t5, t6, t7, t8); \
-static ret (*prefix ## ptr) (t1, t2, t3, t4, t5, t6, t7, t8) = prefix ## finit  
+static ret (*prefix ## fptr) (t1, t2, t3, t4, t5, t6, t7, t8) = prefix ## finit  
 
 #define MKFWINIT9(prefix, ret, t1, t2, t3, t4, t5, t6, t7, t8, t9) \
 static ret prefix ## finit(t1, t2, t3, t4, t5, t6, t7, t8, t9); \
 static ret prefix ## ffunc(t1, t2, t3, t4, t5, t6, t7, t8, t9); \
-static ret (*prefix ## ptr) (t1, t2, t3, t4, t5, t6, t7, t8, t9) = prefix ## finit  
+static ret (*prefix ## fptr) (t1, t2, t3, t4, t5, t6, t7, t8, t9) = prefix ## finit  
 
 #endif
