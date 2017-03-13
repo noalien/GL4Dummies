@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <GL4D/gl4du.h>
+#include "gl4df.h"
 #include "gl4dfCommon.h"
 
 static GLuint _scatteringPId = 0, _width = 1, _height = 1, _noiseTex = 0;

@@ -27,7 +27,6 @@
 #define GL4DM_PI		3.14159265358979323846
 #define GL4DM_PI_2		1.57079632679489661923
 #define GL4DM_PI_4		0.78539816339744830962
-#define GL4DM_PI_180		0.01745329251994329576
 #define GL4DM_1_PI		0.31830988618379067154
 #define GL4DM_2_PI		0.63661977236758134308
 #define GL4DM_2_SQRTPI	        1.12837916709551257390
@@ -91,15 +90,6 @@
     (r)[1]  = (m)[4]  * (v)[0] + (m)[5]  * (v)[1] + (m)[6]  * (v)[2]  + (m)[7]  * (v)[3]; \
     (r)[2]  = (m)[8]  * (v)[0] + (m)[9]  * (v)[1] + (m)[10] * (v)[2]  + (m)[11] * (v)[3]; \
     (r)[3]  = (m)[12] * (v)[0] + (m)[13] * (v)[1] + (m)[14] * (v)[2]  + (m)[15] * (v)[3]; \
-  } while(0)
-
-/*!\brief divise les composantes x, y et z du vecteur \a v par sa
- * composante w et remet w à 1. */
-#define MVEC4WEIGHT(v) do {\
-    v[0] /= v[3];          \
-    v[1] /= v[3];          \
-    v[2] /= v[3];          \
-    v[3]  = 1.0;           \
   } while(0)
 
 /*!\brief Transposée de la matrice 4x4 \a m. */
@@ -317,21 +307,6 @@
     (mat)[14] = 0.0;					\
     (mat)[15] = 1.0;					\
   } while(0)
-
-
-
-/*!\brief Création d'une matrice de projection en perspective selon
- * l'ancienne fonction gluPerspective.
- */
-#define MPERSPECTIVE(mat, fovy, aspect, zNear, zFar) do {		\
-  memset((perspective), 0, sizeof(perspective));                        \
-  (perspective)[0]  = (1.0/tan((fovy) * GL4DM_PI_180 / 2.0))/(aspect);  \
-  (perspective)[5]  = 1.0/tan((fovy) * GL4DM_PI_180 / 2.0);		\
-  (perspective)[10] = ((zFar)+(zNear)) / ((zNear)-(zFar));		\
-  (perspective)[11] = 2*(zFar)*(zNear)/((zNear)-(zFar));		\
-  (perspective)[14] = -1;                                               \
-  } while(0)
-
 
 /*!\brief Chargement d'une matrice identitéé dans \a m. */
 #define MIDENTITY(m) do {						\
