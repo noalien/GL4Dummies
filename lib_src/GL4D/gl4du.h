@@ -82,6 +82,7 @@ extern "C" {
   GL4DAPI void      GL4DAPIENTRY gl4duLoadMatrixd(const GLdouble * matrix);
   GL4DAPI void      GL4DAPIENTRY gl4duMultMatrixf(const GLfloat * matrix);
   GL4DAPI void      GL4DAPIENTRY gl4duMultMatrixd(const GLdouble * matrix);
+  GL4DAPI void      GL4DAPIENTRY gl4duMultMatrixByName(const char * name);
   GL4DAPI void      GL4DAPIENTRY gl4duRotatef(GLfloat  angle, GLfloat x, GLfloat y, GLfloat z);
   GL4DAPI void      GL4DAPIENTRY gl4duRotated(GLdouble angle, GLdouble x, GLdouble y, GLdouble z);
   GL4DAPI void      GL4DAPIENTRY gl4duTranslatef(GLfloat tx, GLfloat ty, GLfloat tz);

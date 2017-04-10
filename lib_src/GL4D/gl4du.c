@@ -955,13 +955,14 @@ GLboolean gl4duIsMatrix(const char * name) {
  *
  * Si la matrice existe l'active et renvoie GL_TRUE, sinon renvoie
  * GL_FALSE. Si le paramètre \a name est NULL, désactive toute
- * matrice.
+ * matrice et renvoie GL_TRUE.
  *
  * \param name le nom de la matrice à rechercher pour activer. Si NULL
  * désactive (dé-bind) tout.
  *
  * \return GL_TRUE si la matrice existe (et elle est préalablement
- * activée), GL_FALSE sinon.
+ * activée), GL_FALSE sinon. Si le paramètre \a name est NULL,
+ * désactive toute matrice et renvoie GL_TRUE.
  */
 GLboolean gl4duBindMatrix(const char * name) {
   bin_tree_t ** bt;
@@ -1248,6 +1249,47 @@ void gl4duMultMatrixd(const GLdouble * matrix) {
   mat = (GLdouble *)&(((GLubyte *)_gl4dCurMatrix->data)[_gl4dCurMatrix->top * _gl4dCurMatrix->size]);
   memcpy(cpy, mat, _gl4dCurMatrix->size);
   MMAT4XMAT4(mat, cpy, matrix);
+}
+
+/*!\brief Multiplication de la matrice en cours par une des matrices
+ *  connues dans GL4Dummies. Cette fonction utilise le nom de la
+ *  matrice \a name afin de la récupérer et réaliser la multiplication
+ *  à droite, le tout dans la matrice courante : currentMatrix =
+ *  currentMatrix x matrixBy(name)
+ *
+ * \param name le nom de la matrice GL4Dummies à utiliser pour la
+ * multiplication (currentMatrix x matrixBy(name)).
+ */
+void gl4duMultMatrixByName(const char * name) {
+  bin_tree_t ** bt;
+  assert(_gl4dCurMatrix);
+  if(_gl4dCurMatrix->type == GL_FLOAT) {
+    GLfloat cpy[16], *mat = (GLfloat *)&(((GLubyte *)_gl4dCurMatrix->data)[_gl4dCurMatrix->top * _gl4dCurMatrix->size]);
+    memcpy(cpy, mat, _gl4dCurMatrix->size);
+    if(name && (bt = findMatrix(name))) {
+      _GL4DUMatrix * namedMatrix = (_GL4DUMatrix *)((*bt)->data);
+      if(namedMatrix->type == GL_FLOAT) {
+	GLfloat *matrix = (GLfloat *)&(((GLubyte *)namedMatrix->data)[namedMatrix->top * namedMatrix->size]);
+	MMAT4XMAT4(mat, cpy, matrix);
+      } else { /* GL_DOUBLE */
+	GLdouble *matrix = (GLdouble *)&(((GLubyte *)namedMatrix->data)[namedMatrix->top * namedMatrix->size]);
+	MMAT4XMAT4(mat, cpy, matrix);
+      }
+    }
+  } else {
+    GLdouble cpy[16], *mat = (GLdouble *)&(((GLubyte *)_gl4dCurMatrix->data)[_gl4dCurMatrix->top * _gl4dCurMatrix->size]);
+    memcpy(cpy, mat, _gl4dCurMatrix->size);
+    if(name && (bt = findMatrix(name))) {
+      _GL4DUMatrix * namedMatrix = (_GL4DUMatrix *)((*bt)->data);
+      if(namedMatrix->type == GL_FLOAT) {
+	GLfloat *matrix = (GLfloat *)&(((GLubyte *)namedMatrix->data)[namedMatrix->top * namedMatrix->size]);
+	MMAT4XMAT4(mat, cpy, matrix);
+      } else { /* GL_DOUBLE */
+	GLdouble *matrix = (GLdouble *)&(((GLubyte *)namedMatrix->data)[namedMatrix->top * namedMatrix->size]);
+	MMAT4XMAT4(mat, cpy, matrix);
+      }
+    }
+  }
 }
 
 /*!\brief Multiplication de la matrice en cours par une matrice de

@@ -24,7 +24,6 @@
 extern "C" {
 #endif
 
-  typedef enum GL4DFenum GL4DFenum;
   enum GL4DFenum {
     GL4DF_SOBEL_RESULT_RGB = 0,
     GL4DF_SOBEL_RESULT_INV_RGB,
@@ -34,6 +33,7 @@ extern "C" {
     GL4DF_SOBEL_MIX_ADD,
     GL4DF_SOBEL_MIX_MULT
   };
+  typedef enum GL4DFenum GL4DFenum;
   /* Dans gl4dConversion.c */
   /*!\brief Envoie le framebuffer actif (ou l'écran) vers une texture.
    *
