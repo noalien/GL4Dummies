@@ -405,8 +405,8 @@ GLfloat * gl4dpSDLSurfaceToLuminanceMap(SDL_Surface * s) {
  * translate.
  */
 void gl4dpCopyFromSDLSurfaceWithTransforms(SDL_Surface * s, const GLfloat scale[2], const GLfloat translate[2]) {
-  GLint fboTId;
-  GLuint id = 0;
+  GLint ofbo, fboTId;
+  GLuint fbo, id = 0;
   const GLfloat s0[2] = {1.0, 1.0}, t0[2] = {0.0, 0.0};
   SDL_Surface * d = SDL_CreateRGBSurface(0, s->w, s->h, 32, R_MASK, G_MASK, B_MASK, A_MASK);
   SDL_BlitSurface(s, NULL, d, NULL);
@@ -418,12 +418,23 @@ void gl4dpCopyFromSDLSurfaceWithTransforms(SDL_Surface * s, const GLfloat scale[
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, d->w, d->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, d->pixels);
   SDL_FreeSurface(d);
-  /* RECUPERER L'ID DE LA DERNIERE TEXTURE ATTACHEE AU FRAMEBUFFER */
-  glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &fboTId);
+  glGetIntegerv(GL_FRAMEBUFFER_BINDING, &ofbo);
+  if(ofbo) {
+    /* RECUPERER L'ID DE LA DERNIERE TEXTURE ATTACHEE AU FRAMEBUFFER */
+    glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &fboTId);
+  } else {
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);    
+  }
   /* ATTACHER LA TEXTURE ECRAN POUR RENDRE DESSUS */
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, (*_cur_screen)->tId,  0);
   drawTex(id, scale, translate);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,  fboTId,  0);
+  if(ofbo) {
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,  fboTId,  0);
+  } else {
+    glDeleteFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  }
   glDeleteTextures(1, &id);
   (*_cur_screen)->isCPUToDate = 0;
 
@@ -446,8 +457,8 @@ void gl4dpCopyFromSDLSurface(SDL_Surface * s) {
  * \param rotation angle de rotation en radians appliqué lors du placage. Le rectangle pRect tourne autour de son centre.
  */
 void gl4dpMap(GLuint dstSId, GLuint srcSId, const GLfloat pRect[4], const GLfloat tRect[4], GLfloat rotation) {
-  GLint fboTId;
-  GLuint vao, buffer;
+  GLint ofbo, fboTId;
+  GLuint fbo, vao, buffer;
   GLfloat s[2] = {1.0, 1.0}, t[2] = {0.0, 0.0}, pt[2];
   GLfloat data[] = {
     /* 4 coordonnées de sommets */
@@ -482,8 +493,14 @@ void gl4dpMap(GLuint dstSId, GLuint srcSId, const GLfloat pRect[4], const GLfloa
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const void *)((4 * 3) * sizeof *data));
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (const void *)((8 * 3) * sizeof *data));
 
-  /* RECUPERER L'ID DE LA DERNIERE TEXTURE ATTACHEE AU FRAMEBUFFER */
-  glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &fboTId);
+  glGetIntegerv(GL_FRAMEBUFFER_BINDING, &ofbo);
+  if(ofbo) {
+    /* RECUPERER L'ID DE LA DERNIERE TEXTURE ATTACHEE AU FRAMEBUFFER */
+    glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &fboTId);
+  } else {
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);    
+  }
   /* ATTACHER LA TEXTURE ECRAN POUR RENDRE DESSUS */
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, (*_cur_screen)->tId,  0);
 
@@ -507,7 +524,12 @@ void gl4dpMap(GLuint dstSId, GLuint srcSId, const GLfloat pRect[4], const GLfloa
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,  fboTId,  0);
+  if(ofbo) {
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,  fboTId,  0);
+  } else {
+    glDeleteFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  }
   if(vao)
     glDeleteVertexArrays(1, &vao);
   if(buffer)

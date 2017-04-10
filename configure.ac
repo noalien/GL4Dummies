@@ -1,6 +1,6 @@
 dnl INIT
 AC_CONFIG_MACRO_DIRS([m4])
-AC_INIT([GL4Dummies], [0.1.5])
+AC_INIT([GL4Dummies], [0.1.6])
 AM_INIT_AUTOMAKE([subdir-objects])
 dnl Verifier le type de systeme
 AC_CANONICAL_HOST
@@ -37,7 +37,7 @@ dnl 5. If any interfaces have been added since the last public
 dnl release, then increment age.
 dnl 6. If any interfaces have been removed or changed since the last
 dnl public release, then set age to 0.  
-m4_define(LT_CURRENT, 5)
+m4_define(LT_CURRENT, 6)
 m4_define(LT_REVISION, 0) 
 m4_define(LT_AGE, 0)
 
@@ -94,4 +94,4 @@ dnl OTHER SYSTEMS
 ;;
 esac
 
-AC_OUTPUT([Makefile] [lib_src/Makefile] [lib_src/documentation/Makefile] [samples/Makefile] [samples/example01/Makefile] [samples/example02/Makefile] [samples/example03/Makefile] [samples/example04/Makefile] [samples/landscape_multitex/Makefile])
+AC_OUTPUT([Makefile] [lib_src/Makefile] [lib_src/documentation/Makefile] [samples/Makefile] [samples/example01/Makefile] [samples/example02/Makefile] [samples/example03/Makefile] [samples/example04/Makefile])
