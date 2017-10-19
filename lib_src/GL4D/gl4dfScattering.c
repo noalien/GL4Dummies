@@ -29,7 +29,6 @@ void gl4dfScatteringChange(void) {
   init();
 }
 
-
 static void scatteringfinit(GLuint in, GLuint out, GLuint radius, GLuint displacementmap, GLuint weightmap, GLboolean flipV) {
   init();
   scatteringfptr = scatteringffunc;
@@ -170,11 +169,11 @@ static void setDimensions(GLuint w, GLuint h) {
   free(noise);
 }
 
-
 static void quit(void) {
   if(_noiseTex) {
     glDeleteTextures(1, &_noiseTex);
     _noiseTex = 0;
     scatteringfptr = scatteringfinit;
   }
+  _scatteringPId = 0;
 }
