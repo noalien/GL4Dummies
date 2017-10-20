@@ -134,7 +134,7 @@ static void sobelffunc(GLuint in, GLuint out, GLboolean flipV) {
   }
   if(!out) { /* Copier à l'écran en cas de out nul */
     glUseProgram(0);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, cfbo);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glBlitFramebuffer(0, 0, w, h, vp[0], vp[1], vp[2], vp[3], GL_COLOR_BUFFER_BIT, GL_LINEAR);
   }
   glViewport(vp[0], vp[1], vp[2], vp[3]);

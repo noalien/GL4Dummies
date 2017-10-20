@@ -56,6 +56,16 @@ extern "C" {
    *\param filter est le filtre d'interpolation (GL_LINEAR ou GL_NEAREST).
    */
   GL4DAPI void GL4DAPIENTRY gl4dfConvSetFilter(GLenum filter);
+  /*!\brief Copie la texture identifiée par \a in dans \a out. Le mode
+   * d'interpolation (par défaut GL_NEAREST) est à renseigner à l'aide
+   * de la fonction \ref gl4dfConvSetFilter.
+   *
+   *\param in identifiant GL de la texture en entrée.
+   *\param out identifiant GL de la texture en sortie.
+   *\param flipV indique s'il est nécessaire d'effectuer un mirroir vertical lors de la copie.
+   *\see gl4dfConvSetFilter
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfConvTex2Tex(GLuint in, GLuint out, GLboolean flipV);
   /* Dans gl4dfBlur.c */
   /*!\brief Indique la composante R (=0), G (=1), B (=2) ou A (=3) à
    * utiliser dans la weight map.
