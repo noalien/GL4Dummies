@@ -48,14 +48,14 @@ extern "C" {
   extern GLuint fcommGetFBO(void);
 
 
-  static inline GLuint autoFBOInit(void);
-  static inline GLuint autoFBOGet(void);
-  static void autoFBOQuit(void);
-
   /************************************************************/
   /* Gestion automatique (init/quit) de _getFBO() pour tous   */
   /* _getFBO() donne un FBO créé par fichier C incluant ce .h */
   /************************************************************/
+  static inline GLuint autoFBOInit(void);
+  static inline GLuint autoFBOGet(void);
+  static void autoFBOQuit(void);
+
   static GLuint (*_getFBO)(void) = autoFBOInit;
   static GLuint _autoFBO = 0;
   
@@ -63,7 +63,7 @@ extern "C" {
     glGenFramebuffers(1, &_autoFBO);
     gl4duAtExit(autoFBOQuit);
     _getFBO = autoFBOGet;
-    return 0;
+    return _getFBO();
   }
   
   static inline GLuint autoFBOGet(void) {
