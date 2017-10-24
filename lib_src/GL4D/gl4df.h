@@ -39,10 +39,12 @@ extern "C" {
    *
    *\param out pointeur vers la variable contenant l'identifiant de
    * texture dans laquelle le framebuffer (ou l'écran) sera copié. Si
-   * cette identifiant est nul (0), copie le framebuffer (ou l'écran)
-   * vers un identifiant temporaire (donc pouvant etre écrasé par un
-   * autre appel à cette fonction ou une autre) qui est inscrit dans
-   * \a out.
+   * cette identifiant (*out) est nul (0), copie le framebuffer (ou
+   * l'écran) vers une nouvelle texture dont l'identifiant sera écrit
+   * dans \a out et devra être libéré avec glDeleteTextures. Cette
+   * nouvelle texture aura les dimensions (largeur et hauteur) du
+   * viewport courant et le filtre utilisé est celui choisi à l'aide
+   * de \ref gl4dfConvSetFilter.
    */
   GL4DAPI void GL4DAPIENTRY gl4dfConvFrame2Tex(GLuint * out);
   /*!\brief Envoie une texture identifiée par \a in vers le framebuffer actif (ou écran).
