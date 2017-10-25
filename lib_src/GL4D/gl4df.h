@@ -159,6 +159,72 @@ extern "C" {
    */
   GL4DAPI void GL4DAPIENTRY gl4dfSobelSetMixFactor(GLfloat factor);
 
+  /*!\brief A documenter
+   *
+   *\todo A documenter
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfMCMD(GLuint in, GLuint out, GLboolean flipV);
+  /*!\brief A documenter
+   *
+   *\todo A documenter
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfMCMDDimensions(GLuint, GLuint);
+  /*!\brief A documenter
+   *
+   *\todo A documenter
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfMCMDTakeColor(GLboolean mcmd_take_color);
+  /*!\brief A documenter
+   *
+   *\todo A documenter
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfMCMDChangeSeed(GLboolean change_seed);
+  /*!\brief A documenter
+   *
+   *\todo A documenter
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetSkeletonize(GLboolean skeletonize);
+  /*!\brief A documenter
+   *
+   * Ir > 0 extrapolation vers le bas, Ir < 0 extrapolation vers le
+   * haut. Ir nul extrapolation en maintenant la même altitude. |Ir| < 1
+   * croissance ou décroissance lente. |Ir| < 1 croissance ou
+   * décroissance rapide. |Ir| égale à 1 croissance ou décroissance
+   * linéaire.
+   *\todo A documenter
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetIr(GLfloat * mcmd_Ir);
+  /*!\brief A documenter
+   *
+   *\todo A documenter
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetI(GLfloat * mcmd_I);
+  /*!\brief A documenter
+   *
+   *\todo A documenter
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetNoiseH(GLfloat * mcmd_noise_H);
+  /*!\brief A documenter
+   *
+   *\todo A documenter
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetNoiseS(GLfloat * mcmd_noise_S);
+  /*!\brief A documenter
+   *
+   *\todo A documenter
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetNoiseT(GLfloat * mcmd_noise_T);
+  /*!\brief A documenter
+   *
+   *\todo A documenter
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetNoisePhaseChange(GLfloat * mcmd_noise_phase_change);
+  /*!\brief A documenter
+   *
+   *\todo A documenter
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetSkeletonizeRandThreshold(GLfloat rand_threshold);
+
 #ifdef __cplusplus
 }
 #endif

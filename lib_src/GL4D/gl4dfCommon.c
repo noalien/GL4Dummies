@@ -25,8 +25,8 @@ MKFWINIT0(plane, GLuint);
 MKFWINIT0(fbo, GLuint);
 
 static void init(void) {
-  GLint tex;
-  glGetIntegerv(GL_TEXTURE_BINDING_2D, &tex);
+  GLint ctex;
+  glGetIntegerv(GL_TEXTURE_BINDING_2D, &ctex);
   if(gl4dfBasicVS); /* éviter des warnings stupides */
   if(!_plan)
     _plan = gl4dgGenQuadf();
@@ -42,7 +42,7 @@ static void init(void) {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
-    glBindTexture(GL_TEXTURE_2D, (GLuint)tex);
+    glBindTexture(GL_TEXTURE_2D, (GLuint)ctex);
     gl4duAtExit(quit);
   }
   temptexfptr = temptexffunc;
