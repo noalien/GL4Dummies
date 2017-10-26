@@ -103,7 +103,7 @@ static void scatteringffunc(GLuint in, GLuint out, GLuint radius, GLuint displac
   if(!out) { /* Copier à l'écran en cas de out nul */
     glUseProgram(0);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    glBlitFramebuffer(0, 0, _width, _height, vp[0], vp[1], vp[2], vp[3], GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    glBlitFramebuffer(0, 0, _width, _height, vp[0], vp[1], vp[0] + vp[2], vp[1] + vp[3], GL_COLOR_BUFFER_BIT, GL_LINEAR);
   }
   glViewport(vp[0], vp[1], vp[2], vp[3]);
   glBindFramebuffer(GL_FRAMEBUFFER, cfbo);

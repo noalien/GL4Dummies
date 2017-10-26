@@ -41,7 +41,7 @@ void gl4dfConvFrame2Tex(GLuint * out) {
   glBindFramebuffer(GL_READ_FRAMEBUFFER, (GLuint)cfbo);
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
   glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, *out,  0);
-  glBlitFramebuffer(vp[0], vp[1], vp[2], vp[3], 0, 0, w, h, GL_COLOR_BUFFER_BIT, _filter);
+  glBlitFramebuffer(vp[0], vp[1], vp[0] + vp[2], vp[1] + vp[3], 0, 0, w, h, GL_COLOR_BUFFER_BIT, _filter);
   glDeleteFramebuffers(1, &fbo);
   glBindTexture(GL_TEXTURE_2D, (GLuint)ctex);
   glBindFramebuffer(GL_FRAMEBUFFER, (GLuint)cfbo);
@@ -62,7 +62,7 @@ void gl4dfConvTex2Frame(GLuint in) {
   glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
   glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, in,  0);
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, (GLuint)cfbo);
-  glBlitFramebuffer(0, 0, w, h, vp[0], vp[1], vp[2], vp[3], GL_COLOR_BUFFER_BIT, _filter);
+  glBlitFramebuffer(0, 0, w, h, vp[0], vp[1], vp[0] + vp[2], vp[1] + vp[3], GL_COLOR_BUFFER_BIT, _filter);
 
   glDeleteFramebuffers(1, &fbo);
   glBindTexture(GL_TEXTURE_2D, (GLuint)ctex);

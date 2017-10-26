@@ -170,9 +170,9 @@ static void fractalPaintingffunc(GLuint in, GLuint out, GLboolean flipV) {
     glUseProgram(0);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     if(flipV)
-      glBlitFramebuffer(0, 0, _width, _height, vp[0], vp[3], vp[2], vp[1], GL_COLOR_BUFFER_BIT, GL_LINEAR);
+      glBlitFramebuffer(0, 0, _width, _height, vp[0], vp[1] + vp[3], vp[0] + vp[2], vp[1], GL_COLOR_BUFFER_BIT, GL_LINEAR);
     else
-      glBlitFramebuffer(0, 0, _width, _height, vp[0], vp[1], vp[2], vp[3], GL_COLOR_BUFFER_BIT, GL_LINEAR);
+      glBlitFramebuffer(0, 0, _width, _height, vp[0], vp[1], vp[0] + vp[2], vp[1] + vp[3], GL_COLOR_BUFFER_BIT, GL_LINEAR);
   } else
     gl4dfConvTex2Tex(_tempTexId[(ati + 1) % 2], out, flipV);
   glDeleteFramebuffers(1, &fbo);
