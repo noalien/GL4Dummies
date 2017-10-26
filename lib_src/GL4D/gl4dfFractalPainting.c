@@ -255,19 +255,19 @@ static const char * gl4dfMCMD_select4mcmdFS =
      float sobel(void) {\n						\
        vec2 g = vec2(0.0, 0.0);\n					\
        for(int i = 0; i < ossize; i++)\n				\
-         g += luminance(texture2D(etage0, vsoTexCoord.st + offset[i]).rgb) * G[i];\n \
+         g += luminance(texture(etage0, vsoTexCoord.st + offset[i]).rgb) * G[i];\n \
        return 1.0 - length(g);\n					\
      }\n								\
      float sobelFromMedia(void) {\n					\
        vec2 g = vec2(0.0, 0.0);\n					\
        for(int i = 0; i < ossize; i++)\n				\
-         g += pow(texture2D(etage0, vsoTexCoord.st + offset[i]).a, 2.99) * G[i];\n \
+         g += pow(texture(etage0, vsoTexCoord.st + offset[i]).a, 2.99) * G[i];\n \
        return 1.0 - length(g);\n					\
      }\n								\
      const vec3 minc = vec3(1.0 / 255.0);\n				\
      void main() {\n							\
        if((rand(vsoTexCoord.st) > rand_threshold) || 0.2 * sobel() < 0.15 || sobelFromMedia() < 0.1)\n \
-         fragColor = vec4(max(texture2D(etage0, vsoTexCoord.st).rgb, minc), 1.0);\n \
+         fragColor = vec4(max(texture(etage0, vsoTexCoord.st).rgb, minc), 1.0);\n \
        else\n								\
          fragColor = vec4(0.0, 0.0, 0.0, 1.0);\n			\
      }";
@@ -287,7 +287,7 @@ static const char * gl4dfMCMD_mdFS =
        vec4 c;\n							\
        for(i = 0; i < 4; i++) {\n					\
          x = i + int((st.s * float(width) - 0.5 /*transforme le nearest en floor*/) * 4.0);\n \
-         c = texture2D(etage1, vec2(float(x) / (float(width) * 4.0), st.t));\n \
+         c = texture(etage1, vec2(float(x) / (float(width) * 4.0), st.t));\n \
          p[i].x = (int(c.r * 255.0) << 8) | int(c.g * 255.0);\n		\
          p[i].y = (int(c.b * 255.0) << 8) | int(c.a * 255.0);\n		\
        }\n								\
