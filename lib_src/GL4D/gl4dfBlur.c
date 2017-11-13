@@ -174,7 +174,7 @@ static void setDimensions(GLuint w, GLuint h) {
   }
   for(i = 1; i < 3; i++) {
     glBindTexture(GL_TEXTURE_2D, fcommGetTempTex(i));
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);  
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);  
   }
 }
 
