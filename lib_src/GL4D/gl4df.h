@@ -193,32 +193,32 @@ extern "C" {
    * linéaire.
    *\todo A documenter
    */
-  GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetIr(GLfloat * mcmd_Ir);
+  GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetIr(const GLfloat * mcmd_Ir);
   /*!\brief A documenter
    *
    *\todo A documenter
    */
-  GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetI(GLfloat * mcmd_I);
+  GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetI(const GLfloat * mcmd_I);
   /*!\brief A documenter
    *
    *\todo A documenter
    */
-  GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetNoiseH(GLfloat * mcmd_noise_H);
+  GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetNoiseH(const GLfloat * mcmd_noise_H);
   /*!\brief A documenter
    *
    *\todo A documenter
    */
-  GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetNoiseS(GLfloat * mcmd_noise_S);
+  GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetNoiseS(const GLfloat * mcmd_noise_S);
   /*!\brief A documenter
    *
    *\todo A documenter
    */
-  GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetNoiseT(GLfloat * mcmd_noise_T);
+  GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetNoiseT(const GLfloat * mcmd_noise_T);
   /*!\brief A documenter
    *
    *\todo A documenter
    */
-  GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetNoisePhaseChange(GLfloat * mcmd_noise_phase_change);
+  GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetNoisePhaseChange(const GLfloat * mcmd_noise_phase_change);
   /*!\brief A documenter
    *
    *\todo A documenter

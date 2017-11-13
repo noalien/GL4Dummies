@@ -197,27 +197,27 @@ void gl4dfMCMDSetSkeletonize(GLboolean skeletonize) {
   _skeletonize = skeletonize;
 }
 
-void gl4dfMCMDSetIr(GLfloat * mcmd_Ir) {
+void gl4dfMCMDSetIr(const GLfloat * mcmd_Ir) {
   memcpy(_mcmd_Ir, mcmd_Ir, sizeof _mcmd_Ir);
 }
 
-void gl4dfMCMDSetI(GLfloat * mcmd_I) {
+void gl4dfMCMDSetI(const GLfloat * mcmd_I) {
   memcpy(_mcmd_I, mcmd_I, sizeof _mcmd_I);
 }
 
-void gl4dfMCMDSetNoiseH(GLfloat * mcmd_noise_H) {
+void gl4dfMCMDSetNoiseH(const GLfloat * mcmd_noise_H) {
   memcpy(_mcmd_noise_H, mcmd_noise_H, sizeof _mcmd_noise_H);
 }
 
-void gl4dfMCMDSetNoiseS(GLfloat * mcmd_noise_S) {
+void gl4dfMCMDSetNoiseS(const GLfloat * mcmd_noise_S) {
   memcpy(_mcmd_noise_S, mcmd_noise_S, sizeof _mcmd_noise_S);
 }
 
-void gl4dfMCMDSetNoiseT(GLfloat * mcmd_noise_T) {
+void gl4dfMCMDSetNoiseT(const GLfloat * mcmd_noise_T) {
   memcpy(_mcmd_noise_T, mcmd_noise_T, sizeof _mcmd_noise_T);
 }
 
-void gl4dfMCMDSetNoisePhaseChange(GLfloat * mcmd_noise_phase_change) {
+void gl4dfMCMDSetNoisePhaseChange(const GLfloat * mcmd_noise_phase_change) {
   memcpy(_mcmd_noise_phase_change, mcmd_noise_phase_change, sizeof _mcmd_noise_phase_change);
 }
 
