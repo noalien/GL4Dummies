@@ -16,7 +16,7 @@
 #include "gl4dfCommon.h"
 
 static GLfloat _mixFactor = 0.5f/* , _color[4] = {1, 1, 1, 1} */;
-static GLuint _sobelPId = 0, _mixMode = 0 /* none */;
+static GLuint _sobelPId = 0, _mixMode = 0 /* none */, _tId = 0;
 static GLboolean _isLuminance = GL_TRUE, _isInvert = GL_TRUE;
 
 static void init(void);
@@ -98,7 +98,8 @@ static void sobelffunc(GLuint in, GLuint out, GLboolean flipV) {
   cfbo = n;
   glGetIntegerv(GL_CURRENT_PROGRAM, &cpId);
   if(in == 0) { /* Pas d'entrée, donc l'entrée est le dernier draw */
-    gl4dfConvFrame2Tex(&rin);
+    gl4dfConvFrame2Tex(&_tId);
+    rin = _tId;
   } 
   if(out == 0) { /* Pas de sortie, donc sortie aux dimensions du viewport */
     w = vp[2] - vp[0]; 
@@ -194,4 +195,8 @@ static void init(void) {
 
 static void quit(void) {
   sobelfptr = sobelfinit;
+  if(_tId) {
+    glDeleteTextures(1, &_tId);
+    _tId = 0;
+  }
 }
