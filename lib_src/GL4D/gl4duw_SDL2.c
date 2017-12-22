@@ -10,7 +10,6 @@
 #include "bin_tree.h"
 #include "gl4duw_SDL2.h"
 
-
 /*!\brief type lié à la structure de données struct window_t. */
 typedef struct window_t window_t;
 
@@ -29,6 +28,7 @@ struct window_t {
   void (*passivemousemotion)(int x, int y);
   void (*idle)(void);
   void (*display)(void);
+  int  (*catchSDL_Event)(SDL_Event * event);
 };
 
 /*!\brief arbre binaire contenant l'ensemble des fenêtres créées. */
@@ -43,6 +43,8 @@ static window_t * _focusedWindow = NULL;
 static int _glMajorVersion = 3, _glMinorVersion = 2, _glProfileMask = SDL_GL_CONTEXT_PROFILE_CORE, _glDoubleBuffer = 1, _glDepthSize = 16;
 /*!\brief flag permettant de savoir si la lib a déjà été initialisée */
 static int _hasInit = 0;
+/*!\brief flag permettant de savoir si la lib gère les événements */
+static int _hasManageEvents = 1;
 
 static inline int        initGL4DUW(int argc, char ** argv);
 static inline window_t * newWindow(const char * name, SDL_Window * win, SDL_GLContext oglc);
@@ -69,6 +71,8 @@ static inline void fake_passivemousemotion(int x, int y) {}
 static inline void fake_idle(void) {}
 /*!\brief fonction fictive liée au callback de display. */
 static inline void fake_display(void) {}
+/*!\brief fonction fictive liée au callback de catchSDL_Event. */
+static inline int  fake_catchSDL_Event(SDL_Event * event) { return 0; }
 
 void gl4duwSetGLAttributes(int glMajorVersion, int glMinorVersion, int glProfileMask, int glDoubleBuffer, int glDepthSize) {
   _glMajorVersion = glMajorVersion;
@@ -119,6 +123,10 @@ GLboolean gl4duwCreateWindow(int argc, char ** argv, const char * title, int x, 
   return GL_TRUE;
 }
 
+SDL_Window * gl4duwGetSDL_Window(void) {
+  return _curWindow ? _curWindow->window : NULL;
+}
+
 GLboolean gl4duwBindWindow(const char * title) {
   window_t wt = { (char *)title, NULL };
   pair_t pair;
@@ -131,7 +139,8 @@ GLboolean gl4duwBindWindow(const char * title) {
 
 void gl4duwMainLoop(void) {
   for(;;) {
-    manageEvents();
+    if(_hasManageEvents)
+      manageEvents();
     btForAll(_btWindows, mainLoopBody, NULL);
     gl4duPrintFPS(stderr);
     gl4duUpdateShaders();
@@ -168,6 +177,18 @@ void gl4duwIdleFunc(void (*func)(void)) {
 
 void gl4duwDisplayFunc(void (*func)(void)) {
   _curWindow->display = func ? func : fake_display;
+}
+
+void gl4duwCatchSDL_EventFunc(int (*func)(SDL_Event *)) {
+  _curWindow->catchSDL_Event = func ? func : fake_catchSDL_Event;
+}
+
+void gl4duwEnableManageEvents(void) {
+  _hasManageEvents = 1;
+}
+
+void gl4duwDisableManageEvents(void) {
+  _hasManageEvents = 0;
 }
 
 /*!\brief initialise SDL et GL4Dummies.
@@ -211,6 +232,7 @@ static inline window_t * newWindow(const char * name, SDL_Window * win, SDL_GLCo
   w->passivemousemotion = fake_passivemousemotion;
   w->idle = fake_idle;
   w->display = fake_display;
+  w->catchSDL_Event = fake_catchSDL_Event;
   return w;
 }
 
@@ -269,7 +291,9 @@ void gl4duwGetWindowSize(int * w, int * h) {
  */
 static inline void manageEvents(void) {
   SDL_Event event;
-  while(SDL_PollEvent(&event))
+  while(SDL_PollEvent(&event)) {
+    if(_focusedWindow && _focusedWindow->catchSDL_Event(&event))
+      continue;
     switch (event.type) {
     case SDL_KEYDOWN:
       if(_focusedWindow)
@@ -312,6 +336,7 @@ static inline void manageEvents(void) {
     case SDL_QUIT:
       exit(0);
     }
+  }
 }
 
 /*!\brief corps de la boucle principale événement/simulation/affichage */

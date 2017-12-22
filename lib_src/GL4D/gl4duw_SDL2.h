@@ -341,6 +341,14 @@ extern "C" {
    * \see SDL_CreateWindow
    */
   GL4DAPI GLboolean  GL4DAPIENTRY gl4duwCreateWindow(int argc, char ** argv, const char * title, int x, int y, int width, int height, Uint32 wflags);
+  /*!\brief retourne le pointeur vers la structure SDL_Window de la
+   * fenêtre courante (suite à un \ref gl4duwCreateWindow ou \ref
+   * gl4duwBindWindow ...).
+   *
+   * \return le pointeur vers la structure SDL_Window de la fenêtre
+   * courante.
+   */
+  GL4DAPI SDL_Window * GL4DAPIENTRY gl4duwGetSDL_Window(void);
   /*!\brief recherche et positionne "courant" une fenêtre en fonction de son titre.
    *
    * La fenêtre courante est celle qui est affectée par les appelles des
@@ -413,7 +421,19 @@ extern "C" {
    * réaliser le display (dessin).
    */
   GL4DAPI void       GL4DAPIENTRY gl4duwDisplayFunc(void (*func)(void));
-  
+  /*!\brief affecte la fonction appelée lors de la gestion manuelle par le programmeur des événements SDL. 
+   * \param func pointeur vers fonction utilisateur à appeler pour la
+   * gestion manuelle des événements SDL. Cette fonction reçoit le
+   * pointeur vers l'événement bas-niveau SDL à traiter. Si la
+   * fonction utilisateur traitant l'événement renvoie une valeur non
+   * nulle ceci implique que l'événement est traité et ne doit plus
+   * figurer dans la liste des événements à traiter, sinon,
+   * potentiellement l'événement pourra être traité par une des
+   * "autres" fonctions "événements" spécialisées.
+   */
+  GL4DAPI void       GL4DAPIENTRY gl4duwCatchSDL_EventFunc(int (*func)(SDL_Event *));
+  GL4DAPI void       GL4DAPIENTRY gl4duwEnableManageEvents(void);
+  GL4DAPI void       GL4DAPIENTRY gl4duwDisableManageEvents(void);
 #ifdef __cplusplus
 }
 #endif
