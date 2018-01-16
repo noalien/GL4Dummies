@@ -143,7 +143,7 @@ static void init(void) {
        }\n								\
        vec4 weightedBlur(void) {\n					\
          float w = texture(myWeights, vsoTexCoord.st)[weightMapComponent];\n							\
-         int sub_nweights = 1 + int(float(nweights) * clamp(weightMapScale * (w + weightMapTranslate), 0, 1));\n \
+         int sub_nweights = 1 + int(float(nweights) * clamp(weightMapScale * w + weightMapTranslate, 0, 1));\n \
          vec4 c = texture(myTexture, vsoTexCoord.st) * (w = weight[0]);\n \
          for (int i = 1; i < sub_nweights; i++) {\n			\
            w += 2.0 * weight[i];\n					\
