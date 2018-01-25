@@ -323,8 +323,8 @@ static const char * gl4dfMCMD_mdFS =
          }\n								\
          if(sumw > 0.0)\n						\
            v /= sumw;\n							\
-         v += pow(vec4(2.0), vec4(-myLevel * mcmd_noise_H)) * (mcmd_noise_T + mcmd_noise_S * rand(vsoTexCoord.st + vec2(seed), mcmd_noise_phase_change));\n \
-         fragColor = min(max(v, minc), vec4(1.0));\n			\
+         v += pow(vec4(2.0), vec4(-(myLevel + 1) * mcmd_noise_H)) * (mcmd_noise_T + mcmd_noise_S * rand(vsoTexCoord.st + vec2(seed), mcmd_noise_phase_change));\n \
+         fragColor = max(v, minc);\n					\
        } else\n								\
          fragColor = texture(etage0, vsoTexCoord.st);\n			\
      }";
@@ -376,15 +376,18 @@ static const char * gl4dfMCMD_mdbuFS =
          }\n								\
          fragColor = vec4(0.0, 0.0, 0.0, 1.0);\n			\
        } else {\n							\
-         const float maxdist = sqrt(2.0);\n				\
-         float sumn = 0.0, w;\n						\
+         const float maxdist = sqrt(2.0), sc = 0.1, sf = 6.0;\n				\
+         float sumn = 0.0, w, d;\n						\
          vec4 Ir_sign = vec4(mcmd_Ir.x < 0.0 ? -1.0 : 1.0, mcmd_Ir.y < 0.0 ? -1.0 : 1.0, mcmd_Ir.z < 0.0 ? -1.0 : 1.0, mcmd_Ir.w < 0.0 ? -1.0 : 1.0);\n	\
          vec4 sumcoul = vec4(0.0), Ir_abs = abs(mcmd_Ir);\n		\
          for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n \
            if(ret.x >= 0.0 && ret.x <= 1.0 && ret.y >= 0.0 && ret.y <= 1.0) {\n	\
              coul = texture(etage0, ret);\n				\
              if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
-               w = 1.0 - length(ret - vsoTexCoord) / maxdist;\n		\
+               d = (length(ret - vsoTexCoord) / maxdist);\n		\
+               if(d > 0.035) continue;\n \
+               if(d > 0.016) d = 1.0 / (1.0 + exp(-sf * (d / sc - 1.0)));\n \
+               w = 1.0 - d;\n						\
                sumcoul += w * (vec4(1.0) - Ir_sign * (vec4(1.0) - pow(vec4(w), Ir_abs))) * coul; \
                sumn += w;\n						\
              }\n							\
