@@ -376,8 +376,8 @@ static const char * gl4dfMCMD_mdbuFS =
          }\n								\
          fragColor = vec4(0.0, 0.0, 0.0, 1.0);\n			\
        } else {\n							\
-         const float maxdist = sqrt(2.0), sc = 0.1, sf = 6.0;\n				\
-         float sumn = 0.0, w, d;\n						\
+         const float maxdist = sqrt(2.0);\n				\
+         float sumn = 0.0, w, d;\n					\
          vec4 Ir_sign = vec4(mcmd_Ir.x < 0.0 ? -1.0 : 1.0, mcmd_Ir.y < 0.0 ? -1.0 : 1.0, mcmd_Ir.z < 0.0 ? -1.0 : 1.0, mcmd_Ir.w < 0.0 ? -1.0 : 1.0);\n	\
          vec4 sumcoul = vec4(0.0), Ir_abs = abs(mcmd_Ir);\n		\
          for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n \
@@ -385,8 +385,8 @@ static const char * gl4dfMCMD_mdbuFS =
              coul = texture(etage0, ret);\n				\
              if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
                d = (length(ret - vsoTexCoord) / maxdist);\n		\
-               if(d > 0.035) continue;\n \
-               if(d > 0.016) d = 1.0 / (1.0 + exp(-sf * (d / sc - 1.0)));\n \
+               if(d > 0.016) continue;\n				\
+               //ne marche pas (sc = 0.5, sf = 6.0) : d = 1.0 / (1.0 + exp(-sf * (d / sc - 1.0)));\n		\
                w = 1.0 - d;\n						\
                sumcoul += w * (vec4(1.0) - Ir_sign * (vec4(1.0) - pow(vec4(w), Ir_abs))) * coul; \
                sumn += w;\n						\
@@ -396,7 +396,7 @@ static const char * gl4dfMCMD_mdbuFS =
          if(sumn > 0.0)\n						\
            fragColor = sumcoul / sumn;\n				\
          else\n								\
-           fragColor = vec4(0.0, 0.0, 0.0, 1.0);\n			\
+           fragColor = vec4(0.0);\n					\
        }\n								\
      }";
 
