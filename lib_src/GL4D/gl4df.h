@@ -224,6 +224,11 @@ extern "C" {
    *\todo A documenter
    */
   GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetSkeletonizeRandThreshold(GLfloat rand_threshold);
+  /*!\brief A documenter
+   *\param version 0 pour cpu-original-like, 1 (et plus, plus tard ...) pour nouvelles
+   *\todo A documenter
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetMDBUVersion(GLuint version);
 
 #ifdef __cplusplus
 }

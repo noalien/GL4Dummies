@@ -25,7 +25,7 @@ static int  mdTexData(unsigned int w, unsigned int h);
 static void init(void);
 static void quit(void);
 
-static GLuint _pId[3] = { 0 };
+static GLuint _pId[4] = { 0 }, _mdbu_version = 1 + 2;
 static GLuint _mdTexId[4] = { 0 }, _buTreeSize = 0,  _tempTexId[3] = { 0 };
 static GLuint _width = 512, _height = 512;
 static int    _maxLevel = -1;
@@ -72,7 +72,7 @@ static void fractalPaintingfinit(GLuint in, GLuint out, GLboolean flipV) {
 }
 
 static void fractalPaintingffunc(GLuint in, GLuint out, GLboolean flipV) {
-  GLint i, ati = 0, vp[4], polygonMode[2], cpId = 0, cfbo;
+  GLint i, ati = 0, vp[4], polygonMode[2], cpId = 0, cfbo, end;
   GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND), tex = glIsEnabled(GL_TEXTURE_2D);
   GLuint fbo;
   glEnable(GL_TEXTURE_2D);
@@ -100,32 +100,34 @@ static void fractalPaintingffunc(GLuint in, GLuint out, GLboolean flipV) {
     glViewport(0, 0, _width, _height);
     if(_skeletonize) {
       glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _tempTexId[1],  0);
-      glUseProgram(_pId[2]);
-      glUniform1f(glGetUniformLocation(_pId[2], "rand_threshold"), _rand_threshold);
-      glUniform1i(glGetUniformLocation(_pId[2], "etage0"), 0);
-      glUniform1i(glGetUniformLocation(_pId[2], "inv"), 0);
-      glUniform1i(glGetUniformLocation(_pId[2], "width"), _width);
-      glUniform1i(glGetUniformLocation(_pId[2], "height"), _height);
+      glUseProgram(_pId[1]);
+      glUniform1f(glGetUniformLocation(_pId[1], "rand_threshold"), _rand_threshold);
+      glUniform1i(glGetUniformLocation(_pId[1], "etage0"), 0);
+      glUniform1i(glGetUniformLocation(_pId[1], "inv"), 0);
+      glUniform1i(glGetUniformLocation(_pId[1], "width"), _width);
+      glUniform1i(glGetUniformLocation(_pId[1], "height"), _height);
       glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D, _tempTexId[2]);
       gl4dgDraw(fcommGetPlane());
     }
     /* mdbu */
-    glUseProgram(_pId[1]);
+    glUseProgram(_pId[_mdbu_version]);
     glActiveTexture(GL_TEXTURE3); glBindTexture(GL_TEXTURE_2D, _tempTexId[2]);
     glActiveTexture(GL_TEXTURE2); glBindTexture(GL_TEXTURE_2D, _mdTexId[3]);
     glActiveTexture(GL_TEXTURE1); glBindTexture(GL_TEXTURE_2D, _mdTexId[2]);
-    glUniform1i(glGetUniformLocation(_pId[1], "etage0"), 0);
-    glUniform1i(glGetUniformLocation(_pId[1], "etage1"), 1);
-    glUniform1i(glGetUniformLocation(_pId[1], "etage2"), 2);
-    glUniform1i(glGetUniformLocation(_pId[1], "etage3"), 3);
-    glUniform1i(glGetUniformLocation(_pId[1], "width"), _width);
-    glUniform4fv(glGetUniformLocation(_pId[1], "mcmd_Ir"), 1, _mcmd_Ir);
-    glUniform1i(glGetUniformLocation(_pId[1], "mcmd_take_color"), _mcmd_take_color);
-    glUniform1i(glGetUniformLocation(_pId[1], "buTreeSize"), _buTreeSize);
-    glUniform1i(glGetUniformLocation(_pId[1], "buTreeWidth"), (int)sqrt(_buTreeSize));
-    glUniform1i(glGetUniformLocation(_pId[1], "buTreeHeight"), _buTreeSize / (int)sqrt(_buTreeSize));
-    for(i = 0, ati = 0; i < (nbLevels(_width, _height) >> 2) - 1; i++) {
+    glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "etage0"), 0);
+    glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "etage1"), 1);
+    glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "etage2"), 2);
+    glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "etage3"), 3);
+    glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "width"), _width);
+    glUniform4fv(glGetUniformLocation(_pId[_mdbu_version], "mcmd_Ir"), 1, _mcmd_Ir);
+    glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "mcmd_take_color"), _mcmd_take_color);
+    glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "buTreeSize"), _buTreeSize);
+    glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "buTreeWidth"), (int)sqrt(_buTreeSize));
+    glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "buTreeHeight"), _buTreeSize / (int)sqrt(_buTreeSize));
+    /* end = _mdbu_version > 2 ? (nbLevels(_width, _height) >> 2) - 1 : nbLevels(_width, _height) - 1; */
+    end = (nbLevels(_width, _height) >> 2) - 1;
+    for(i = 0, ati = 0; i < end; i++) {
       glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,    GL_TEXTURE_2D, _tempTexId[ati], 0);
       ati = (ati + 1) % 2;
       glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, _tempTexId[ati]);
@@ -223,6 +225,10 @@ void gl4dfMCMDSetNoisePhaseChange(const GLfloat * mcmd_noise_phase_change) {
 
 void gl4dfMCMDSetSkeletonizeRandThreshold(GLfloat rand_threshold) {
   _rand_threshold = rand_threshold;
+}
+
+void gl4dfMCMDSetMDBUVersion(GLuint version) {
+  _mdbu_version = MIN(version, 1) + 2;
 }
 
 static const char * gl4dfMCMD_select4mcmdFS = 
@@ -329,8 +335,8 @@ static const char * gl4dfMCMD_mdFS =
          fragColor = texture(etage0, vsoTexCoord.st);\n			\
      }";
 
-static const char * gl4dfMCMD_mdbuFS = 
-  "<imfs>gl4dfMCMD_mdbu.fs</imfs>\n\
+static const char * gl4dfMCMD_mdbuV0FS = 
+  "<imfs>gl4dfMCMD_mdbuV0.fs</imfs>\n\
      #version 330\n							\
      in vec2 vsoTexCoord;\n						\
      out vec4 fragColor;\n						\
@@ -377,7 +383,75 @@ static const char * gl4dfMCMD_mdbuFS =
          fragColor = vec4(0.0, 0.0, 0.0, 1.0);\n			\
        } else {\n							\
          const float maxdist = sqrt(2.0);\n				\
-         float sumn = 0.0, w, d;\n					\
+         float sumn = 0.0, w;\n						\
+         vec4 Ir_sign = vec4(mcmd_Ir.x < 0.0 ? -1.0 : 1.0, mcmd_Ir.y < 0.0 ? -1.0 : 1.0, mcmd_Ir.z < 0.0 ? -1.0 : 1.0, mcmd_Ir.w < 0.0 ? -1.0 : 1.0);\n	\
+         vec4 sumcoul = vec4(0.0), Ir_abs = abs(mcmd_Ir);\n		\
+         for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n \
+           if(ret.x >= 0.0 && ret.x <= 1.0 && ret.y >= 0.0 && ret.y <= 1.0) {\n	\
+             coul = texture(etage0, ret);\n				\
+             if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
+               w = 1.0 - length(ret - vsoTexCoord) / maxdist;\n		\
+               sumcoul += w * (vec4(1.0) - Ir_sign * (vec4(1.0) - pow(vec4(w), Ir_abs))) * coul; \
+               sumn += w;\n						\
+             }\n							\
+           }\n								\
+         }\n								\
+         if(sumn > 0.0)\n						\
+           fragColor = sumcoul / sumn;\n				\
+         else\n								\
+           fragColor = vec4(0.0, 0.0, 0.0, 1.0);\n			\
+       }\n								\
+     }";
+
+static const char * gl4dfMCMD_mdbuV1FS = 
+  "<imfs>gl4dfMCMD_mdbuV1.fs</imfs>\n\
+     #version 330\n							\
+     in vec2 vsoTexCoord;\n						\
+     out vec4 fragColor;\n						\
+     uniform vec4 mcmd_Ir;\n						\
+     uniform int width, mcmd_take_color, buTreeSize, buTreeWidth, buTreeHeight;\n \
+     uniform sampler2D etage0, etage1, etage2, etage3;\n		\
+     float luminance(vec3 rgb) {\n					\
+       return dot(vec3(0.299, 0.587, 0.114), rgb);\n			\
+     }\n								\
+     uint rgba2ui(vec4 rgba) {\n					\
+       return (uint(rgba.r * 255.0) << uint(24)) |\n			\
+         (uint(rgba.g * 255.0) << uint(16)) |\n				\
+         (uint(rgba.b * 255.0) << uint(8) ) |\n				\
+         (uint(rgba.a * 255.0));\n					\
+     }\n								\
+     float rgba2f(vec4 rgba) {\n					\
+       return float(rgba2ui(rgba)) / float(uint(-1));\n			\
+     }\n								\
+     vec2 getChild(uint ipos) {\n					\
+       return vec2(float(ipos % uint(buTreeWidth)) / float(buTreeWidth - 1.0), float(ipos / uint(buTreeWidth)) / float(buTreeHeight - 1.0));\n \
+     }\n								\
+     vec2 readChildCoords(uint pos, float step) {\n			\
+       return vec2(texture(etage2, getChild(pos)).r, texture(etage2, getChild(pos + uint(1))).r) * step;\n \
+     }\n								\
+     void main() {\n							\
+       vec4 coul = texture(etage0, vsoTexCoord.st);\n			\
+       if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
+         fragColor = coul;\n						\
+         return;\n							\
+       }\n								\
+       float step = 65535.0 / float(width - 1.0);\n			\
+       uint i0 = rgba2ui(texture(etage1, vsoTexCoord.st));\n		\
+       if(mcmd_take_color != 0) {\n					\
+         uint i0 = rgba2ui(texture(etage1, vsoTexCoord.st));\n		\
+         for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n \
+           if(ret.x >= 0.0 && ret.x <= 1.0 && ret.y >= 0.0 && ret.y <= 1.0) {\n	\
+             coul = texture(etage0, ret);\n				\
+     	     if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
+               fragColor = texture(etage3, vsoTexCoord.st);\n		\
+               return;\n						\
+             }\n							\
+           }\n								\
+         }\n								\
+         fragColor = vec4(0.0, 0.0, 0.0, 1.0);\n			\
+       } else {\n							\
+         const float maxdist = sqrt(2.0);\n				\
+         float sumn = 0.0, w, d, sc = 0.032, sf = 0.01;\n		\
          vec4 Ir_sign = vec4(mcmd_Ir.x < 0.0 ? -1.0 : 1.0, mcmd_Ir.y < 0.0 ? -1.0 : 1.0, mcmd_Ir.z < 0.0 ? -1.0 : 1.0, mcmd_Ir.w < 0.0 ? -1.0 : 1.0);\n	\
          vec4 sumcoul = vec4(0.0), Ir_abs = abs(mcmd_Ir);\n		\
          for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n \
@@ -385,15 +459,16 @@ static const char * gl4dfMCMD_mdbuFS =
              coul = texture(etage0, ret);\n				\
              if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
                d = (length(ret - vsoTexCoord) / maxdist);\n		\
-               if(d > 0.016) continue;\n				\
-               //ne marche pas (sc = 0.5, sf = 6.0) : d = 1.0 / (1.0 + exp(-sf * (d / sc - 1.0)));\n		\
+               //sf=0.1;sc=0.032; plot (x<sc) ? x : sc+(1-sc)*((x-sc)**sf) / ((1-sc)**sf);\n \
+               if(d > sc) \n						\
+                 d = sc + (1.0 - sc) * pow(d - sc, sf) / pow(1.0 - sc, sf);\n \
                w = 1.0 - d;\n						\
                sumcoul += w * (vec4(1.0) - Ir_sign * (vec4(1.0) - pow(vec4(w), Ir_abs))) * coul; \
                sumn += w;\n						\
              }\n							\
            }\n								\
          }\n								\
-         if(sumn > 0.0)\n						\
+         if(sumn >= 1.0 - sc)\n						\
            fragColor = sumcoul / sumn;\n				\
          else\n								\
            fragColor = vec4(0.0);\n					\
@@ -404,8 +479,9 @@ static void init(void) {
   int i;
   if(!_pId[0]) {
     _pId[0] = gl4duCreateProgram(gl4dfBasicVS, gl4dfMCMD_mdFS, NULL);
-    _pId[1] = gl4duCreateProgram(gl4dfBasicVS, gl4dfMCMD_mdbuFS, NULL);
-    _pId[2] = gl4duCreateProgram(gl4dfBasicVS, gl4dfMCMD_select4mcmdFS, NULL);
+    _pId[1] = gl4duCreateProgram(gl4dfBasicVS, gl4dfMCMD_select4mcmdFS, NULL);
+    _pId[2] = gl4duCreateProgram(gl4dfBasicVS, gl4dfMCMD_mdbuV0FS, NULL);
+    _pId[3] = gl4duCreateProgram(gl4dfBasicVS, gl4dfMCMD_mdbuV1FS, NULL);
   }
   if(!_mdTexId[0])
     glGenTextures(4, _mdTexId);
