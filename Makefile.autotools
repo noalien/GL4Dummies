@@ -1,6 +1,6 @@
 all:
+	libtoolize
 	autoreconf -i -Im4
-	#libtoolize
 	#aclocal
 	autoconf
 	automake --add-missing
