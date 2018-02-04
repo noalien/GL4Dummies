@@ -14,6 +14,10 @@
  * partie est dépendante de la bibliothèque SDL2 */
 #include <GL4D/gl4duw_SDL2.h>
 
+
+/*!\brief fonction appelée à chaque draw par la gl4duwMainLoop.*/
+static void dessine(void);
+
 /*!\brief créé la fenêtre, un screen 2D effacé en noir et lance une
  *  boucle infinie.*/
 int main(int argc, char ** argv) {
@@ -30,12 +34,18 @@ int main(int argc, char ** argv) {
   /* création d'un screen GL4Dummies (texture dans laquelle nous
    * pouvons dessiner) aux dimensions de la fenêtre */
   gl4dpInitScreen();
-  /* effacement du screen en cours en utilisant la couleur par défaut,
-   * le noir */
-  gl4dpClearScreen();
-  gl4dpUpdateScreen(NULL);
+  gl4duwDisplayFunc(dessine);
   /* boucle infinie pour éviter que le programme ne s'arrête et ferme
    * la fenêtre */
   gl4duwMainLoop();
   return 0;
+}
+
+void dessine(void) {
+  /* sélection au hasard d'une intensité de rouge, de vert et de bleu */
+  GLubyte r = rand() % 256, g = rand() % 256, b = rand() % 256;
+  /* effacement du screen en cours en utilisant une couleur au hasard */
+  gl4dpClearScreenWith(RGB(r, g, b));
+  /* mise à jour du screen côté OpenGL */
+  gl4dpUpdateScreen(NULL);
 }
