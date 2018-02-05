@@ -1,4 +1,4 @@
 all:
-	for i in sample2d_00-1.0 sample2d_00-1.1 sample2d_00-1.2; do make -C "$$i" dist && mv "$$i/$$i.tgz" archives/; done
+	for i in sample*; do make -C "$$i" dist && mv "$$i/$$i.tgz" archives/; done
 clean:
 	rm -f archives/*.tgz
