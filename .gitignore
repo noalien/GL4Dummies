@@ -20,7 +20,6 @@
 /Windows/*.user
 
 x64
-Makefile
 CMakeFiles
 CMakeCache.txt
 cmake_install.cmake
