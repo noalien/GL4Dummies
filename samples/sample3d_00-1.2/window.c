@@ -1,6 +1,6 @@
 /*!\file window.c
  *
- * \brief GL4Dummies, exemple 3D simple avec dessin de triangle coloré
+ * \brief GL4Dummies, exemple 3D simple avec dessin d'un quadrilatère
  * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
  * \date February 11 2018
  */
@@ -38,23 +38,27 @@ int main(int argc, char ** argv) {
 }
 /*!\brief initialise les paramètres OpenGL et les données. 
  *
- * Exercice (corrigé en 1.1) : modifier data, les lignes
- * glVertexAttribPointer et glDrawArrays (dans draw) afin de dessiner
- * un quadrilatère recouvrant l'ensemble de l'écran ; mettre une
- * couleur jaune pour le point ajouté.
+ * Exercice (corrigé en 1.3) : utiliser GL4Dummies (voir manuel + doc
+ * de référence concernant gl4du.h) pour créer
+ * (gl4duGenMatrix/gl4duBindMatrix) une matrice de projection
+ * (orthogonale (gl4duOrthof) ou perspective (gl4duFrustumf)) et une
+ * matrice de modélisation et de vue. De plus, les fonctions
+ * gl4duLoadIdentityf, gl4duTranslatef, gl4duRotatef, gl4duSendMatrix
+ * ou gl4duSendMatrices peuvent être utiles ; ne pas oublier de
+ * récupérer les matrices dans le vertex shader et de les appliquer.
  */
 static void init(void) {
-  /* données envoyées par tranches (différent du mode interleaved
-   * array) dans le VBO */
+  /* données envoyées par tranches sommet-attributs dans le VBO */
   GLfloat data[] = {
-    /* 3 coordonnées de sommets en 2D */
+    /* 4 coordonnées de sommets en 2D chacune suivie de sa couleur */
     -1.0f, -1.0f, 
-    1.0f, -1.0f,
-     0.0f,  1.0f,
-    /* 3 couleurs */
     1.0f, 0.0f, 0.0f, 
+    1.0f, -1.0f,
     0.0f, 1.0f, 0.0f,
-    0.0f, 0.0f, 1.0f
+    -1.0f,  1.0f,
+    0.0f, 0.0f, 1.0f,
+    1.0f, 1.0f,
+    1.0f, 1.0f, 0.0f
   };
   /* Création du programme shader (voir le dossier shader) */
   _pId = gl4duCreateProgram("<vs>shaders/basic.vs", "<fs>shaders/basic.fs", NULL);
@@ -76,22 +80,31 @@ static void init(void) {
   /* Transfert des données VBO */
   glBufferData(GL_ARRAY_BUFFER, sizeof data, data, GL_STATIC_DRAW);
   /* Paramétrage 2 premiers indices d'attribut de sommet */
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (const void *)0);  
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const void *)(3 * 2 * sizeof *data));
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof *data, (const void *)0);  
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof *data, (const void *)(2 * sizeof *data));
   /* dé-lier le VBO et VAO */
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 }
 /*!\brief Cette fonction dessine dans le contexte OpenGL actif. */
 static void draw(void) {
+  /* une variable d'angle */
+  static GLfloat angle = 0.0f;
   /* effacement du buffer de couleur */
   glClear(GL_COLOR_BUFFER_BIT);
   /* activation du programme _pId */
   glUseProgram(_pId);
+  /* on transmet la variable uniform d'angle */
+  glUniform1f(glGetUniformLocation(_pId, "angle"), angle);
+  /* on incrémente angle d'un 1/60 de tour. Tester l'application en
+   * activant/désactivant la synchronisation verticale de votre carte
+   * graphique. Que se passe-t-il ? Trouver une solution pour que
+   * résultat soit toujours le même. */
+  angle += (1.0f / 60.0f) * 2.0f * M_PI;
   /* Lier le VAO-machine-GL à l'identifiant VAO _vao */
   glBindVertexArray(_vao);
-  /* Dessiner le VAO comme une bande de triangles à 3 sommets commençant à 0 */
-  glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
+  /* Dessiner le VAO comme une bande de deux triangles avec 4 sommets commençant à 0 */
+  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   /* dé-lier le VAO */
   glBindVertexArray(0);
   /* désactiver le programme shader */

@@ -1,6 +1,6 @@
 /*!\file window.c
  *
- * \brief GL4Dummies, exemple 3D simple avec dessin de triangle coloré
+ * \brief GL4Dummies, exemple 3D simple avec dessin d'un quadrilatère
  * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
  * \date February 11 2018
  */
@@ -38,23 +38,35 @@ int main(int argc, char ** argv) {
 }
 /*!\brief initialise les paramètres OpenGL et les données. 
  *
- * Exercice (corrigé en 1.1) : modifier data, les lignes
- * glVertexAttribPointer et glDrawArrays (dans draw) afin de dessiner
- * un quadrilatère recouvrant l'ensemble de l'écran ; mettre une
- * couleur jaune pour le point ajouté.
+ * Exercice (corrigé en 1.2) : entrelacer les données de sommet dans
+ * data afin d'avoir la 1ere coordonnée spaciale suivie de sa couleur,
+ * suivi de la 2ème coordonnée ... modifier les appels à
+ * glVertexAttribPointer en corrigeant le 5ème et 6ème argument (voir
+ * doc de glVertexAttribPointer sur
+ * https://www.khronos.org/registry/OpenGL-Refpages/gl4).
+ *
+ * puis ajouter une variable d'angle (en radians) qui s'incrémente
+ * dans draw, envoyer cette variable à GLSL (le vertex shader) comme
+ * variable "uniform float angle;" en utilisant les fonctions
+ * glGetUniformLocation et glUniform1f (voir les doc sur
+ * https://www.khronos.org/registry/OpenGL-Refpages/gl4).  Enfin
+ * utiliser cet angle côté vertex shader pour construire une matrice
+ * de rotation 4x4 autour de l'axe y et l'utiliser sur le sommet.
  */
 static void init(void) {
   /* données envoyées par tranches (différent du mode interleaved
    * array) dans le VBO */
   GLfloat data[] = {
-    /* 3 coordonnées de sommets en 2D */
+    /* 4 coordonnées de sommets en 2D */
     -1.0f, -1.0f, 
     1.0f, -1.0f,
-     0.0f,  1.0f,
+    -1.0f,  1.0f,
+    1.0f, 1.0f,
     /* 3 couleurs */
     1.0f, 0.0f, 0.0f, 
     0.0f, 1.0f, 0.0f,
-    0.0f, 0.0f, 1.0f
+    0.0f, 0.0f, 1.0f,
+    1.0f, 1.0f, 0.0f
   };
   /* Création du programme shader (voir le dossier shader) */
   _pId = gl4duCreateProgram("<vs>shaders/basic.vs", "<fs>shaders/basic.fs", NULL);
@@ -77,7 +89,7 @@ static void init(void) {
   glBufferData(GL_ARRAY_BUFFER, sizeof data, data, GL_STATIC_DRAW);
   /* Paramétrage 2 premiers indices d'attribut de sommet */
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (const void *)0);  
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const void *)(3 * 2 * sizeof *data));
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const void *)(4 * 2 * sizeof *data));
   /* dé-lier le VBO et VAO */
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
@@ -90,8 +102,8 @@ static void draw(void) {
   glUseProgram(_pId);
   /* Lier le VAO-machine-GL à l'identifiant VAO _vao */
   glBindVertexArray(_vao);
-  /* Dessiner le VAO comme une bande de triangles à 3 sommets commençant à 0 */
-  glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
+  /* Dessiner le VAO comme une bande de deux triangles avec 4 sommets commençant à 0 */
+  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   /* dé-lier le VAO */
   glBindVertexArray(0);
   /* désactiver le programme shader */
