@@ -66,7 +66,7 @@ static void init(void) {
   glGenVertexArrays(1, &_vao);
   /* Lier le VAO-machine-GL à l'identifiant VAO généré */
   glBindVertexArray(_vao);
-  /* Activation des 3 premiers indices d'attribut de sommet */
+  /* Activation des 2 premiers indices d'attribut de sommet */
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
   /* Génération d'un identifiant de VBO */

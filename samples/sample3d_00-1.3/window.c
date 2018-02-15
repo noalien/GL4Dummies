@@ -2,7 +2,7 @@
  *
  * \brief GL4Dummies, exemple 3D simple avec dessin d'un quadrilatère
  * plus des transformations spaciales projection/modélisation
- * utulisant les fonction gl4duXXX  
+ * utilisant les fonction gl4duXXX  
  * \author Farès BELHADJ,
  * amsi@ai.univ-paris8.fr \date February 11 2018
  */
@@ -90,7 +90,7 @@ static void init(void) {
   glGenVertexArrays(1, &_vao);
   /* Lier le VAO-machine-GL à l'identifiant VAO généré */
   glBindVertexArray(_vao);
-  /* Activation des 3 premiers indices d'attribut de sommet */
+  /* Activation des 2 premiers indices d'attribut de sommet */
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
   /* Génération d'un identifiant de VBO */

@@ -1,8 +1,9 @@
 /*!\file window.c
  *
- * \brief GL4Dummies, exemple 3D simple avec dessin d'un quadrilatère
- * plus des transformations spaciales projection/modélisation
- * utulisant les fonction gl4duXXX  
+ * \brief GL4Dummies, exemple 3D avec fabrication d'un triangle plein
+ * tourant dans un cube unitaire en fil de fer plus des
+ * transformations spaciales projection/modélisation utilisant les
+ * fonction gl4duXXX
  * \author Farès BELHADJ,
  * amsi@ai.univ-paris8.fr \date February 11 2018
  */
@@ -121,7 +122,7 @@ static void init(void) {
   glGenVertexArrays(1, &_vao);
   /* Lier le VAO-machine-GL à l'identifiant VAO généré */
   glBindVertexArray(_vao);
-  /* Activation des 3 premiers indices d'attribut de sommet */
+  /* Activation des 2 premiers indices d'attribut de sommet */
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
   /* Génération d'un identifiant de VBO */
@@ -155,9 +156,9 @@ static void draw(void) {
   gl4duBindMatrix("modelViewMatrix");
   /* Charger la matrice identité dans la matrice courante (liée) */
   gl4duLoadIdentityf();
-  /* Composer la matrice courante avec une translation (voir la
-   * projection perspective dans le manuel pour comprendre pourquoi
-   * nous devons éloigner de -3 en z les objets dessinés) */
+  /* Composer la matrice vue courante en simulant une "caméra" à
+   * l'aide de la fonction LookAt(xyz_position_cam,
+   * xyz_ou_elle_regarde, xyz_son_vecteur_haut) */
   gl4duLookAtf(-3, 3, -5, 0, 0, 0, 0, 1, 0);
   /* Envoyer, au shader courant, toutes les matrices connues dans
    * GL4Dummies, ici on intègre pas la rotation qui vient après */

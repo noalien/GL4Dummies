@@ -9,13 +9,13 @@
 #version 330
 /* texture 2 dimensions */
 uniform sampler2D myTexture;
-/* Le fragment shader est directement en relatrion avec les sorties du vertex shader */
-in  vec2 vsoTexCoord;
-in  vec3 vsoColor;
+/* Le fragment shader est directement en relation avec les sorties du vertex shader */
+in  vec4 vsoColor;
 /* sortie du frament shader : une couleur */
 out vec4 fragColor;
 
 void main(void) {
-  /* mélange entre la texture et la couleur.*/
-  fragColor = vec4(texture(myTexture, vsoTexCoord).rgb + vsoColor, 1.0);
+  /* la couleur de sortie est le vsoColor linéairement interpolé au
+     fragment (voir attribut flat pour désactiver l'interpolation). */
+  fragColor = vsoColor;
 }
