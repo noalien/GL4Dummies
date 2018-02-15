@@ -1,7 +1,7 @@
 all:
 	libtoolize
 	autoreconf -i -Im4
-	#aclocal
+	aclocal
 	autoconf
 	automake --add-missing
 clean:
