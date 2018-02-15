@@ -40,7 +40,7 @@ int main(int argc, char ** argv) {
 }
 /*!\brief initialise les paramètres OpenGL et les données. 
  *
- * Exercice compliqué (ne sera pas corrigé) : séparer la vue de la
+ * Exercice compliqué (corrigé en 1.5) : séparer la vue de la
  * modélisation en utilisant deux matrices disjointes (par exemple
  * viewMatrix et modelMatrix). Refaire la même vue que celle obtenue
  * ici en n'utilisant que des rotate et translate (pas de lookAt).
@@ -49,7 +49,7 @@ int main(int argc, char ** argv) {
  * cube de data et mettre à la place 8 sommets représentant les 8
  * sommets du cube. Mettre du Rouge-Vert-Bleu-Jaune sombres pour les 4
  * de devant et saturées-claires pour les 4 de derrière. Utiliser un
- * second VBO de type GL_ELEMENT_ARRAY_BUFFER et un tableau idx
+ * second VBO de type GL_ELEMENT_ARRAY_BUFFER et un tableau idata
  * contenant 6x4 indices des sommets du cube (avec répétition) de
  * manière à reconstruire le même cube avec des LINE_LOOP mais cette
  * fois-ci en utilisant la fonction glDrawElements. Enfin, ajouter les
@@ -133,9 +133,9 @@ static void init(void) {
   /* Paramétrage 2 premiers indices d'attribut de sommet */
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof *data, (const void *)0);  
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof *data, (const void *)(3 * sizeof *data));
-  /* dé-lier le VBO et VAO */
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  /* dé-lier le VAO et VBO */
   glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 /*!\brief Cette fonction dessine dans le contexte OpenGL actif. */
 static void draw(void) {

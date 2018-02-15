@@ -78,9 +78,9 @@ static void init(void) {
   /* Paramétrage 2 premiers indices d'attribut de sommet */
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (const void *)0);  
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const void *)(3 * 2 * sizeof *data));
-  /* dé-lier le VBO et VAO */
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  /* dé-lier le VAO et VBO */
   glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 /*!\brief Cette fonction dessine dans le contexte OpenGL actif. */
 static void draw(void) {
