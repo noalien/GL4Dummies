@@ -123,8 +123,8 @@ static void init(void) {
    * https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexParameter.xhtml */
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   /* envoi de la donnée texture depuis la RAM CPU vers la RAM GPU voir
    * la doc de glTexImage2D (voir aussi glTexImage1D et glTexImage3D)
    * sur

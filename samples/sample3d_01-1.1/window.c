@@ -94,8 +94,8 @@ static void init(void) {
    * https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexParameter.xhtml */
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   /* chargement de l'image logo GL4D avec une fonction native SDL2, si
    * vous souhaitez charger d'autres type d'images, utilisez par
    * exemple IMG_Load de la sous-bibliothèque SDL2_image */
