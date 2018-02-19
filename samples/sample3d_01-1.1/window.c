@@ -39,26 +39,7 @@ int main(int argc, char ** argv) {
   gl4duwMainLoop();
   return 0;
 }
-/*!\brief initialise les paramètres OpenGL et les données. 
- *
- * Exercice (corrigé en 1.1) : utiliser une fonctionnalité SDL2 ou
- * SDL2_image ou autres pour charger une image à partir d'un fichier
- * et l'appliquer avec interpolation linéaire au quadrilatère.
- *
- * Exercice (corrigé en 1.2) : remplacer la texture ci-dessous par un
- * damier noir et blanc de 50x50 cases en utilisant très peu de
- * données. Puis (corrigé en 1.3) remplacer le vao créé manuellement
- * par le quadrilatère générable par gl4dgGenQuadf et modifier le
- * shader pour n'afficher que la texture car les couleurs n'existent
- * pas dans ce qui est généré par les fonctions gl4dgGenXXXXX où : (1)
- * la première donnée est un vec3 coordonnée 3D ; (2) la seconde est
- * un vec3 vecteur normal 3D ; (3) la troisième est un vec2 coordonnée
- * de texture 2D normalisée. Ce dernier point ne permet plus de
- * répéter la texture, corriger le problème en trouvant une solution
- * (corrigé en 1.4). Enfin (corrigé en 1.5), placer le quadrilatère
- * horizontalement et agrandisser-le d'un facteur au moins 50. Tenter
- * de faire du MipMapping ou de l'anisotropic filtering.
- */
+/*!\brief initialise les paramètres OpenGL et les données. */
 static void init(void) {
   /* indices pour réaliser le maillage des géométrie, envoyés dans le
    * VBO ELEMENT_ARRAY_BUFFER */
@@ -75,17 +56,7 @@ static void init(void) {
     /* sommet  2 */  1,  1, 0, 0, 0, 1, 1, 1,
     /* sommet  3 */ -1,  1, 0, 1, 0, 0, 0, 1
   };
-  const GLuint R = RGB(255, 0, 0), B = RGB(255, 255, 255), N = 0;
-  GLuint tex[] = {
-    B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, 
-    B, B, N, N, N, B, B, N, B, B, B, B, B, B, B, R, B, B, B, N, N, N, B, B, 
-    B, N, B, B, B, B, B, N, B, B, B, B, B, B, R, R, B, B, B, N, B, B, N, B, 
-    B, N, B, B, B, B, B, N, B, B, B, B, B, R, B, R, B, B, B, N, B, B, N, B, 
-    B, N, B, N, N, B, B, N, B, B, B, B, R, B, B, R, B, B, B, N, B, B, N, B, 
-    B, N, B, B, N, B, B, N, B, B, B, R, R, R, R, R, R, B, B, N, B, B, N, B, 
-    B, B, N, N, N, B, B, N, N, N, N, B, B, B, B, R, B, B, B, N, N, N, B, B, 
-    B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B
-  };
+  SDL_Surface * s;
   /* Génération d'un identifiant de VAO */
   glGenVertexArrays(1, &_vao);
   /* Lier le VAO-machine-GL à l'identifiant VAO généré */
@@ -121,15 +92,22 @@ static void init(void) {
   /* paramétrer la texture, voir la doc de la fonction glTexParameter
    * sur
    * https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexParameter.xhtml */
-  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-  /* envoi de la donnée texture depuis la RAM CPU vers la RAM GPU voir
-   * la doc de glTexImage2D (voir aussi glTexImage1D et glTexImage3D)
-   * sur
-   * https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexImage2D.xhtml */
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 24, 8, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
+  /* chargement de l'image logo GL4D avec une fonction native SDL2, si
+   * vous souhaitez charger d'autres type d'images, utilisez par
+   * exemple IMG_Load de la sous-bibliothèque SDL2_image */
+  if((s = SDL_LoadBMP("images/gl4d.bmp"))) {
+      /* envoi de la donnée texture depuis la RAM CPU vers la RAM GPU voir
+       * la doc de glTexImage2D (voir aussi glTexImage1D et glTexImage3D)
+       * sur
+       * https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexImage2D.xhtml */
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, s->w, s->h, 0,
+		 s->format->BytesPerPixel == 3 ? GL_BGR : GL_BGRA, GL_UNSIGNED_BYTE, s->pixels);
+    SDL_FreeSurface(s);
+  }
   /* dé-lier la texture 2D */
   glBindTexture(GL_TEXTURE_2D, 0);
 

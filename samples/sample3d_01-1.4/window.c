@@ -2,11 +2,13 @@
  *
  * \brief introduction aux textures (plus ce qui a été vu avant) 
  * \author Farès BELHADJ, amsi@ai.univ-paris8.fr 
- * \date February 15 2018
+ * \date February 19 2018
  */
 
 #include <GL4D/gl4du.h>
 #include <GL4D/gl4dp.h>
+/* pour les géométries GL4Dummies */
+#include <GL4D/gl4dg.h>
 #include <GL4D/gl4duw_SDL2.h>
 
 /* Prototypes des fonctions statiques contenues dans ce fichier C */
@@ -16,10 +18,8 @@ static void quit(void);
 
 /*!\brief largeur et hauteur de la fenêtre */
 static int _wW = 800, _wH = 600;
-/*!\brief identifiant du Vertex Array Object */
-static GLuint _vao = 0;
-/*!\brief identifiant des Vertex Buffer Objects */
-static GLuint _buffer[2] = { 0 };
+/*!\brief identifiant de la géométrie quadrilatère de GL4Dummies */
+static GLuint _quad = 0;
 /*!\brief identifiant du GLSL program */
 static GLuint _pId = 0;
 /*!\brief identifiant d'une texture */
@@ -41,10 +41,6 @@ int main(int argc, char ** argv) {
 }
 /*!\brief initialise les paramètres OpenGL et les données. 
  *
- * Exercice (corrigé en 1.1) : utiliser une fonctionnalité SDL2 ou
- * SDL2_image ou autres pour charger une image à partir d'un fichier
- * et l'appliquer avec interpolation linéaire au quadrilatère.
- *
  * Exercice (corrigé en 1.2) : remplacer la texture ci-dessous par un
  * damier noir et blanc de 50x50 cases en utilisant très peu de
  * données. Puis (corrigé en 1.3) remplacer le vao créé manuellement
@@ -60,59 +56,10 @@ int main(int argc, char ** argv) {
  * de faire du MipMapping ou de l'anisotropic filtering.
  */
 static void init(void) {
-  /* indices pour réaliser le maillage des géométrie, envoyés dans le
-   * VBO ELEMENT_ARRAY_BUFFER */
-  GLuint idata[] = {
-    /* un quadrilatère en triangle strip (d'où inversion entre 3 et 2) */
-    0, 1, 3, 2
-  };
-  /* données-sommets envoyée dans le VBO ARRAY_BUFFER */
-  GLfloat data[] = {
-    /* un sommet est composé d'une coordonnée 3D, d'une couleur 3D et
-     * d'une coordonnée de texture 2D */
-    /* sommet  0 */ -1, -1, 0, 1, 0, 0, 0, 0,
-    /* sommet  1 */  1, -1, 0, 0, 1, 0, 1, 0,
-    /* sommet  2 */  1,  1, 0, 0, 0, 1, 1, 1,
-    /* sommet  3 */ -1,  1, 0, 1, 0, 0, 0, 1
-  };
-  const GLuint R = RGB(255, 0, 0), B = RGB(255, 255, 255), N = 0;
-  GLuint tex[] = {
-    B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, 
-    B, B, N, N, N, B, B, N, B, B, B, B, B, B, B, R, B, B, B, N, N, N, B, B, 
-    B, N, B, B, B, B, B, N, B, B, B, B, B, B, R, R, B, B, B, N, B, B, N, B, 
-    B, N, B, B, B, B, B, N, B, B, B, B, B, R, B, R, B, B, B, N, B, B, N, B, 
-    B, N, B, N, N, B, B, N, B, B, B, B, R, B, B, R, B, B, B, N, B, B, N, B, 
-    B, N, B, B, N, B, B, N, B, B, B, R, R, R, R, R, R, B, B, N, B, B, N, B, 
-    B, B, N, N, N, B, B, N, N, N, N, B, B, B, B, R, B, B, B, N, N, N, B, B, 
-    B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B
-  };
-  /* Génération d'un identifiant de VAO */
-  glGenVertexArrays(1, &_vao);
-  /* Lier le VAO-machine-GL à l'identifiant VAO généré */
-  glBindVertexArray(_vao);
-  /* Activation des 3 premiers indices d'attribut de sommet */
-  glEnableVertexAttribArray(0);
-  glEnableVertexAttribArray(1);
-  glEnableVertexAttribArray(2);
-  /* Génération de deux identifiants de VBO un pour ARRAY_BUFFER, un
-   * pour ELEMENT_ARRAY_BUFFER */
-  glGenBuffers(2, _buffer);
-  /* Lier le VBO-ARRAY_BUFFER à l'identifiant du premier VBO généré */
-  glBindBuffer(GL_ARRAY_BUFFER, _buffer[0]);
-  /* Transfert des données VBO-ARRAY_BUFFER */
-  glBufferData(GL_ARRAY_BUFFER, sizeof data, data, GL_STATIC_DRAW);
-  /* Paramétrage 3 premiers indices d'attribut de sommet */
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof *data, (const void *)0);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof *data, (const void *)(3 * sizeof *data));
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof *data, (const void *)(6 * sizeof *data));
-  /* Lier le VBO-ELEMENT_ARRAY_BUFFER à l'identifiant du second VBO généré */
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _buffer[1]);
-  /* Transfert des données d'indices VBO-ELEMENT_ARRAY_BUFFER */
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof idata, idata, GL_STATIC_DRAW);
-  /* dé-lier le VAO puis les VAO */
-  glBindVertexArray(0);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  const GLuint B = RGB(255, 255, 255), N = 0;
+  GLuint tex[] = { B, N, N, B };
+  /* Génération du quadrilatère GL4Dummies */
+  _quad = gl4dgGenQuadf();
   /* générer un identifiant de texture */
   glGenTextures(1, &_texId);
   /* lier l'identifiant de texture comme texture 2D (1D ou 3D
@@ -123,13 +70,13 @@ static void init(void) {
    * https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexParameter.xhtml */
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   /* envoi de la donnée texture depuis la RAM CPU vers la RAM GPU voir
    * la doc de glTexImage2D (voir aussi glTexImage1D et glTexImage3D)
    * sur
    * https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexImage2D.xhtml */
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 24, 8, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
   /* dé-lier la texture 2D */
   glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -209,17 +156,12 @@ static void draw(void) {
   glUniform1i(glGetUniformLocation(_pId, "tex"), 0);
   /* envoi d'un booléen pour inverser l'axe y des coordonnées de
    * textures (plus efficace à faire dans le vertex shader */
-  glUniform1i(glGetUniformLocation(_pId, "inv"), 1); 
-  /* Lier le VAO-machine-GL à l'identifiant VAO _vao */
-  glBindVertexArray(_vao);
-  /* Dessiner le VAO comme une bande d'un triangle avec 4 sommets
-   * commençant à 0
-   *
-   * Attention ! Maintenant nous dessinons avec DrawElement qui
-   * utilise les indices des sommets poassés pour mailler */
-  glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, (const GLvoid *)0);
-  /* dé-lier le VAO */
-  glBindVertexArray(0);
+  glUniform1i(glGetUniformLocation(_pId, "inv"), 0); 
+  /* envoi d'un facteur permettant de multiplier la coordonnée de
+   * texture afin de la faire répéter */
+  glUniform1f(glGetUniformLocation(_pId, "tcScale"), 50.0f); 
+  /* Dessiner une géométrie générée par GL4Dummies */
+  gl4dgDraw(_quad);
   /* désactiver le programme shader */
   glUseProgram(0);
 }
@@ -229,12 +171,7 @@ static void quit(void) {
   /* suppression de la texture _texId en GPU */
   if(_texId)
     glDeleteTextures(1, &_texId);
-  /* suppression du VAO _vao en GPU */
-  if(_vao)
-    glDeleteVertexArrays(1, &_vao);
-  /* suppression du VBO _buffer en GPU, maintenant il y en a deux */
-  if(_buffer[0])
-    glDeleteBuffers(2, _buffer);
-  /* nettoyage des éléments utilisés par la bibliothèque GL4Dummies */
+  /* nettoyage des éléments utilisés et générés par la bibliothèque
+   * GL4Dummies */
   gl4duClean(GL4DU_ALL);
 }

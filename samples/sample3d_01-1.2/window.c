@@ -41,10 +41,6 @@ int main(int argc, char ** argv) {
 }
 /*!\brief initialise les paramètres OpenGL et les données. 
  *
- * Exercice (corrigé en 1.1) : utiliser une fonctionnalité SDL2 ou
- * SDL2_image ou autres pour charger une image à partir d'un fichier
- * et l'appliquer avec interpolation linéaire au quadrilatère.
- *
  * Exercice (corrigé en 1.2) : remplacer la texture ci-dessous par un
  * damier noir et blanc de 50x50 cases en utilisant très peu de
  * données. Puis (corrigé en 1.3) remplacer le vao créé manuellement
@@ -70,22 +66,13 @@ static void init(void) {
   GLfloat data[] = {
     /* un sommet est composé d'une coordonnée 3D, d'une couleur 3D et
      * d'une coordonnée de texture 2D */
-    /* sommet  0 */ -1, -1, 0, 1, 0, 0, 0, 0,
-    /* sommet  1 */  1, -1, 0, 0, 1, 0, 1, 0,
-    /* sommet  2 */  1,  1, 0, 0, 0, 1, 1, 1,
-    /* sommet  3 */ -1,  1, 0, 1, 0, 0, 0, 1
+    /* sommet  0 */ -1, -1, 0, 1, 0, 0,  0,  0,
+    /* sommet  1 */  1, -1, 0, 0, 1, 0, 50,  0,
+    /* sommet  2 */  1,  1, 0, 0, 0, 1, 50, 50,
+    /* sommet  3 */ -1,  1, 0, 1, 0, 0,  0, 50
   };
-  const GLuint R = RGB(255, 0, 0), B = RGB(255, 255, 255), N = 0;
-  GLuint tex[] = {
-    B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, 
-    B, B, N, N, N, B, B, N, B, B, B, B, B, B, B, R, B, B, B, N, N, N, B, B, 
-    B, N, B, B, B, B, B, N, B, B, B, B, B, B, R, R, B, B, B, N, B, B, N, B, 
-    B, N, B, B, B, B, B, N, B, B, B, B, B, R, B, R, B, B, B, N, B, B, N, B, 
-    B, N, B, N, N, B, B, N, B, B, B, B, R, B, B, R, B, B, B, N, B, B, N, B, 
-    B, N, B, B, N, B, B, N, B, B, B, R, R, R, R, R, R, B, B, N, B, B, N, B, 
-    B, B, N, N, N, B, B, N, N, N, N, B, B, B, B, R, B, B, B, N, N, N, B, B, 
-    B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B
-  };
+  const GLuint B = RGB(255, 255, 255), N = 0;
+  GLuint tex[] = { B, N, N, B };
   /* Génération d'un identifiant de VAO */
   glGenVertexArrays(1, &_vao);
   /* Lier le VAO-machine-GL à l'identifiant VAO généré */
@@ -129,7 +116,7 @@ static void init(void) {
    * la doc de glTexImage2D (voir aussi glTexImage1D et glTexImage3D)
    * sur
    * https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexImage2D.xhtml */
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 24, 8, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
   /* dé-lier la texture 2D */
   glBindTexture(GL_TEXTURE_2D, 0);
 
