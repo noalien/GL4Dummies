@@ -6,6 +6,7 @@
  */
 
 #include <GL4D/gl4du.h>
+#include <GL4D/gl4dp.h>
 #include <GL4D/gl4duw_SDL2.h>
 
 /* Prototypes des fonctions statiques contenues dans ce fichier C */
@@ -15,12 +16,14 @@ static void quit(void);
 
 /*!\brief largeur et hauteur de la fenêtre */
 static int _wW = 800, _wH = 600;
-/*!\brief identifiant du (futur) Vertex Array Object */
+/*!\brief identifiant du Vertex Array Object */
 static GLuint _vao = 0;
-/*!\brief identifiant du (futur) buffer de data - VBO ou Vertex Buffer Object */
+/*!\brief identifiant des Vertex Buffer Objects */
 static GLuint _buffer[2] = { 0 };
-/*!\brief identifiant du (futur) GLSL program */
+/*!\brief identifiant du GLSL program */
 static GLuint _pId = 0;
+/*!\brief identifiant d'une texture */
+static GLuint _texId = 0;
 
 /*!\brief créé la fenêtre d'affichage, initialise GL et les données,
  * affecte les fonctions d'événements et lance la boucle principale
@@ -53,17 +56,17 @@ static void init(void) {
     /* sommet  2 */  1,  1, 0, 0, 0, 1, 1, 1,
     /* sommet  3 */ -1,  1, 0, 1, 0, 0, 0, 1
   };
-/*   const GLuint R = RGB(255, 0, 0), B = RGB(255, 255, 255); */
-/*   GLuint tex[] = { */
-/*     B, N, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B,  */
-/*     B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B,  */
-/*     B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B,  */
-/*     B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B,  */
-/*     B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B,  */
-/*     B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B,  */
-/*     B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B,  */
-/*     B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B */
-/*   }; */
+  const GLuint R = RGB(255, 0, 0), B = RGB(255, 255, 255), N = 0;
+  GLuint tex[] = {
+    B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, 
+    B, B, N, N, N, B, B, N, B, B, B, B, B, B, B, R, B, B, B, N, N, N, B, B, 
+    B, N, B, B, B, B, B, N, B, B, B, B, B, B, R, R, B, B, B, N, B, B, N, B, 
+    B, N, B, B, B, B, B, N, B, B, B, B, B, R, B, R, B, B, B, N, B, B, N, B, 
+    B, N, B, N, N, B, B, N, B, B, B, B, R, B, B, R, B, B, B, N, B, B, N, B, 
+    B, N, B, B, N, B, B, N, B, B, B, R, R, R, R, R, R, B, B, N, B, B, N, B, 
+    B, B, N, N, N, B, B, N, N, N, N, B, B, B, B, R, B, B, B, N, N, N, B, B, 
+    B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B
+  };
   /* Génération d'un identifiant de VAO */
   glGenVertexArrays(1, &_vao);
   /* Lier le VAO-machine-GL à l'identifiant VAO généré */
@@ -92,10 +95,21 @@ static void init(void) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+  glGenTextures(1, &_texId);
+  glBindTexture(GL_TEXTURE_2D, _texId);
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 24, 8, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
+  glBindTexture(GL_TEXTURE_2D, 0);
+
   /* Création du programme shader (voir le dossier shader) */
   _pId = gl4duCreateProgram("<vs>shaders/basic.vs", "<fs>shaders/basic.fs", NULL);
   /* Set de la couleur (RGBA) d'effacement OpenGL */
   glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+  /* activation de la texture 2D */
+  glEnable(GL_TEXTURE_2D);
   /* activation du test de profondeur afin de prendre en compte la
    * notion de devant-derrière. */
   glEnable(GL_DEPTH_TEST);
@@ -155,6 +169,9 @@ static void draw(void) {
   /* Envoyer, au shader courant, toutes les matrices connues dans
    * GL4Dummies */
   gl4duSendMatrices();
+  glBindTexture(GL_TEXTURE_2D, _texId);
+  glActiveTexture(GL_TEXTURE0);
+  glUniform1i(glGetUniformLocation(_pId, "tex"), 0); 
   /* Lier le VAO-machine-GL à l'identifiant VAO _vao */
   glBindVertexArray(_vao);
   /* Dessiner le VAO comme une bande d'un triangle avec 4 sommets
@@ -171,6 +188,9 @@ static void draw(void) {
 /*!\brief appelée au moment de sortir du programme (atexit), elle
  *  libère les éléments OpenGL utilisés.*/
 static void quit(void) {
+  /* suppression de la texture _texId en GPU */
+  if(_texId)
+    glDeleteTextures(1, &_texId);
   /* suppression du VAO _vao en GPU */
   if(_vao)
     glDeleteVertexArrays(1, &_vao);

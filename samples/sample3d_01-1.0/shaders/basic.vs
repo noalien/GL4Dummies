@@ -17,9 +17,12 @@
 layout (location = 0) in vec3 vsiPosition;
 /* variable cablée sur l'attribut 1 du sommet dans le code CPU (glVertexAttribPointer(1, ...) le 1 correspond au location = 1) */
 layout (location = 1) in vec3 vsiColor;
+/* variable cablée sur l'attribut 2 du sommet dans le code CPU (glVertexAttribPointer(2, ...) le 2 correspond au location = 2) */
+layout (location = 2) in vec2 vsiTexCoord;
 
 /* une sortie du vertex shader vers le fragment shader (voir basic.fs, in vec2 vsoColor) */
 out vec4 vsoColor;
+out vec2 vsoTexCoord;
 
 uniform mat4 projectionMatrix, viewMatrix, modelMatrix;
 
@@ -32,4 +35,5 @@ void main(void) {
   gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vsiPosition, 1.0);
   /* la couleur en sortie du vertex shader vers le fragment shader, vsoColor est un vecteur 4D (w = 1) alors que la couleur reçu est 3D */
   vsoColor = vec4(vsiColor, 1.0);
+  vsoTexCoord = vsiTexCoord;
 }
