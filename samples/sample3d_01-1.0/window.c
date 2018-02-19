@@ -94,14 +94,24 @@ static void init(void) {
   glBindVertexArray(0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+  /* générer un identifiant de texture */
   glGenTextures(1, &_texId);
+  /* lier l'identifiant de texture comme texture 2D (1D ou 3D
+   * possibles) */
   glBindTexture(GL_TEXTURE_2D, _texId);
+  /* paramétrer la texture, voir la doc de la fonction glTexParameter
+   * sur
+   * https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexParameter.xhtml */
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  /* envoi de la donnée texture depuis la RAM CPU vers la RAM GPU voir
+   * la doc de glTexImage2D (voir aussi glTexImage1D et glTexImage3D)
+   * sur
+   * https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexImage2D.xhtml */
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 24, 8, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
+  /* dé-lier la texture 2D */
   glBindTexture(GL_TEXTURE_2D, 0);
 
   /* Création du programme shader (voir le dossier shader) */
@@ -169,9 +179,18 @@ static void draw(void) {
   /* Envoyer, au shader courant, toutes les matrices connues dans
    * GL4Dummies */
   gl4duSendMatrices();
-  glBindTexture(GL_TEXTURE_2D, _texId);
+  /* activer l'étage de textures 0, plusieurs étages sont disponibles,
+   * nous pouvons lier une texture par type et par étage */
   glActiveTexture(GL_TEXTURE0);
-  glUniform1i(glGetUniformLocation(_pId, "tex"), 0); 
+  /* lier la texture _texId comme texture 2D */
+  glBindTexture(GL_TEXTURE_2D, _texId);
+  /* envoyer une info au program shader indiquant que tex est une
+   * texture d'étage 0, voir le type (sampler2D) de la variable tex
+   * dans le shader */
+  glUniform1i(glGetUniformLocation(_pId, "tex"), 0);
+  /* envoi d'un booléen pour inverser l'axe y des coordonnées de
+   * textures (plus efficace à faire dans le vertex shader */
+  glUniform1i(glGetUniformLocation(_pId, "inv"), 1); 
   /* Lier le VAO-machine-GL à l'identifiant VAO _vao */
   glBindVertexArray(_vao);
   /* Dessiner le VAO comme une bande d'un triangle avec 4 sommets
