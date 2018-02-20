@@ -18,6 +18,9 @@ static void keyup(int keycode);
 static void pmotion(int x, int y);
 static void draw(void);
 
+/* from makeLabyrinth.c */
+extern unsigned int * labyrinth(int w, int h);
+
 /*!\brief opened window width and height */
 static int _wW = 800, _wH = 600;
 /*!\brief mouse position (modified by pmotion function) */
@@ -104,8 +107,7 @@ static void initGL(void) {
  * creates 3D objects (plane and sphere) and 2D textures.
  */
 static void initData(void) {
-  /* the checkboard texture */
-  GLuint check[] = {-1, 255 << 24, 128 << 24, -1};
+  GLuint * lab;
   /* a red-white texture used to draw a compass */
   GLuint northsouth[] = {(255 << 24) + 255, -1};
   /* generates a quad using GL4Dummies */
@@ -118,7 +120,9 @@ static void initData(void) {
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, check);
+  lab = labyrinth(21, 21);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 21, 21, 0, GL_RGBA, GL_UNSIGNED_BYTE, lab);
+  free(lab);
 
   /* creation and parametrization of the compass texture */
   glGenTextures(1, &_compassTexId);
@@ -153,7 +157,7 @@ static void resize(int w, int h) {
  * direction, orientation and time (dt = delta-time)
  */
 static void idle(void) {
-  double dt, dtheta = M_PI, step = 5.0;
+  double dt, dtheta = M_PI, step = 15.0;
   static Uint32 t0 = 0, t;
   dt = ((t = SDL_GetTicks()) - t0) / 1000.0;
   t0 = t;
@@ -277,8 +281,8 @@ static void draw(void) {
   gl4duLoadIdentityf();
   /* modifies the current matrix to simulate camera position and orientation in the scene */
   /* see gl4duLookAtf documentation or gluLookAt documentation */
-  gl4duLookAtf(_cam.x, 1.0, _cam.z, 
-	       _cam.x - sin(_cam.theta), 1.0 - (_ym - (_wH >> 1)) / (GLfloat)_wH, _cam.z - cos(_cam.theta), 
+  gl4duLookAtf(_cam.x, 3.0, _cam.z, 
+	       _cam.x - sin(_cam.theta), 3.0 - (_ym - (_wH >> 1)) / (GLfloat)_wH, _cam.z - cos(_cam.theta), 
 	       0.0, 1.0,0.0);
   gl4duBindMatrix("modelMatrix");
   /* loads the identity matrix in the current GL4Dummies matrix ("modelMatrix") */
@@ -300,7 +304,7 @@ static void draw(void) {
   /* uses the checkboard texture */
   glBindTexture(GL_TEXTURE_2D, _planeTexId);
   /* sets in pId the uniform variable texRepeat to the plane scale */
-  glUniform1f(glGetUniformLocation(_pId, "texRepeat"), _planeScale);
+  glUniform1f(glGetUniformLocation(_pId, "texRepeat"), 1.0);
   /* tells pId that the sky is false */
   glUniform1i(glGetUniformLocation(_pId, "sky"), 0);
   /* draws the plane */

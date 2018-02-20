@@ -1,6 +1,7 @@
 /*!\file window.c
  *
- * \brief Walking on finite plane with compass.
+ * \brief Walking on finite plane with skydome textured with a
+ * triangle-edge midpoint-displacement algorithm.
  *
  * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
  * \date February 19 2018
@@ -24,10 +25,14 @@ static int _wW = 800, _wH = 600;
 static int _xm = 400, _ym = 300;
 /*!\brief Quad geometry Id  */
 static GLuint _plane = 0;
+/*!\brief Sphere geometry Id  */
+static GLuint _sphere = 0;
 /*!\brief GLSL program Id */
 static GLuint _pId = 0;
 /*!\brief plane texture Id */
 static GLuint _planeTexId = 0;
+/*!\brief sky texture Id */
+static GLuint _skyTexId = 0;
 /*!\brief compass texture Id */
 static GLuint _compassTexId = 0;
 /*!\brief plane scale factor */
@@ -36,6 +41,8 @@ static GLfloat _planeScale = 100.0f;
 static GLboolean _anisotropic = GL_FALSE;
 /*!\brief boolean to toggle mipmapping */
 static GLboolean _mipmap = GL_FALSE;
+/*!\brief boolean to toggle scene fog */
+static GLboolean _fog = GL_FALSE;
 
 /*!\brief enum that index keyboard mapping for direction commands */
 enum kyes_t {
@@ -90,6 +97,8 @@ int main(int argc, char ** argv) {
 static void initGL(void) {
   glClearColor(0.0f, 0.4f, 0.9f, 0.0f);
   glEnable(GL_CULL_FACE);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_TEXTURE_2D);
   _pId  = gl4duCreateProgram("<vs>shaders/basic.vs", "<fs>shaders/basic.fs", NULL);
@@ -108,8 +117,12 @@ static void initData(void) {
   GLuint check[] = {-1, 255 << 24, 128 << 24, -1};
   /* a red-white texture used to draw a compass */
   GLuint northsouth[] = {(255 << 24) + 255, -1};
+  /* a fractal texture generated usind a midpoint displacement algorithm */
+  GLfloat * hm = gl4dmTriangleEdge(257, 257, 0.4);
   /* generates a quad using GL4Dummies */
   _plane = gl4dgGenQuadf();
+  /* generates a sphere using GL4Dummies */
+  _sphere = gl4dgGenSpheref(10, 10);
 
   /* creation and parametrization of the plane texture */
   glGenTextures(1, &_planeTexId);
@@ -119,6 +132,16 @@ static void initData(void) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, check);
+
+  /* creation and parametrization of the sky texture */
+  glGenTextures(1, &_skyTexId);
+  glBindTexture(GL_TEXTURE_2D, _skyTexId);
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 257, 257, 0, GL_RED, GL_FLOAT, hm);
+  free(hm);
 
   /* creation and parametrization of the compass texture */
   glGenTextures(1, &_compassTexId);
@@ -206,6 +229,9 @@ static void keydown(int keycode) {
       glLineWidth(1.0);
     }
     break;
+  case 'f':
+    _fog = !_fog;
+    break;
     /* when 'm' pressed, toggle between mipmapping or nearest for the plane texture */
   case 'm': {
     _mipmap = !_mipmap;
@@ -287,6 +313,8 @@ static void draw(void) {
   glActiveTexture(GL_TEXTURE0);
   /* tells the pId program that "tex" is set to stage 0 */
   glUniform1i(glGetUniformLocation(_pId, "tex"), 0);
+  /* tells the pId program what is the value of fog */
+  glUniform1i(glGetUniformLocation(_pId, "fog"), _fog);
 
   /* pushs (saves) the current matrix (modelMatrix), scales, rotates,
    * sends matrices to pId and then pops (restore) the matrix */
@@ -306,6 +334,26 @@ static void draw(void) {
   /* draws the plane */
   gl4dgDraw(_plane);
 
+  /* pushs (saves) the current matrix (modelMatrix), scales,
+   * translates, sends matrices to pId and then pops (restore) the
+   * matrix */
+  /* this part means that the skydome always follow the camera position */
+  gl4duPushMatrix(); {
+    gl4duTranslatef(_cam.x, 1.0, _cam.z);
+    gl4duScalef(_planeScale, _planeScale, _planeScale);
+    gl4duSendMatrices();
+  } gl4duPopMatrix();
+  /* culls the front faces (because we are in the skydome) */
+  glCullFace(GL_FRONT);
+  /* uses the sky texture (fractal cloud) */
+  glBindTexture(GL_TEXTURE_2D, _skyTexId);
+  /* texture repeat only once */
+  glUniform1f(glGetUniformLocation(_pId, "texRepeat"), 1);
+  /* tells pId that the sky is true (we are drawing the sky dome) */
+  glUniform1i(glGetUniformLocation(_pId, "sky"), 1);
+  /* draws the sky dome */
+  gl4dgDraw(_sphere);
+  
   /* the compass should be drawn in an orthographic projection, thus
    * we should bind the projection matrix; save it; load identity;
    * bind the model-view matrix; modify it to place the compass at the
@@ -353,6 +401,8 @@ static void draw(void) {
 static void quit(void) {
   if(_planeTexId)
     glDeleteTextures(1, &_planeTexId);
+  if(_skyTexId)
+    glDeleteTextures(1, &_skyTexId);
   if(_compassTexId)
     glDeleteTextures(1, &_compassTexId);
   gl4duClean(GL4DU_ALL);
