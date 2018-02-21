@@ -65,7 +65,7 @@ static void init(void) {
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
   /* on peut maintenant choisir comment GL filtre le rendu de textures
    * en fonction de l'éloignement */
-  const int filtre = 2; /* 0 nearest, 1 mipmap, 2 anisotropic */
+  const int filtre = 1; /* 0 nearest, 1 mipmap, 2 anisotropic */
   switch(filtre) {
     GLfloat max;
   case 1:

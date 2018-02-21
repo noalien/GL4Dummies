@@ -154,8 +154,8 @@ static void resize(int w, int h) {
  */
 static void idle(void) {
   double dt, dtheta = M_PI, step = 5.0;
-  static Uint32 t0 = 0, t;
-  dt = ((t = SDL_GetTicks()) - t0) / 1000.0;
+  static double t0 = 0, t;
+  dt = ((t = gl4dGetElapsedTime()) - t0) / 1000.0;
   t0 = t;
   if(_keys[KLEFT])
     _cam.theta += dt * dtheta;
@@ -180,19 +180,19 @@ static void idle(void) {
 static void keydown(int keycode) {
   GLint v[2];
   switch(keycode) {
-  case SDLK_LEFT:
+  case GL4DK_LEFT:
     _keys[KLEFT] = 1;
     break;
-  case SDLK_RIGHT:
+  case GL4DK_RIGHT:
     _keys[KRIGHT] = 1;
     break;
-  case SDLK_UP:
+  case GL4DK_UP:
     _keys[KUP] = 1;
     break;
-  case SDLK_DOWN:
+  case GL4DK_DOWN:
     _keys[KDOWN] = 1;
     break;
-  case SDLK_ESCAPE:
+  case GL4DK_ESCAPE:
   case 'q':
     exit(0);
     /* when 'w' pressed, toggle between line and filled mode */
@@ -243,16 +243,16 @@ static void keydown(int keycode) {
  */
 static void keyup(int keycode) {
   switch(keycode) {
-  case SDLK_LEFT:
+  case GL4DK_LEFT:
     _keys[KLEFT] = 0;
     break;
-  case SDLK_RIGHT:
+  case GL4DK_RIGHT:
     _keys[KRIGHT] = 0;
     break;
-  case SDLK_UP:
+  case GL4DK_UP:
     _keys[KUP] = 0;
     break;
-  case SDLK_DOWN:
+  case GL4DK_DOWN:
     _keys[KDOWN] = 0;
     break;
   default:
@@ -320,7 +320,7 @@ static void draw(void) {
     gl4duPushMatrix(); {
       gl4duLoadIdentityf();
       gl4duTranslatef(-0.75, 0.7, 0.0);
-      gl4duRotatef(_cam.theta * 180.0 / M_PI, 0, 0, 1);
+      gl4duRotatef(-_cam.theta * 180.0 / M_PI, 0, 0, 1);
       gl4duScalef(0.03 / 5.0, 1.0 / 5.0, 1.0 / 5.0);
       gl4duBindMatrix("viewMatrix");
       gl4duPushMatrix(); {
