@@ -26,7 +26,7 @@ static void init(void);
 static void quit(void);
 
 static GLuint _pId[4] = { 0 }, _mdbu_version = 1 + 2;
-static GLuint _mdTexId[4] = { 0 }, _buTreeSize = 0,  _tempTexId[3] = { 0 };
+static GLuint _mdTexId[4] = { 0 }, _buTreeSize = 0, _buTreeWidth = 0, _buTreeHeight = 0,  _tempTexId[3] = { 0 };
 static GLuint _width = 512, _height = 512;
 static int    _maxLevel = -1;
 static GLfloat _rand_threshold = 1.0f, _seed = 0.0f;
@@ -123,8 +123,8 @@ static void fractalPaintingffunc(GLuint in, GLuint out, GLboolean flipV) {
     glUniform4fv(glGetUniformLocation(_pId[_mdbu_version], "mcmd_Ir"), 1, _mcmd_Ir);
     glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "mcmd_take_color"), _mcmd_take_color);
     glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "buTreeSize"), _buTreeSize);
-    glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "buTreeWidth"), (int)sqrt(_buTreeSize));
-    glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "buTreeHeight"), _buTreeSize / (int)sqrt(_buTreeSize));
+    glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "buTreeWidth"), _buTreeWidth);
+    glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "buTreeHeight"), _buTreeHeight);
     /* end = _mdbu_version > 2 ? (nbLevels(_width, _height) >> 2) - 1 : nbLevels(_width, _height) - 1; */
     end = (nbLevels(_width, _height) >> 2) - 1;
     for(i = 0, ati = 0; i < end; i++) {
@@ -718,7 +718,9 @@ static int mdTexData(unsigned int w, unsigned int h) {
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, (int)sqrt(_buTreeSize), _buTreeSize/(int)sqrt(_buTreeSize), 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, childData);
+  _buTreeWidth  = (int)sqrt(_buTreeSize);
+  _buTreeHeight = (int)ceil(_buTreeSize / (double)_buTreeWidth);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, _buTreeWidth, _buTreeHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, childData);
   free(childData);
   
   glBindTexture(GL_TEXTURE_2D, _mdTexId[2]);
