@@ -229,6 +229,12 @@ extern "C" {
    *\todo A documenter
    */
   GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetMDBUVersion(GLuint version);
+  /*!\brief Permet de modifier la méthode de subdivision utilisée : 0
+   * Triangle-Edge, 1 Diamond-Square.
+   *\param method si 0 subdivision Triangle-Edge, si 1 subdivision
+   * Diamond-Square.
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetSubdivisionMethod(GLuint method);
 
 #ifdef __cplusplus
 }

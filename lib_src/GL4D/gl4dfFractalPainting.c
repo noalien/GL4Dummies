@@ -25,14 +25,14 @@ static int  mdTexData(unsigned int w, unsigned int h);
 static void init(void);
 static void quit(void);
 
-static GLuint _pId[4] = { 0 }, _mdbu_version = 1 + 2;
+static GLuint _pId[4] = { 0 }, _mdbu_version = 1 + 2, _subdivision_method = 0 /* 0 triangle-edge, 1 diamond-square */;
 static GLuint _mdTexId[4] = { 0 }, _buTreeSize = 0, _buTreeWidth = 0, _buTreeHeight = 0,  _tempTexId[3] = { 0 };
 static GLuint _width = 512, _height = 512;
 static int    _maxLevel = -1;
 static GLfloat _rand_threshold = 1.0f, _seed = 0.0f;
 static GLboolean _skeletonize = GL_FALSE, _change_seed = GL_FALSE, _mcmd_take_color = GL_FALSE;
 static GLfloat _mcmd_Ir[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-static GLfloat _mcmd_noise_H[4] = { 0.5f, 0.5f, 0.5f, 0.5f }, 
+static GLfloat _mcmd_noise_H[4] = { 1.0f, 1.0f, 1.0f, 1.0f }, 
   _mcmd_noise_S[4] = { 1.0f, 1.0f, 1.0f, 1.0f }, 
   _mcmd_noise_T[4] = { 0.0f, 0.0f, 0.0f, 0.0f }, 
   _mcmd_noise_phase_change[4] = { 0.0f, 0.0f, 0.0f, 0.0f }, 
@@ -72,9 +72,17 @@ static void fractalPaintingfinit(GLuint in, GLuint out, GLboolean flipV) {
 }
 
 static void fractalPaintingffunc(GLuint in, GLuint out, GLboolean flipV) {
-  GLint i, ati = 0, vp[4], polygonMode[2], cpId = 0, cfbo, end;
+  GLint i, ati = 0, vp[4], polygonMode[2], cpId = 0, cfbo, end, n;
   GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND), tex = glIsEnabled(GL_TEXTURE_2D);
+  GLfloat H[4];
   GLuint fbo;
+  if(_subdivision_method == 0) { /* Triangle-Edge */
+    for(i = 0; i < 4; ++i)
+      H[i] = _mcmd_noise_H[i];
+  } else { /* Diamond-Square */
+    for(i = 0; i < 4; ++i) 
+      H[i] = 0.5f * _mcmd_noise_H[i];
+  }
   glEnable(GL_TEXTURE_2D);
   glDisable(GL_BLEND);
   glDisable(GL_DEPTH_TEST);
@@ -126,7 +134,7 @@ static void fractalPaintingffunc(GLuint in, GLuint out, GLboolean flipV) {
     glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "buTreeWidth"), _buTreeWidth);
     glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "buTreeHeight"), _buTreeHeight);
     /* end = _mdbu_version > 2 ? (nbLevels(_width, _height) >> 2) - 1 : nbLevels(_width, _height) - 1; */
-    end = (nbLevels(_width, _height) >> 2) - 1;
+    end = (nbLevels(_width, _height) >> (_subdivision_method == 0 ? 1 : 2)) - 1;
     for(i = 0, ati = 0; i < end; i++) {
       glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,    GL_TEXTURE_2D, _tempTexId[ati], 0);
       ati = (ati + 1) % 2;
@@ -146,7 +154,7 @@ static void fractalPaintingffunc(GLuint in, GLuint out, GLboolean flipV) {
     glUniform1i(glGetUniformLocation(_pId[0], "width"), _width);
     glUniform1i(glGetUniformLocation(_pId[0], "height"), _height);
     glUniform1i(glGetUniformLocation(_pId[0], "maxLevel"), _maxLevel);
-    glUniform4fv(glGetUniformLocation(_pId[0], "mcmd_noise_H"), 1, _mcmd_noise_H);
+    glUniform4fv(glGetUniformLocation(_pId[0], "mcmd_noise_H"), 1, H);
     glUniform4fv(glGetUniformLocation(_pId[0], "mcmd_noise_S"), 1, _mcmd_noise_S);
     glUniform4fv(glGetUniformLocation(_pId[0], "mcmd_noise_T"), 1, _mcmd_noise_T);
     glUniform4fv(glGetUniformLocation(_pId[0], "mcmd_noise_phase_change"), 1, _mcmd_noise_phase_change);
@@ -154,7 +162,7 @@ static void fractalPaintingffunc(GLuint in, GLuint out, GLboolean flipV) {
     glUniform1f(glGetUniformLocation(_pId[0], "seed"), _seed);
     if(_change_seed)
       _seed += 0.0001f;
-    for(i = 0; i < nbLevels(_width, _height); i++) {
+    for(i = 0, n = nbLevels(_width, _height); i < n; i++) {
       glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,    GL_TEXTURE_2D, _tempTexId[ati], 0);
       ati = (ati + 1) % 2;
       glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, _tempTexId[ati]);
@@ -229,6 +237,12 @@ void gl4dfMCMDSetSkeletonizeRandThreshold(GLfloat rand_threshold) {
 
 void gl4dfMCMDSetMDBUVersion(GLuint version) {
   _mdbu_version = MIN(version, 1) + 2;
+}
+
+void gl4dfMCMDSetSubdivisionMethod(GLuint method) {
+  _subdivision_method = method % 2;
+  init();
+  fractalPaintingfptr = fractalPaintingffunc;  
 }
 
 static const char * gl4dfMCMD_select4mcmdFS = 
@@ -534,7 +548,8 @@ struct ll_t {
 };
 
 static inline int nbLevels(int w, int h) {
-  return 2 * (int)ceil(log(MAX(w, h)) / log(2.0));
+  /* DS : un fois 2 car pair->square, impair->diamond */
+  return (_subdivision_method == 0 ? 1 : 2) * (int)ceil(log(MAX(w, h)) / log(2.0));
 }
 
 static inline void llAdd(ll_t ** here, GLushort x, GLushort y) {
@@ -594,6 +609,63 @@ static inline void setParentDataY(GLubyte * parentData, GLushort value, GLushort
   int d = ((y * mapWidth + x) << 4) + (i << 2) + 2;
   parentData[d]     = (GLubyte)(value >> 8);
   parentData[d + 1] = (GLubyte)(value & 0xFF);
+}
+
+static void triangleEdge(GLubyte * parentData, GLubyte * levelData, ll_t ** llmap, GLushort mapWidth, GLushort mapHeight, int x0, int y0, int w, int h, int current_level, int computing_level) {
+  int x[10], y[10], i, w_2, w_21, h_2, h_21;
+  w_2 = w >> 1; w_21 = w_2 + (w & 1); 
+  h_2 = h >> 1; h_21 = h_2 + (h & 1);
+
+  if(current_level < computing_level) { /* "!=" car jamais ">" */
+    ++current_level;
+    if(w_21 > 1 || h_21 > 1) {
+      x[7] = x[0] = x0; x[9] = x[1] = x0 + w_2;
+      y[1] = y[0] = y0; y[7] = y[9] = y0 + h_2;
+      triangleEdge(parentData, levelData, llmap, mapWidth, mapHeight, x[0], y[0],  w_2,  h_2, current_level, computing_level);
+      triangleEdge(parentData, levelData, llmap, mapWidth, mapHeight, x[1], y[1], w_21,  h_2, current_level, computing_level);
+      triangleEdge(parentData, levelData, llmap, mapWidth, mapHeight, x[9], y[9], w_21, h_21, current_level, computing_level);
+      triangleEdge(parentData, levelData, llmap, mapWidth, mapHeight, x[7], y[7],  w_2, h_21, current_level, computing_level);
+    }
+    return;
+  }
+  if(!w_2 && !h_2)
+    return;
+  x[6]  = x[7]  = x[8] = x[0] = x0;
+  x[5] = x[9] = x[1] = x0 + w_2;
+  x[3]  = x[4]  = x[2] = x0 + w;
+  y[1]  = y[2]  = y[8] = y[0] = y0;
+  y[7] = y[9] = y[3] = y0 + h_2;
+  y[5]  = y[6]  = y[4] = y0 + h;
+  for(i = 1; i < 8; i += 2) {
+    if(getParentDataX(parentData, mapWidth, x[i], y[i], 0) == UNDEFINED_PARENT) {
+      levelData[y[i] * mapWidth + x[i]] = current_level;
+      setParentDataX(parentData, x[i - 1], mapWidth, x[i], y[i], 0);
+      setParentDataY(parentData, y[i - 1], mapWidth, x[i], y[i], 0);
+      setParentDataX(parentData, x[i + 1], mapWidth, x[i], y[i], 1);
+      setParentDataY(parentData, y[i + 1], mapWidth, x[i], y[i], 1);
+      if(InMap(x[i], y[i], mapWidth, mapHeight)) {
+	llInsert(&(llmap[y[i - 1] * mapWidth + x[i - 1]]), x[i], y[i]);
+	//\todo VOIR pourquoi il y a une assertion failed !
+	//assert(x[i - 1] != x[i] || y[i - 1] != y[i]);
+	llInsert(&(llmap[y[i + 1] * mapWidth + x[i + 1]]), x[i], y[i]);
+	//\todo VOIR pourquoi il y a une assertion failed !
+	//assert(x[i + 1] != x[i] || y[i + 1] != y[i]);
+      }
+    }
+  }
+  if(getParentDataX(parentData, mapWidth, x[9], y[9], 0) == UNDEFINED_PARENT) {
+    levelData[y[9] * mapWidth + x[9]] = current_level;
+    for(i = 0; i < 4; ++i) {
+      setParentDataX(parentData, x[i << 1], mapWidth, x[9], y[9], i);
+      setParentDataY(parentData, y[i << 1], mapWidth, x[9], y[9], i);
+    }
+    if(InMap(x[9], y[9], mapWidth, mapHeight)) {
+      for(i = 0; i < 4; ++i) {
+	llInsert(&(llmap[y[i << 1] * mapWidth + x[i << 1]]), x[9], y[9]);
+	assert(x[i << 1] != x[9] || y[i << 1] != y[9]);
+      }
+    }
+  }
 }
 
 static void diamondSquare(GLubyte * parentData, GLubyte * levelData, ll_t ** llmap, GLushort mapWidth, GLushort mapHeight, int x0, int y0, int w, int h, int current_level, int computing_level) {
@@ -673,8 +745,13 @@ static void diamondSquare(GLubyte * parentData, GLubyte * levelData, ll_t ** llm
   }
 }
 
-static void diamondSquare2Tex(GLubyte ** parentData, GLubyte ** levelData, GLushort ** childData, GLuint * childDataSize, GLubyte ** childPos, unsigned int w, unsigned int h) {
-  int i, l, sl, maxsl = 0;
+static void (*_subdivision_func[])(GLubyte *, GLubyte *, ll_t **, GLushort, GLushort, int, int, int, int, int, int) = {
+  triangleEdge, diamondSquare
+};
+
+
+static void subdivision2Tex(GLubyte ** parentData, GLubyte ** levelData, GLushort ** childData, GLuint * childDataSize, GLubyte ** childPos, unsigned int w, unsigned int h) {
+  int i, l, sl, maxsl = 0, n;
   ll_t ** llmap = llMapNew(w, h);
   *parentData = malloc(4 * w * 4 * h * sizeof ** parentData); assert(*parentData);
   *levelData = malloc(w * h * sizeof ** levelData); assert(*levelData);
@@ -683,8 +760,8 @@ static void diamondSquare2Tex(GLubyte ** parentData, GLubyte ** levelData, GLush
   
   memset(*parentData, 0xFF, 4 * w * 4 * h * sizeof ** parentData);
   memset(*levelData, 0xFF, w * h * sizeof ** levelData);
-  for(i = 0; i < nbLevels(w, h); i++)
-    diamondSquare(*parentData, *levelData, llmap, w, h, 0, 0,  w - 1,  h - 1, 0, i);
+  for(i = 0, n = nbLevels(w, h); i < n; i++)
+    _subdivision_func[_subdivision_method](*parentData, *levelData, llmap, w, h, 0, 0,  w - 1,  h - 1, 0, i);
   
   for(i = 0, l = 0; i < w * h; i++) {
     ll_t * ptr;
@@ -711,7 +788,7 @@ static int mdTexData(unsigned int w, unsigned int h) {
   GLushort * childData;
   GLubyte * childPos, * parentData = NULL, * levelData = NULL;
   
-  diamondSquare2Tex(&parentData, &levelData, &childData, &_buTreeSize, &childPos, w, h);
+  subdivision2Tex(&parentData, &levelData, &childData, &_buTreeSize, &childPos, w, h);
   
   glBindTexture(GL_TEXTURE_2D, _mdTexId[3]);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_REPEAT);
