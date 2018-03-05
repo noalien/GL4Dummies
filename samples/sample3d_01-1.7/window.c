@@ -305,8 +305,6 @@ static void draw(void) {
   glBindTexture(GL_TEXTURE_2D, _planeTexId);
   /* sets in pId the uniform variable texRepeat to the plane scale */
   glUniform1f(glGetUniformLocation(_pId, "texRepeat"), 1.0);
-  /* tells pId that the sky is false */
-  glUniform1i(glGetUniformLocation(_pId, "sky"), 0);
   /* draws the plane */
   gl4dgDraw(_plane);
 
@@ -343,8 +341,6 @@ static void draw(void) {
   glBindTexture(GL_TEXTURE_2D, _compassTexId);
   /* texture repeat only once */
   glUniform1f(glGetUniformLocation(_pId, "texRepeat"), 1);
-  /* tells pId that the sky is false */
-  glUniform1i(glGetUniformLocation(_pId, "sky"), 0);
   /* draws the compass */
   gl4dgDraw(_plane);
 
@@ -375,10 +371,14 @@ static void draw(void) {
   /* disables cull facing and depth testing */
   glDisable(GL_CULL_FACE);
   glDisable(GL_DEPTH_TEST);
-  /* uses the compass texture */
+  /* uses the labyrinth texture */
   glBindTexture(GL_TEXTURE_2D, _planeTexId);
+  /* draws borders */
+  glUniform1i(glGetUniformLocation(_pId, "border"), 1);
   /* draws the map */
   gl4dgDraw(_plane);
+  /* do not draw borders */
+  glUniform1i(glGetUniformLocation(_pId, "border"), 0);
 
 
 
