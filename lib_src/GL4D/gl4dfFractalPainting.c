@@ -417,7 +417,88 @@ static const char * gl4dfMCMD_mdbuV0FS =
        }\n								\
      }";
 
-static const char * gl4dfMCMD_mdbuV1FS = 
+static const char * gl4dfMCMD_mdbuV1FS/* New */ = 
+  "<imfs>gl4dfMCMD_mdbuV1.fs</imfs>\n\
+     #version 330\n							\
+     in vec2 vsoTexCoord;\n						\
+     out vec4 fragColor;\n						\
+     uniform vec4 mcmd_Ir;\n						\
+     uniform int width, mcmd_take_color, buTreeSize, buTreeWidth, buTreeHeight;\n \
+     uniform sampler2D etage0, etage1, etage2, etage3;\n		\
+     float luminance(vec3 rgb) {\n					\
+       return dot(vec3(0.299, 0.587, 0.114), rgb);\n			\
+     }\n								\
+     uint rgba2ui(vec4 rgba) {\n					\
+       return (uint(rgba.r * 255.0) << uint(24)) |\n			\
+         (uint(rgba.g * 255.0) << uint(16)) |\n				\
+         (uint(rgba.b * 255.0) << uint(8) ) |\n				\
+         (uint(rgba.a * 255.0));\n					\
+     }\n								\
+     float rgba2f(vec4 rgba) {\n					\
+       return float(rgba2ui(rgba)) / float(uint(-1));\n			\
+     }\n								\
+     vec2 getChild(uint ipos) {\n					\
+       return vec2(float(ipos % uint(buTreeWidth)) / float(buTreeWidth - 1.0), float(ipos / uint(buTreeWidth)) / float(buTreeHeight - 1.0));\n \
+     }\n								\
+     vec2 readChildCoords(uint pos, float step) {\n			\
+       return vec2(texture(etage2, getChild(pos)).r, texture(etage2, getChild(pos + uint(1))).r) * step;\n \
+     }\n								\
+     void main() {\n							\
+       vec4 coul = texture(etage0, vsoTexCoord.st);\n			\
+       float orig_a = coul.a;\n						\
+       if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
+         fragColor = coul;\n						\
+         return;\n							\
+       }\n								\
+       float step = 65535.0 / float(width - 1.0);\n			\
+       uint i0 = rgba2ui(texture(etage1, vsoTexCoord.st));\n		\
+       if(mcmd_take_color != 0) {\n					\
+         uint i0 = rgba2ui(texture(etage1, vsoTexCoord.st));\n		\
+         for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n \
+           if(ret.x >= 0.0 && ret.x <= 1.0 && ret.y >= 0.0 && ret.y <= 1.0) {\n	\
+             coul = texture(etage0, ret);\n				\
+     	     if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
+               fragColor = texture(etage3, vsoTexCoord.st);\n		\
+               return;\n						\
+             }\n							\
+           }\n								\
+         }\n								\
+         fragColor = vec4(0.0, 0.0, 0.0, orig_a /* avant 1.0 */);\n	\
+       } else {\n							\
+         const float maxdist = sqrt(2.0);\n				\
+         float sumn = 0.0, suma = 0.0, w, d, sc = 0.032, sf = 0.01;\n	\
+         vec4 Ir_sign = vec4(mcmd_Ir.x < 0.0 ? -1.0 : 1.0, mcmd_Ir.y < 0.0 ? -1.0 : 1.0, mcmd_Ir.z < 0.0 ? -1.0 : 1.0, mcmd_Ir.w < 0.0 ? -1.0 : 1.0);\n	\
+         vec4 sumcoul = vec4(0.0), Ir_abs = abs(mcmd_Ir);\n		\
+         for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n \
+           if(ret.x >= 0.0 && ret.x <= 1.0 && ret.y >= 0.0 && ret.y <= 1.0) {\n	\
+             coul = texture(etage0, ret);\n				\
+             if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
+               float ridge_river_fact = 1.0;\n				\
+               if(coul.a < 1.0 && coul.a > 0.0) { \n			\
+                 ridge_river_fact = -1.0;\n				\
+                 //Ir_abs /= 2.0; sc *= 2.0; sf *= 10.0;\n		\
+               } else {\n						\
+                 //Ir_abs = abs(mcmd_Ir); sc = 0.032; sf = 0.01;\n	\
+               }\n							\
+               d = (length(ret - vsoTexCoord) / maxdist);\n		\
+               //sf=0.1;sc=0.032; plot (x<sc) ? x : sc+(1-sc)*((x-sc)**sf) / ((1-sc)**sf);\n \
+               if(d > sc) \n						\
+                 d = sc + (1.0 - sc) * pow(d - sc, sf) / pow(1.0 - sc, sf);\n \
+               w = 1.0 - d;\n						\
+               sumcoul += w * (vec4(1.0) - ridge_river_fact * Ir_sign * (vec4(1.0) - pow(vec4(w), Ir_abs))) * coul; \
+               suma += w * ridge_river_fact;\n				\
+               sumn += w;\n						\
+             }\n							\
+           }\n								\
+         }\n								\
+         if(sumn >= 1.0 - sc)\n						\
+           fragColor = vec4(sumcoul.rgb / sumn, suma < 0.0 ? 254.0 / 255.0 : 1.0);\n \
+         else\n								\
+           fragColor = vec4(0.0, 0.0, 0.0, orig_a/* avant 0.0 */);\n	\
+       }\n								\
+     }";
+
+static const char * gl4dfMCMD_mdbuV1FSOld = 
   "<imfs>gl4dfMCMD_mdbuV1.fs</imfs>\n\
      #version 330\n							\
      in vec2 vsoTexCoord;\n						\
@@ -485,7 +566,7 @@ static const char * gl4dfMCMD_mdbuV1FS =
          if(sumn >= 1.0 - sc)\n						\
            fragColor = sumcoul / sumn;\n				\
          else\n								\
-           fragColor = vec4(0.0);\n					\
+           fragColor = vec4(0.0, 0.0, 0.0, 0.0);\n			\
        }\n								\
      }";
 
