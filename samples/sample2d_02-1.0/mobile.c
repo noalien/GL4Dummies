@@ -95,55 +95,6 @@ void mobile_move(void) {
       _mobiles[i].vy += G * dt;
   }
 }
-/*void mobile_move(void) {
-  static int t0 = 0;
-  static float k = 0.01;
-  int t, i, j, collision;
-  float dt, dx, dy, d, vx, vy, de, ndx, ndy, nde;
-  t = SDL_GetTicks();
-  dt = (t - t0) / 1000.0;
-  t0 = t;
-  for(i = 0; i < _nmobiles; i++) {
-    for(j = i + 1; j < _nmobiles; j++) {
-      dx = _mobiles[i].x - _mobiles[j].x;
-      dy = _mobiles[i].y - _mobiles[j].y;
-      d = _mobiles[i].r + _mobiles[j].r;
-      if((de = dx * dx + dy * dy) < d * d) {
-	ndx = _mobiles[i].x + _mobiles[j].vx * dt - (_mobiles[j].x + _mobiles[i].vx * dt);
-	ndy = _mobiles[i].y + _mobiles[j].vy * dt - (_mobiles[j].y + _mobiles[i].vy * dt);
-	nde = ndx * ndx + ndy * ndy;
-	if(nde < de) continue;
-	vx = _mobiles[i].vx;
-	vy = _mobiles[i].vy;
-	_mobiles[i].vx = _mobiles[j].vx;
-	_mobiles[i].vy = _mobiles[j].vy;
-	_mobiles[j].vx = vx;
-	_mobiles[j].vy = vy;
-	frottements(i, 5 * k, 5 * k);
-      }
-    }
-  }
-  for(i = 0; i < _nmobiles; i++) {
-    collision = 0;
-    if((_mobiles[i].x + _mobiles[i].r >= gl4dpGetWidth() && _mobiles[i].vx > 0.0) || 
-       (_mobiles[i].x - _mobiles[i].r < 0 && _mobiles[i].vx < 0.0) ) {
-      _mobiles[i].vx = -_mobiles[i].vx;
-      frottements(i, 20 * k, 50 * k);
-      collision = 1;
-    }
-    if((_mobiles[i].y + _mobiles[i].r > gl4dpGetHeight() && _mobiles[i].vy > 0.0) || 
-       (_mobiles[i].y - _mobiles[i].r < 0 && _mobiles[i].vy < 0.0) ) {
-      _mobiles[i].vy = -_mobiles[i].vy;
-      frottements(i, 30 * k, 50 * k); 
-      collision = 1;
-    }
-    if(!collision)
-      _mobiles[i].vy += -980 * dt;
-    _mobiles[i].x  += _mobiles[i].vx * dt;
-    _mobiles[i].y  += _mobiles[i].vy * dt;
-    frottements(i, 0.5 * k, 0.5 * k);
-  }
-  }*/
 
 void mobile_draw(void) {
   int i;
