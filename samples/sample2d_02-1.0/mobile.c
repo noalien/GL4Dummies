@@ -64,8 +64,8 @@ void mobile_move(void) {
   double dt = (t - t0) / 1000.0, d;
   t0 = t;
   int i, collision_x, collision_bas;
-  /* décommenter pour obtenir la collision entre mobiles
-     inter_mobile(dt); */
+  /* décommenter pour obtenir la collision entre mobiles */
+  inter_mobile(dt);
   for(i = 0; i < _nmobiles; i++) {
     collision_x = collision_bas = 0;
     _mobiles[i].x += _mobiles[i].vx * dt;
