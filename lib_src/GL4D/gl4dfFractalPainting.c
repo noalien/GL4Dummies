@@ -75,13 +75,13 @@ static void fractalPaintingfinit(GLuint in, GLuint out, GLboolean flipV) {
 static void fractalPaintingffunc(GLuint in, GLuint out, GLboolean flipV) {
   GLint i, ati = 0, vp[4], polygonMode[2], cpId = 0, cfbo, end, n;
   GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND), tex = glIsEnabled(GL_TEXTURE_2D);
-  GLfloat H[4];
+  GLfloat H[4], Hf;
   GLuint fbo, md = _mcmd_H_map_tex_id ? 4 : 0;
   if(_subdivision_method == 0) { /* Triangle-Edge */
-    for(i = 0; i < 4; ++i)
+    for(i = 0, Hf = 1.0f; i < 4; ++i)
       H[i] = _mcmd_noise_H[i];
   } else { /* Diamond-Square */
-    for(i = 0; i < 4; ++i) 
+    for(i = 0, Hf = 0.5f; i < 4; ++i) 
       H[i] = 0.5f * _mcmd_noise_H[i];
   }
   glEnable(GL_TEXTURE_2D);
@@ -161,6 +161,7 @@ static void fractalPaintingffunc(GLuint in, GLuint out, GLboolean flipV) {
     glUniform1i(glGetUniformLocation(_pId[md], "height"), _height);
     glUniform1i(glGetUniformLocation(_pId[md], "maxLevel"), _maxLevel);
     glUniform4fv(glGetUniformLocation(_pId[md], "mcmd_noise_H"), 1, H);
+    glUniform1f(glGetUniformLocation(_pId[md], "local_Hf"), Hf);
     glUniform4fv(glGetUniformLocation(_pId[md], "mcmd_noise_S"), 1, _mcmd_noise_S);
     glUniform4fv(glGetUniformLocation(_pId[md], "mcmd_noise_T"), 1, _mcmd_noise_T);
     glUniform4fv(glGetUniformLocation(_pId[md], "mcmd_noise_phase_change"), 1, _mcmd_noise_phase_change);
@@ -370,7 +371,7 @@ static const char * gl4dfMCMD_mdLocalFS =
      out vec4 fragColor;\n						\
      uniform int width, height, level, maxLevel;\n			\
      uniform sampler2D etage0, etage1, etage2, etage3;\n		\
-     uniform float seed;\n						\
+     uniform float seed, local_Hf;\n						\
      uniform vec4 mcmd_noise_H, mcmd_noise_S, mcmd_noise_T, mcmd_noise_phase_change, mcmd_I;\n \
      vec2[4] getParents(vec2 st) {\n					\
        int i, x;\n							\
@@ -400,7 +401,7 @@ static const char * gl4dfMCMD_mdLocalFS =
        int myLevel = int(texture(etage2, vsoTexCoord.st).r * 255.0);\n	\
        if(myLevel == level && texture(etage0, vsoTexCoord.st).r == 0.0) {\n \
          const float maxdist = sqrt(2.0);\n				\
-         vec4 texH = mcmd_noise_H + texture(etage3, vsoTexCoord.st);\n	\
+         vec4 texH = mcmd_noise_H + local_Hf * (texture(etage3, vsoTexCoord.st) - vec4(0.5));\n \
          float sumw = 0.0, w;\n						\
          vec4 I_sign = vec4(mcmd_I.x < 0.0 ? -1.0 : 1.0, mcmd_I.y < 0.0 ? -1.0 : 1.0, mcmd_I.z < 0.0 ? -1.0 : 1.0, mcmd_I.w < 0.0 ? -1.0 : 1.0);\n \
          vec4 I_abs = abs(mcmd_I), v = vec4(0.0);\n			\
