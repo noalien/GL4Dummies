@@ -25,9 +25,10 @@ static int  mdTexData(unsigned int w, unsigned int h);
 static void init(void);
 static void quit(void);
 
-static GLuint _pId[4] = { 0 }, _mdbu_version = 1 + 2, _subdivision_method = 0 /* 0 triangle-edge, 1 diamond-square */;
+static GLuint _pId[5] = { 0 }, _mdbu_version = 1 + 2, _subdivision_method = 0 /* 0 triangle-edge, 1 diamond-square */;
 static GLuint _mdTexId[4] = { 0 }, _buTreeSize = 0, _buTreeWidth = 0, _buTreeHeight = 0,  _tempTexId[3] = { 0 };
 static GLuint _width = 512, _height = 512;
+static GLuint _mcmd_H_map_tex_id = 0;
 static int    _maxLevel = -1;
 static GLfloat _rand_threshold = 1.0f, _seed = 0.0f;
 static GLboolean _skeletonize = GL_FALSE, _change_seed = GL_FALSE, _mcmd_take_color = GL_FALSE;
@@ -75,7 +76,7 @@ static void fractalPaintingffunc(GLuint in, GLuint out, GLboolean flipV) {
   GLint i, ati = 0, vp[4], polygonMode[2], cpId = 0, cfbo, end, n;
   GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND), tex = glIsEnabled(GL_TEXTURE_2D);
   GLfloat H[4];
-  GLuint fbo;
+  GLuint fbo, md = _mcmd_H_map_tex_id ? 4 : 0;
   if(_subdivision_method == 0) { /* Triangle-Edge */
     for(i = 0; i < 4; ++i)
       H[i] = _mcmd_noise_H[i];
@@ -145,31 +146,40 @@ static void fractalPaintingffunc(GLuint in, GLuint out, GLboolean flipV) {
     glActiveTexture(GL_TEXTURE0); 
     /* fin mdbu */
     /* debut md */
-    glUseProgram(_pId[0]);
+    glUseProgram(_pId[md]);
+    if(_mcmd_H_map_tex_id) {
+      glActiveTexture(GL_TEXTURE3); 
+      glBindTexture(GL_TEXTURE_2D, _mcmd_H_map_tex_id);
+    }
     glActiveTexture(GL_TEXTURE2); glBindTexture(GL_TEXTURE_2D, _mdTexId[1]);
     glActiveTexture(GL_TEXTURE1); glBindTexture(GL_TEXTURE_2D, _mdTexId[0]);
-    glUniform1i(glGetUniformLocation(_pId[0], "etage0"), 0);
-    glUniform1i(glGetUniformLocation(_pId[0], "etage1"), 1);
-    glUniform1i(glGetUniformLocation(_pId[0], "etage2"), 2);
-    glUniform1i(glGetUniformLocation(_pId[0], "width"), _width);
-    glUniform1i(glGetUniformLocation(_pId[0], "height"), _height);
-    glUniform1i(glGetUniformLocation(_pId[0], "maxLevel"), _maxLevel);
-    glUniform4fv(glGetUniformLocation(_pId[0], "mcmd_noise_H"), 1, H);
-    glUniform4fv(glGetUniformLocation(_pId[0], "mcmd_noise_S"), 1, _mcmd_noise_S);
-    glUniform4fv(glGetUniformLocation(_pId[0], "mcmd_noise_T"), 1, _mcmd_noise_T);
-    glUniform4fv(glGetUniformLocation(_pId[0], "mcmd_noise_phase_change"), 1, _mcmd_noise_phase_change);
-    glUniform4fv(glGetUniformLocation(_pId[0], "mcmd_I"), 1, _mcmd_I);
-    glUniform1f(glGetUniformLocation(_pId[0], "seed"), _seed);
+    glUniform1i(glGetUniformLocation(_pId[md], "etage0"), 0);
+    glUniform1i(glGetUniformLocation(_pId[md], "etage1"), 1);
+    glUniform1i(glGetUniformLocation(_pId[md], "etage2"), 2);
+    glUniform1i(glGetUniformLocation(_pId[md], "etage3"), 3);
+    glUniform1i(glGetUniformLocation(_pId[md], "width"), _width);
+    glUniform1i(glGetUniformLocation(_pId[md], "height"), _height);
+    glUniform1i(glGetUniformLocation(_pId[md], "maxLevel"), _maxLevel);
+    glUniform4fv(glGetUniformLocation(_pId[md], "mcmd_noise_H"), 1, H);
+    glUniform4fv(glGetUniformLocation(_pId[md], "mcmd_noise_S"), 1, _mcmd_noise_S);
+    glUniform4fv(glGetUniformLocation(_pId[md], "mcmd_noise_T"), 1, _mcmd_noise_T);
+    glUniform4fv(glGetUniformLocation(_pId[md], "mcmd_noise_phase_change"), 1, _mcmd_noise_phase_change);
+    glUniform4fv(glGetUniformLocation(_pId[md], "mcmd_I"), 1, _mcmd_I);
+    glUniform1f(glGetUniformLocation(_pId[md], "seed"), _seed);
     if(_change_seed)
       _seed += 0.0001f;
     for(i = 0, n = nbLevels(_width, _height); i < n; i++) {
       glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,    GL_TEXTURE_2D, _tempTexId[ati], 0);
       ati = (ati + 1) % 2;
       glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, _tempTexId[ati]);
-      glUniform1i(glGetUniformLocation(_pId[0], "level"), i);
+      glUniform1i(glGetUniformLocation(_pId[md], "level"), i);
       gl4dgDraw(fcommGetPlane());
     }
     /* fin md */
+    if(_mcmd_H_map_tex_id) {
+      glActiveTexture(GL_TEXTURE3); 
+      glBindTexture(GL_TEXTURE_2D, 0);
+    }
     glActiveTexture(GL_TEXTURE2); glBindTexture(GL_TEXTURE_2D, 0);
     glActiveTexture(GL_TEXTURE1); glBindTexture(GL_TEXTURE_2D, 0);
     glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, 0);
@@ -243,6 +253,10 @@ void gl4dfMCMDSetSubdivisionMethod(GLuint method) {
   _subdivision_method = method % 2;
   init();
   fractalPaintingfptr = fractalPaintingffunc;  
+}
+
+void gl4dMCMDSetUseRoughnessMap(GLuint map_tex_id) {
+  _mcmd_H_map_tex_id = map_tex_id;
 }
 
 static const char * gl4dfMCMD_select4mcmdFS = 
@@ -349,6 +363,64 @@ static const char * gl4dfMCMD_mdFS =
          fragColor = texture(etage0, vsoTexCoord.st);\n			\
      }";
 
+static const char * gl4dfMCMD_mdLocalFS = 
+  "<imfs>gl4dfMCMD_mdLocal.fs</imfs>\n\
+     #version 330\n							\
+     in vec2 vsoTexCoord;\n						\
+     out vec4 fragColor;\n						\
+     uniform int width, height, level, maxLevel;\n			\
+     uniform sampler2D etage0, etage1, etage2, etage3;\n		\
+     uniform float seed;\n						\
+     uniform vec4 mcmd_noise_H, mcmd_noise_S, mcmd_noise_T, mcmd_noise_phase_change, mcmd_I;\n \
+     vec2[4] getParents(vec2 st) {\n					\
+       int i, x;\n							\
+       vec2 p[4];\n							\
+       vec4 c;\n							\
+       for(i = 0; i < 4; i++) {\n					\
+         x = i + int((st.s * float(width) - 0.5 /*transforme le nearest en floor*/) * 4.0);\n \
+         c = texture(etage1, vec2(float(x) / (float(width) * 4.0), st.t));\n \
+         p[i].x = (int(c.r * 255.0) << 8) | int(c.g * 255.0);\n		\
+         p[i].y = (int(c.b * 255.0) << 8) | int(c.a * 255.0);\n		\
+       }\n								\
+       return p;\n							\
+     }\n								\
+     highp float rand(vec2 co) {\n					\
+       highp float a = 12.9898;\n					\
+       highp float b = 78.233;\n					\
+       highp float c = 43758.5453;\n					\
+       highp float dt= dot(co.xy ,vec2(a,b));\n				\
+       highp float sn= mod(dt,3.14);\n					\
+       return 2.0 * fract(sin(sn) * c) - 1.0;\n				\
+     }\n								\
+     highp vec4 rand(vec2 co, vec4 s) {\n				\
+       return vec4(rand(co + vec2(s.x)), rand(co + vec2(s.y)), rand(co + vec2(s.z)), rand(co + vec2(s.w)));\n \
+     }\n								\
+     void main() {\n							\
+       const vec4 minc = vec4(1.0 / 255.0);\n				\
+       int myLevel = int(texture(etage2, vsoTexCoord.st).r * 255.0);\n	\
+       if(myLevel == level && texture(etage0, vsoTexCoord.st).r == 0.0) {\n \
+         const float maxdist = sqrt(2.0);\n				\
+         vec4 texH = mcmd_noise_H + texture(etage3, vsoTexCoord.st);\n	\
+         float sumw = 0.0, w;\n						\
+         vec4 I_sign = vec4(mcmd_I.x < 0.0 ? -1.0 : 1.0, mcmd_I.y < 0.0 ? -1.0 : 1.0, mcmd_I.z < 0.0 ? -1.0 : 1.0, mcmd_I.w < 0.0 ? -1.0 : 1.0);\n \
+         vec4 I_abs = abs(mcmd_I), v = vec4(0.0);\n			\
+         vec2[4] parents = getParents(vsoTexCoord.st);\n		\
+         for(int i = 0; i < 4; i++) {\n					\
+           if(parents[i].x != 65535) {\n				\
+             vec2 p = vec2(parents[i].x / width , parents[i].y / height);\n \
+             w = 1.0 - length(p - vsoTexCoord) / maxdist;\n		\
+             v += w * (vec4(1.0) - I_sign * (vec4(1.0) - pow(vec4(w), I_abs))) * texture(etage0, p);\n \
+             sumw += w;\n						\
+           }\n								\
+         }\n								\
+         if(sumw > 0.0)\n						\
+           v /= sumw;\n							\
+         v += pow(vec4(2.0), vec4(-(myLevel + 1) * texH)) * (mcmd_noise_T + mcmd_noise_S * rand(vsoTexCoord.st + vec2(seed), mcmd_noise_phase_change));\n \
+         fragColor = max(v, minc);\n					\
+       } else\n								\
+         fragColor = texture(etage0, vsoTexCoord.st);\n			\
+     }";
+
 static const char * gl4dfMCMD_mdbuV0FS = 
   "<imfs>gl4dfMCMD_mdbuV0.fs</imfs>\n\
      #version 330\n							\
@@ -417,7 +489,7 @@ static const char * gl4dfMCMD_mdbuV0FS =
        }\n								\
      }";
 
-static const char * gl4dfMCMD_mdbuV1FS/* New */ = 
+static const char * gl4dfMCMD_mdbuV1FSNew = 
   "<imfs>gl4dfMCMD_mdbuV1.fs</imfs>\n\
      #version 330\n							\
      in vec2 vsoTexCoord;\n						\
@@ -498,7 +570,7 @@ static const char * gl4dfMCMD_mdbuV1FS/* New */ =
        }\n								\
      }";
 
-static const char * gl4dfMCMD_mdbuV1FSOld = 
+static const char * gl4dfMCMD_mdbuV1FS/* Old */ = 
   "<imfs>gl4dfMCMD_mdbuV1.fs</imfs>\n\
      #version 330\n							\
      in vec2 vsoTexCoord;\n						\
@@ -577,6 +649,7 @@ static void init(void) {
     _pId[1] = gl4duCreateProgram(gl4dfBasicVS, gl4dfMCMD_select4mcmdFS, NULL);
     _pId[2] = gl4duCreateProgram(gl4dfBasicVS, gl4dfMCMD_mdbuV0FS, NULL);
     _pId[3] = gl4duCreateProgram(gl4dfBasicVS, gl4dfMCMD_mdbuV1FS, NULL);
+    _pId[4] = gl4duCreateProgram(gl4dfBasicVS, gl4dfMCMD_mdLocalFS, NULL);
   }
   if(!_mdTexId[0])
     glGenTextures(4, _mdTexId);

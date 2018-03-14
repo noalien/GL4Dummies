@@ -232,9 +232,15 @@ extern "C" {
   /*!\brief Permet de modifier la méthode de subdivision utilisée : 0
    * Triangle-Edge, 1 Diamond-Square.
    *\param method si 0 subdivision Triangle-Edge, si 1 subdivision
-   * Diamond-Square.
-   */
+   * Diamond-Square. */
   GL4DAPI void GL4DAPIENTRY gl4dfMCMDSetSubdivisionMethod(GLuint method);
+  /*!\brief Permet d'indiquer l'usage ou non d'une map (texture) pour
+   * récupérer les valeurs locales de roughness.
+   *
+   *\param map_tex_id si 0, pas de roughness locale (la globale est
+   * utilisée, voir \ref gl4dfMCMDSetNoiseH), sinon l'identifiant de la
+   * texture servant de map de roughness. */
+  GL4DAPI void GL4DAPIENTRY gl4dMCMDSetUseRoughnessMap(GLuint map_tex_id);
 
 #ifdef __cplusplus
 }
