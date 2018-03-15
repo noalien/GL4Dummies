@@ -27,7 +27,7 @@ __top_builddir__bin_libGL4Dummies_la_SOURCES = GL4D/aes.c GL4D/aes.h	\
 	GL4D/gl4dfScattering.c GL4D/gl4dfFocus.c			\
 	GL4D/gl4dfConversion.c GL4D/gl4dfMedia.c			\
 	GL4D/gl4dfFractalPainting.c GL4D/gl4dfHatching.c		\
-	GL4D/gl4dfSegmentation.c GL4D/gl4dfOpticalFlow.c                \
+	GL4D/gl4dfSegmentation.c GL4D/gl4dfOpticalFlow.c GL4D/gl4dfOp.c \
         GL4D/gl4da.c GL4D/gl4da.h 
 
 if USE_VERSION_RC

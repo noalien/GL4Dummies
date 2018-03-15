@@ -645,13 +645,6 @@ static const char * gl4dfMCMD_mdbuV1FS/* Old */ =
 
 static void init(void) {
   int i;
-  if(!_pId[0]) {
-    _pId[0] = gl4duCreateProgram(gl4dfBasicVS, gl4dfMCMD_mdFS, NULL);
-    _pId[1] = gl4duCreateProgram(gl4dfBasicVS, gl4dfMCMD_select4mcmdFS, NULL);
-    _pId[2] = gl4duCreateProgram(gl4dfBasicVS, gl4dfMCMD_mdbuV0FS, NULL);
-    _pId[3] = gl4duCreateProgram(gl4dfBasicVS, gl4dfMCMD_mdbuV1FS, NULL);
-    _pId[4] = gl4duCreateProgram(gl4dfBasicVS, gl4dfMCMD_mdLocalFS, NULL);
-  }
   if(!_mdTexId[0])
     glGenTextures(4, _mdTexId);
   if(!_tempTexId[0])
@@ -661,12 +654,19 @@ static void init(void) {
     glBindTexture(GL_TEXTURE_2D, _tempTexId[i]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
   }
   glBindTexture(GL_TEXTURE_2D, 0);
-  gl4duAtExit(quit);
+  if(!_pId[0]) {
+    _pId[0] = gl4duCreateProgram(gl4dfBasicVS, gl4dfMCMD_mdFS, NULL);
+    _pId[1] = gl4duCreateProgram(gl4dfBasicVS, gl4dfMCMD_select4mcmdFS, NULL);
+    _pId[2] = gl4duCreateProgram(gl4dfBasicVS, gl4dfMCMD_mdbuV0FS, NULL);
+    _pId[3] = gl4duCreateProgram(gl4dfBasicVS, gl4dfMCMD_mdbuV1FS, NULL);
+    _pId[4] = gl4duCreateProgram(gl4dfBasicVS, gl4dfMCMD_mdLocalFS, NULL);
+    gl4duAtExit(quit);
+  }
 }
 
 static void quit(void) {
@@ -679,6 +679,7 @@ static void quit(void) {
     _tempTexId[0] = 0;
   }
   _pId[0] = 0;
+  fractalPaintingfptr = fractalPaintingfinit;
 }
 
 #define UNDEFINED_PARENT ((GLushort)-1)
@@ -946,8 +947,8 @@ static int mdTexData(unsigned int w, unsigned int h) {
   subdivision2Tex(&parentData, &levelData, &childData, &_buTreeSize, &childPos, w, h);
   
   glBindTexture(GL_TEXTURE_2D, _mdTexId[3]);
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   _buTreeWidth  = (int)sqrt(_buTreeSize);
@@ -956,16 +957,16 @@ static int mdTexData(unsigned int w, unsigned int h) {
   free(childData);
   
   glBindTexture(GL_TEXTURE_2D, _mdTexId[2]);
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, childPos);
   free(childPos);
   
   glBindTexture(GL_TEXTURE_2D, _mdTexId[1]);
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, w, h, 0, GL_RED, GL_UNSIGNED_BYTE, levelData);
@@ -975,8 +976,8 @@ static int mdTexData(unsigned int w, unsigned int h) {
   free(levelData);
 
   glBindTexture(GL_TEXTURE_2D, _mdTexId[0]);
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4 * w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, parentData);

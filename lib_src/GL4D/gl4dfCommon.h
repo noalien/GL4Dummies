@@ -43,6 +43,7 @@ extern "C" {
          fragColor = texture(tex, vsoTexCoord);\n			\
      }";
 
+  extern void   fcommMatchTex(GLuint goal, GLuint orig);
   extern GLuint fcommGetTempTex(GLuint i);
   extern GLuint fcommGetPlane(void);
   extern GLuint fcommGetFBO(void);

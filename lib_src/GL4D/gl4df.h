@@ -31,7 +31,12 @@ extern "C" {
     GL4DF_SOBEL_RESULT_INV_LUMINANCE, /* par défault */
     GL4DF_SOBEL_MIX_NONE,
     GL4DF_SOBEL_MIX_ADD,
-    GL4DF_SOBEL_MIX_MULT
+    GL4DF_SOBEL_MIX_MULT,
+    GL4DF_OP_ADD,
+    GL4DF_OP_SUB,
+    GL4DF_OP_MULT,
+    GL4DF_OP_DIV,
+    GL4DF_OP_OVERLAY
   };
   typedef enum GL4DFenum GL4DFenum;
   /* Dans gl4dConversion.c */
@@ -237,10 +242,31 @@ extern "C" {
   /*!\brief Permet d'indiquer l'usage ou non d'une map (texture) pour
    * récupérer les valeurs locales de roughness.
    *
-   *\param map_tex_id si 0, pas de roughness locale (la globale est
+   * \param map_tex_id si 0, pas de roughness locale (la globale est
    * utilisée, voir \ref gl4dfMCMDSetNoiseH), sinon l'identifiant de la
    * texture servant de map de roughness. */
   GL4DAPI void GL4DAPIENTRY gl4dMCMDSetUseRoughnessMap(GLuint map_tex_id);
+  /*!\brief Réalise un mélange entre deux textures (ou écran) en
+   * entrée et l'écrit dans une texture ou à l'écran en
+   * sortie. L'opération choisie pour le mélange est choisie à l'aide
+   * de la fonction \ref gl4dfOpSetOp ; l'opération par défaut est
+   * l'addition avec la valeur GL4DF_OP_ADD.
+   *
+   * \param in1 identifiant de la première texture en entrée (peut être 0 si écran).
+   * \param in2 identifiant de la seconde texture en entrée (peut être 0 si écran).
+   * \param out identifiant de la texture de sortie (peut être 0 si écran).
+   * \param flipV effectuer un flip vertical si GL_TRUE.
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfOp(GLuint in1, GLuint in2, GLuint out, GLboolean flipV);
+  /*!\brief Permet de choisir l'opération pour le mélange effectué
+   * avec l'aide de la fonction \ref gl4dfOp ; l'opération par défaut
+   * est l'addition avec la valeur GL4DF_OP_ADD.
+   * \param op valeur correspondant à l'opération qui sera
+   * effectuée. Peut être une parmi : GL4DF_OP_ADD (addition),
+   * GL4DF_OP_SUB (soustraction), GL4DF_OP_MULT (multiplication),
+   * GL4DF_OP_DIV (division), GL4DF_OP_OVERLAY (overlay).
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfOpSetOp(GL4DFenum op);
 
 #ifdef __cplusplus
 }
