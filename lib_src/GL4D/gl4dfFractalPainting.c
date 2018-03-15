@@ -252,8 +252,8 @@ void gl4dfMCMDSetMDBUVersion(GLuint version) {
 
 void gl4dfMCMDSetSubdivisionMethod(GLuint method) {
   _subdivision_method = method % 2;
-  init();
-  fractalPaintingfptr = fractalPaintingffunc;  
+   init();
+   fractalPaintingfptr = fractalPaintingffunc;  
 }
 
 void gl4dMCMDSetUseRoughnessMap(GLuint map_tex_id) {
@@ -784,7 +784,9 @@ static void triangleEdge(GLubyte * parentData, GLubyte * levelData, ll_t ** llma
     }
     return;
   }
-  if(!w_2 && !h_2)
+  //\todo en rapport avec les todo plus bas, l'assertion passe avec ||
+  //      à la place de && ???
+  if(!w_2 || !h_2)
     return;
   x[6]  = x[7]  = x[8] = x[0] = x0;
   x[5] = x[9] = x[1] = x0 + w_2;
@@ -802,10 +804,10 @@ static void triangleEdge(GLubyte * parentData, GLubyte * levelData, ll_t ** llma
       if(InMap(x[i], y[i], mapWidth, mapHeight)) {
 	llInsert(&(llmap[y[i - 1] * mapWidth + x[i - 1]]), x[i], y[i]);
 	//\todo VOIR pourquoi il y a une assertion failed !
-	//assert(x[i - 1] != x[i] || y[i - 1] != y[i]);
+	assert(x[i - 1] != x[i] || y[i - 1] != y[i]);
 	llInsert(&(llmap[y[i + 1] * mapWidth + x[i + 1]]), x[i], y[i]);
 	//\todo VOIR pourquoi il y a une assertion failed !
-	//assert(x[i + 1] != x[i] || y[i + 1] != y[i]);
+	assert(x[i + 1] != x[i] || y[i + 1] != y[i]);
       }
     }
   }
@@ -953,7 +955,9 @@ static int mdTexData(unsigned int w, unsigned int h) {
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   _buTreeWidth  = (int)sqrt(_buTreeSize);
   _buTreeHeight = (int)ceil(_buTreeSize / (double)_buTreeWidth);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, _buTreeWidth, _buTreeHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, childData);
+  childData = realloc(childData, _buTreeWidth * _buTreeHeight * sizeof *childData);
+  assert(childData);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, _buTreeWidth, _buTreeHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, childData);
   free(childData);
   
   glBindTexture(GL_TEXTURE_2D, _mdTexId[2]);
