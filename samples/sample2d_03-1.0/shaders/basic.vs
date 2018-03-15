@@ -7,6 +7,6 @@ out vec2 vsoTexCoord;
 uniform float toto;
 
 void main(void) {
-  gl_Position = vec4(vsiPosition * toto, 1.0);
+  gl_Position = vec4(vsiPosition/*  * toto */, 1.0);
   vsoTexCoord = vsiTexCoord;
 }

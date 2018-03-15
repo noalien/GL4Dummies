@@ -12,8 +12,14 @@ out vec3 vsoModPos;
 
 void main(void) {
   vec4 mp = modelViewMatrix * vec4(vsiPosition, 1.0);
+  /* pourquoi la transposée inverse ? 
+     la preuve :
+     http://www.ai.univ-paris8.fr/~amsi/PG3D1718S2/dl/The_Normal_Matrix_Lighthouse3d.pdf
+   */
   vsoNormal = (transpose(inverse(modelViewMatrix))  * vec4(vsiNormal, 0.0)).xyz;
   vsoPosition = vsiPosition;
+  /* position transformée du sommet afin de calculer l'incidence de la
+   * lumière plus loin */
   vsoModPos = mp.xyz;
   gl_Position = projectionMatrix * mp;
 }

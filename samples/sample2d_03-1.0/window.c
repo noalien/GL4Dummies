@@ -24,7 +24,7 @@ static GLuint _tId = 0;
 /*!\brief A generated Quad Id */
 static GLuint _quad = 0;
 /*!\brief number of mobiles to simulate */
-static const int _nb_mobiles = 64;
+static const int _nb_mobiles = 2;
 /*!\brief toggle Voronoï mode */
 static GLboolean _voronoi = GL_FALSE;
 
