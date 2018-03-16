@@ -261,14 +261,20 @@ void gl4dfMCMDSetSubdivisionMethod(GLuint method) {
 
 void gl4dMCMDSetUseRoughnessMap(GLuint map_tex_id) {
   _mcmd_H_map_tex_id = map_tex_id;
+  if(map_tex_id && !_mdbu_version)
+    gl4dfMCMDSetMDBUVersion(1);
 }
 
 void gl4dMCMDSetUseInterpolationMap(GLuint map_tex_id) {
   _mcmd_I_map_tex_id = map_tex_id;
+  if(map_tex_id && !_mdbu_version)
+    gl4dfMCMDSetMDBUVersion(1);
 }
 
 void gl4dMCMDSetUseExtrapolationMap(GLuint map_tex_id) {
   _mcmd_Ir_map_tex_id = map_tex_id;
+  if(map_tex_id && !_mdbu_version)
+    gl4dfMCMDSetMDBUVersion(1);
 }
 
 static const char * gl4dfMCMD_select4mcmdFS = 
