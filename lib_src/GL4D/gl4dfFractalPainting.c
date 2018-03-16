@@ -508,14 +508,14 @@ static const char * gl4dfMCMD_mdbuV0FS =
        }\n								\
      }";
 
-static const char * gl4dfMCMD_mdbuV1FSNew = 
+static const char * gl4dfMCMD_mdbuV1FS/* New */ = 
   "<imfs>gl4dfMCMD_mdbuV1.fs</imfs>\n\
      #version 330\n							\
      in vec2 vsoTexCoord;\n						\
      out vec4 fragColor;\n						\
      uniform vec4 mcmd_Ir;\n						\
-     uniform int width, mcmd_take_color, buTreeSize, buTreeWidth, buTreeHeight;\n \
-     uniform sampler2D etage0, etage1, etage2, etage3;\n		\
+     uniform int width, mcmd_take_color, buTreeSize, buTreeWidth, buTreeHeight, use_etage4;\n \
+     uniform sampler2D etage0, etage1, etage2, etage3, etage4;\n	\
      float luminance(vec3 rgb) {\n					\
        return dot(vec3(0.299, 0.587, 0.114), rgb);\n			\
      }\n								\
@@ -558,8 +558,9 @@ static const char * gl4dfMCMD_mdbuV1FSNew =
        } else {\n							\
          const float maxdist = sqrt(2.0);\n				\
          float sumn = 0.0, suma = 0.0, w, d, sc = 0.032, sf = 0.01;\n	\
-         vec4 Ir_sign = vec4(mcmd_Ir.x < 0.0 ? -1.0 : 1.0, mcmd_Ir.y < 0.0 ? -1.0 : 1.0, mcmd_Ir.z < 0.0 ? -1.0 : 1.0, mcmd_Ir.w < 0.0 ? -1.0 : 1.0);\n	\
-         vec4 sumcoul = vec4(0.0), Ir_abs = abs(mcmd_Ir);\n		\
+         vec4 texIr = mcmd_Ir + (use_etage4 != 0 ? 10.0 * (texture(etage4, vsoTexCoord.st) - vec4(0.5)) : vec4(0));\n \
+         vec4 Ir_sign = vec4(texIr.x < 0.0 ? -1.0 : 1.0, texIr.y < 0.0 ? -1.0 : 1.0, texIr.z < 0.0 ? -1.0 : 1.0, texIr.w < 0.0 ? -1.0 : 1.0);\n	\
+         vec4 sumcoul = vec4(0.0), Ir_abs = abs(texIr);\n		\
          for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n \
            if(ret.x >= 0.0 && ret.x <= 1.0 && ret.y >= 0.0 && ret.y <= 1.0) {\n	\
              coul = texture(etage0, ret);\n				\
@@ -589,7 +590,7 @@ static const char * gl4dfMCMD_mdbuV1FSNew =
        }\n								\
      }";
 
-static const char * gl4dfMCMD_mdbuV1FS/* Old */ = 
+static const char * gl4dfMCMD_mdbuV1FSOld = 
   "<imfs>gl4dfMCMD_mdbuV1.fs</imfs>\n\
      #version 330\n							\
      in vec2 vsoTexCoord;\n						\
