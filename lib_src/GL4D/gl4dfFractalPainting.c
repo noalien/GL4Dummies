@@ -28,7 +28,7 @@ static void quit(void);
 static GLuint _pId[5] = { 0 }, _mdbu_version = 1 + 2, _subdivision_method = 0 /* 0 triangle-edge, 1 diamond-square */;
 static GLuint _mdTexId[4] = { 0 }, _buTreeSize = 0, _buTreeWidth = 0, _buTreeHeight = 0,  _tempTexId[3] = { 0 };
 static GLuint _width = 512, _height = 512;
-static GLuint _mcmd_H_map_tex_id = 0;
+static GLuint _mcmd_H_map_tex_id = 0,  _mcmd_I_map_tex_id = 0, _mcmd_Ir_map_tex_id = 0;
 static int    _maxLevel = -1;
 static GLfloat _rand_threshold = 1.0f, _seed = 0.0f;
 static GLboolean _skeletonize = GL_FALSE, _change_seed = GL_FALSE, _mcmd_take_color = GL_FALSE;
@@ -76,7 +76,7 @@ static void fractalPaintingffunc(GLuint in, GLuint out, GLboolean flipV) {
   GLint i, ati = 0, vp[4], polygonMode[2], cpId = 0, cfbo, end, n;
   GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND), tex = glIsEnabled(GL_TEXTURE_2D);
   GLfloat H[4], Hf;
-  GLuint fbo, md = _mcmd_H_map_tex_id ? 4 : 0;
+  GLuint fbo, md = (_mcmd_H_map_tex_id || _mcmd_I_map_tex_id) ? 4 : 0;
   if(_subdivision_method == 0) { /* Triangle-Edge */
     for(i = 0, Hf = 1.0f; i < 4; ++i)
       H[i] = _mcmd_noise_H[i];
@@ -121,6 +121,7 @@ static void fractalPaintingffunc(GLuint in, GLuint out, GLboolean flipV) {
     }
     /* mdbu */
     glUseProgram(_pId[_mdbu_version]);
+    glActiveTexture(GL_TEXTURE4); glBindTexture(GL_TEXTURE_2D, _mcmd_Ir_map_tex_id);
     glActiveTexture(GL_TEXTURE3); glBindTexture(GL_TEXTURE_2D, _tempTexId[2]);
     glActiveTexture(GL_TEXTURE2); glBindTexture(GL_TEXTURE_2D, _mdTexId[3]);
     glActiveTexture(GL_TEXTURE1); glBindTexture(GL_TEXTURE_2D, _mdTexId[2]);
@@ -128,6 +129,8 @@ static void fractalPaintingffunc(GLuint in, GLuint out, GLboolean flipV) {
     glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "etage1"), 1);
     glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "etage2"), 2);
     glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "etage3"), 3);
+    glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "etage4"), 4);
+    glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "use_etage4"), _mcmd_Ir_map_tex_id);
     glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "width"), _width);
     glUniform4fv(glGetUniformLocation(_pId[_mdbu_version], "mcmd_Ir"), 1, _mcmd_Ir);
     glUniform1i(glGetUniformLocation(_pId[_mdbu_version], "mcmd_take_color"), _mcmd_take_color);
@@ -142,21 +145,23 @@ static void fractalPaintingffunc(GLuint in, GLuint out, GLboolean flipV) {
       glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, _tempTexId[ati]);
       gl4dgDraw(fcommGetPlane());
     }
+    glActiveTexture(GL_TEXTURE4); glBindTexture(GL_TEXTURE_2D, 0);
     glActiveTexture(GL_TEXTURE3); glBindTexture(GL_TEXTURE_2D, 0);
     glActiveTexture(GL_TEXTURE0); 
     /* fin mdbu */
     /* debut md */
     glUseProgram(_pId[md]);
-    if(_mcmd_H_map_tex_id) {
-      glActiveTexture(GL_TEXTURE3); 
-      glBindTexture(GL_TEXTURE_2D, _mcmd_H_map_tex_id);
-    }
+    glActiveTexture(GL_TEXTURE4); glBindTexture(GL_TEXTURE_2D, _mcmd_I_map_tex_id);
+    glActiveTexture(GL_TEXTURE3); glBindTexture(GL_TEXTURE_2D, _mcmd_H_map_tex_id);
     glActiveTexture(GL_TEXTURE2); glBindTexture(GL_TEXTURE_2D, _mdTexId[1]);
     glActiveTexture(GL_TEXTURE1); glBindTexture(GL_TEXTURE_2D, _mdTexId[0]);
     glUniform1i(glGetUniformLocation(_pId[md], "etage0"), 0);
     glUniform1i(glGetUniformLocation(_pId[md], "etage1"), 1);
     glUniform1i(glGetUniformLocation(_pId[md], "etage2"), 2);
     glUniform1i(glGetUniformLocation(_pId[md], "etage3"), 3);
+    glUniform1i(glGetUniformLocation(_pId[md], "etage4"), 4);
+    glUniform1i(glGetUniformLocation(_pId[md], "use_etage3"), _mcmd_H_map_tex_id);
+    glUniform1i(glGetUniformLocation(_pId[md], "use_etage4"), _mcmd_I_map_tex_id);
     glUniform1i(glGetUniformLocation(_pId[md], "width"), _width);
     glUniform1i(glGetUniformLocation(_pId[md], "height"), _height);
     glUniform1i(glGetUniformLocation(_pId[md], "maxLevel"), _maxLevel);
@@ -177,10 +182,8 @@ static void fractalPaintingffunc(GLuint in, GLuint out, GLboolean flipV) {
       gl4dgDraw(fcommGetPlane());
     }
     /* fin md */
-    if(_mcmd_H_map_tex_id) {
-      glActiveTexture(GL_TEXTURE3); 
-      glBindTexture(GL_TEXTURE_2D, 0);
-    }
+    glActiveTexture(GL_TEXTURE4); glBindTexture(GL_TEXTURE_2D, 0);
+    glActiveTexture(GL_TEXTURE3); glBindTexture(GL_TEXTURE_2D, 0);
     glActiveTexture(GL_TEXTURE2); glBindTexture(GL_TEXTURE_2D, 0);
     glActiveTexture(GL_TEXTURE1); glBindTexture(GL_TEXTURE_2D, 0);
     glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, 0);
@@ -258,6 +261,14 @@ void gl4dfMCMDSetSubdivisionMethod(GLuint method) {
 
 void gl4dMCMDSetUseRoughnessMap(GLuint map_tex_id) {
   _mcmd_H_map_tex_id = map_tex_id;
+}
+
+void gl4dMCMDSetUseInterpolationMap(GLuint map_tex_id) {
+  _mcmd_I_map_tex_id = map_tex_id;
+}
+
+void gl4dMCMDSetUseExtrapolationMap(GLuint map_tex_id) {
+  _mcmd_Ir_map_tex_id = map_tex_id;
 }
 
 static const char * gl4dfMCMD_select4mcmdFS = 
@@ -369,9 +380,9 @@ static const char * gl4dfMCMD_mdLocalFS =
      #version 330\n							\
      in vec2 vsoTexCoord;\n						\
      out vec4 fragColor;\n						\
-     uniform int width, height, level, maxLevel;\n			\
-     uniform sampler2D etage0, etage1, etage2, etage3;\n		\
-     uniform float seed, local_Hf;\n						\
+     uniform int width, height, level, maxLevel, use_etage3, use_etage4;\n			\
+     uniform sampler2D etage0, etage1, etage2, etage3, etage4;\n	\
+     uniform float seed, local_Hf;\n					\
      uniform vec4 mcmd_noise_H, mcmd_noise_S, mcmd_noise_T, mcmd_noise_phase_change, mcmd_I;\n \
      vec2[4] getParents(vec2 st) {\n					\
        int i, x;\n							\
@@ -401,10 +412,11 @@ static const char * gl4dfMCMD_mdLocalFS =
        int myLevel = int(texture(etage2, vsoTexCoord.st).r * 255.0);\n	\
        if(myLevel == level && texture(etage0, vsoTexCoord.st).r == 0.0) {\n \
          const float maxdist = sqrt(2.0);\n				\
-         vec4 texH = mcmd_noise_H + local_Hf * (texture(etage3, vsoTexCoord.st) - vec4(0.5));\n \
+         vec4 texH  = mcmd_noise_H + (use_etage3 != 0 ? local_Hf * (texture(etage3, vsoTexCoord.st) - vec4(0.5)) : vec4(0));\n \
+         vec4 texI  = mcmd_I + (use_etage4 != 0 ? 10.0 * (texture(etage4, vsoTexCoord.st) - vec4(0.5)) : vec4(0));\n \
          float sumw = 0.0, w;\n						\
-         vec4 I_sign = vec4(mcmd_I.x < 0.0 ? -1.0 : 1.0, mcmd_I.y < 0.0 ? -1.0 : 1.0, mcmd_I.z < 0.0 ? -1.0 : 1.0, mcmd_I.w < 0.0 ? -1.0 : 1.0);\n \
-         vec4 I_abs = abs(mcmd_I), v = vec4(0.0);\n			\
+         vec4 I_sign = vec4(texI.x < 0.0 ? -1.0 : 1.0, texI.y < 0.0 ? -1.0 : 1.0, texI.z < 0.0 ? -1.0 : 1.0, texI.w < 0.0 ? -1.0 : 1.0);\n \
+         vec4 I_abs = abs(texI), v = vec4(0.0);\n			\
          vec2[4] parents = getParents(vsoTexCoord.st);\n		\
          for(int i = 0; i < 4; i++) {\n					\
            if(parents[i].x != 65535) {\n				\
@@ -577,8 +589,8 @@ static const char * gl4dfMCMD_mdbuV1FS/* Old */ =
      in vec2 vsoTexCoord;\n						\
      out vec4 fragColor;\n						\
      uniform vec4 mcmd_Ir;\n						\
-     uniform int width, mcmd_take_color, buTreeSize, buTreeWidth, buTreeHeight;\n \
-     uniform sampler2D etage0, etage1, etage2, etage3;\n		\
+     uniform int width, mcmd_take_color, buTreeSize, buTreeWidth, buTreeHeight, use_etage4;\n \
+     uniform sampler2D etage0, etage1, etage2, etage3, etage4;\n	\
      float luminance(vec3 rgb) {\n					\
        return dot(vec3(0.299, 0.587, 0.114), rgb);\n			\
      }\n								\
@@ -620,8 +632,9 @@ static const char * gl4dfMCMD_mdbuV1FS/* Old */ =
        } else {\n							\
          const float maxdist = sqrt(2.0);\n				\
          float sumn = 0.0, w, d, sc = 0.032, sf = 0.01;\n		\
-         vec4 Ir_sign = vec4(mcmd_Ir.x < 0.0 ? -1.0 : 1.0, mcmd_Ir.y < 0.0 ? -1.0 : 1.0, mcmd_Ir.z < 0.0 ? -1.0 : 1.0, mcmd_Ir.w < 0.0 ? -1.0 : 1.0);\n	\
-         vec4 sumcoul = vec4(0.0), Ir_abs = abs(mcmd_Ir);\n		\
+         vec4 texIr = mcmd_Ir + (use_etage4 != 0 ? 10.0 * (texture(etage4, vsoTexCoord.st) - vec4(0.5)) : vec4(0));\n \
+         vec4 Ir_sign = vec4(texIr.x < 0.0 ? -1.0 : 1.0, texIr.y < 0.0 ? -1.0 : 1.0, texIr.z < 0.0 ? -1.0 : 1.0, texIr.w < 0.0 ? -1.0 : 1.0);\n	\
+         vec4 sumcoul = vec4(0.0), Ir_abs = abs(texIr);\n		\
          for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n \
            if(ret.x >= 0.0 && ret.x <= 1.0 && ret.y >= 0.0 && ret.y <= 1.0) {\n	\
              coul = texture(etage0, ret);\n				\

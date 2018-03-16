@@ -243,9 +243,23 @@ extern "C" {
    * récupérer les valeurs locales de roughness.
    *
    * \param map_tex_id si 0, pas de roughness locale (la globale est
-   * utilisée, voir \ref gl4dfMCMDSetNoiseH), sinon l'identifiant de la
-   * texture servant de map de roughness. */
+   * utilisée, voir \ref gl4dfMCMDSetNoiseH), sinon l'identifiant de
+   * la texture servira de map de roughness. */
   GL4DAPI void GL4DAPIENTRY gl4dMCMDSetUseRoughnessMap(GLuint map_tex_id);
+  /*!\brief Permet d'indiquer l'usage ou non d'une map (texture) pour
+   * récupérer les valeurs locales d'interpolation.
+   *
+   * \param map_tex_id si 0, pas de valeurs locales d'interpolation
+   * (la globale est utilisée, voir \ref gl4dfMCMDSetI), sinon
+   * l'identifiant de la texture servira de map d'interpolation. */
+  GL4DAPI void GL4DAPIENTRY gl4dMCMDSetUseInterpolationMap(GLuint map_tex_id);
+  /*!\brief Permet d'indiquer l'usage ou non d'une map (texture) pour
+   * récupérer les valeurs locales d'extrapolation.
+   *
+   * \param map_tex_id si 0, pas de valeurs locale d'extrapolation (la
+   * globale est utilisée, voir \ref gl4dfMCMDSetIr), sinon
+   * l'identifiant de la texture servira de map d'extrapolation. */
+  GL4DAPI void GL4DAPIENTRY gl4dMCMDSetUseExtrapolationMap(GLuint map_tex_id);
   /*!\brief Réalise un mélange entre deux textures (ou écran) en
    * entrée et l'écrit dans une texture ou à l'écran en
    * sortie. L'opération choisie pour le mélange est choisie à l'aide
