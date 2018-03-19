@@ -6,7 +6,6 @@
  * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
  * \date March 19 2018
  */
-//#include <assert.h>
 #include <GL4D/gl4du.h>
 #include <GL4D/gl4duw_SDL2.h>
 #include <SDL_image.h>

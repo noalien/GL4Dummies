@@ -14,11 +14,11 @@ out vec3 vsoModPos;
 out vec2 vsoTexCoord;
 
 void main(void) {
-  vec3 bpos = bumpMap != 0 ? vsiPosition + 0.03 * texture(ebump, vsiTexCoord).r * vsiPosition : vsiPosition;
+  vsoTexCoord = vec2(vsiTexCoord.x, 1.0 - vsiTexCoord.y);
+  vec3 bpos = bumpMap != 0 ? vsiPosition + 0.04 * texture(ebump, vsoTexCoord).r * vsiNormal : vsiPosition;
   vec4 mp = modelViewMatrix * vec4(bpos, 1.0);
   vsoNormal = (transpose(inverse(modelViewMatrix))  * vec4(vsiNormal, 0.0)).xyz;
   vsoPosition = bpos;
   vsoModPos = mp.xyz;
-  vsoTexCoord = vec2(vsiTexCoord.x, 1.0 - vsiTexCoord.y);
   gl_Position = projectionMatrix * mp;
 }

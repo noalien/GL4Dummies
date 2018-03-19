@@ -47,16 +47,29 @@ static void init(void) {
 /*!\brief dessine dans le contexte OpenGL actif. */
 static void draw(void) {
   int i;
+  gl4dpSetColor(RGB(255, 255, 255));
   gl4dpSetScreen(_screen);
   gl4dpClearScreen();
-  for(i = 0; i < ECHANTILLONS - 1; i++) {
-    int x0, y0, x1, y1;
+  for(i = 0; i < ECHANTILLONS/*  - 1 */; i+=2) {
+    int x0, y0;//, x1, y1;
     x0 = (i * (_windowWidth - 1)) / (ECHANTILLONS - 1);
     y0 = _hauteurs[i];
-    x1 = ((i + 1) * (_windowWidth - 1)) / (ECHANTILLONS - 1);
-    y1 = _hauteurs[i + 1];
-    gl4dpSetColor(rand());
-    gl4dpLine(x0, y0, x1, y1);
+    //x1 = ((i + 1) * (_windowWidth - 1)) / (ECHANTILLONS - 1);
+    //y1 = _hauteurs[i + 1];
+    //gl4dpSetColor(rand());
+    gl4dpPutPixel(x0, y0);
+    //gl4dpLine(x0, y0, x1, y1);
+  }
+  gl4dpSetColor(RGB(255, 0, 0));
+  for(i = 1; i < ECHANTILLONS/*  - 1 */; i+=2) {
+    int x0, y0;//, x1, y1;
+    x0 = (i * (_windowWidth - 1)) / (ECHANTILLONS - 1);
+    y0 = _hauteurs[i];
+    //x1 = ((i + 1) * (_windowWidth - 1)) / (ECHANTILLONS - 1);
+    //y1 = _hauteurs[i + 1];
+    //gl4dpSetColor(rand());
+    gl4dpPutPixel(x0, y0);
+    //gl4dpLine(x0, y0, x1, y1);
   }
   gl4dpUpdateScreen(NULL);
 }
@@ -78,7 +91,7 @@ static void mixCallback(void *udata, Uint8 *stream, int len) {
 /*!\brief Cette fonction initialise les paramètres SDL_Mixer et charge
  *  le fichier audio.*/
 static void initAudio(const char * file) {
-  int mixFlags = MIX_INIT_OGG, res;
+  int mixFlags = MIX_INIT_OGG | MIX_INIT_MOD, res;
   res = Mix_Init(mixFlags);
   if( (res & mixFlags) != mixFlags ) {
     fprintf(stderr, "Mix_Init: Erreur lors de l'initialisation de la bibliotheque SDL_Mixer\n");

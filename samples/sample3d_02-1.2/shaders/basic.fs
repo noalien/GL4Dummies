@@ -25,9 +25,9 @@ vec2 sobel(sampler2D map) {
 }
 
 void main(void) {
-  const vec4 lum_diffus = vec4(1, 1, 0.8, 1);
+  const vec4 lum_diffus = vec4(1, 1, 0.9, 1);
   const vec4 lum_amb = vec4(0.8, 0.8, 1, 1);
-  const vec4 lum_spec = vec4(1, 1, 0.5, 1);
+  const vec4 lum_spec = vec4(1, 1, 0.75, 1);
   const float Iamb = 0.15;
   /* Lumière vers sommet */
   vec3 L = normalize(gsoModPos - lumPos.xyz);
@@ -38,10 +38,10 @@ void main(void) {
     vec3 B = cross(normalize(vec3(N.x, 0, N.z)), vec3(0, 1, 0));
     vec3 T = cross(N, B);
     if(normalMap != 0) {
-      vec2 v = sobel(ebump) / 2.0;
+      vec2 v = 0.75 * sobel(ebump);
       N = normalize(N + v.x * B + v.y * T);
     }
-    Idiffuse = dot(N, -L);
+    Idiffuse = clamp(dot(N, -L), 0, 1);
   } else
     Idiffuse = gsoIdiffus;
   if(specular != 0) {
@@ -56,5 +56,5 @@ void main(void) {
     color = mix(texture(enight, gsoTexCoord), texture(eday, gsoTexCoord), Idiffuse);
   else
     color = vec4(1.0);
-  fragColor = lum_diffus * color * Idiffuse + lum_amb * Iamb + lum_spec * Ispec;
+  fragColor = lum_diffus * color * Idiffuse + lum_amb * Iamb * color + lum_spec * Ispec;
 }
