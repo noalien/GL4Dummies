@@ -10,7 +10,7 @@ in  vec3 vsoNormal[];
 in  vec3 vsoPosition[];
 in  vec3 vsoModPos[];
 in  vec2 vsoTexCoord[];
-/* les sortie du geometry vers le fragment */
+/* les sorties du geometry vers le fragment */
 out vec3 gsoNormal;
 out vec3 gsoModPos;
 out float gsoIdiffus;

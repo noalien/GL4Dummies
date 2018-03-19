@@ -23,7 +23,7 @@ void main(void) {
     float Ispec = pow(clamp(dot(R, -V), 0, 1), 10);
     /* Intensité lumière diffuse : Phong par rapport à la normale au fragment */
     float IdiffusPhong = dot(gsoNormal, -L);
-    fragColor = vec4(abs(sin(1000 * gsoTexCoord)), 0, 1);//lum_diffus * IdiffusPhong + lum_amb * IlumAmb + lum_spec * Ispec;
+    fragColor = lum_diffus * IdiffusPhong + lum_amb * IlumAmb + lum_spec * Ispec;
   } else
     fragColor = lum_diffus * gsoIdiffus + lum_amb * IlumAmb;
 }
