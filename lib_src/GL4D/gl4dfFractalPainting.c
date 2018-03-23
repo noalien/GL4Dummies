@@ -487,7 +487,7 @@ static const char * gl4dfMCMD_mdbuV0FS =
          }\n								\
          fragColor = vec4(0.0, 0.0, 0.0, 1.0);\n			\
        } else {\n							\
-         const float maxdist = sqrt(2.0);\n				\
+         const float maxdist = sqrt(2.0) / 2.0;\n				\
          float sumn = 0.0, w;\n						\
          vec4 Ir_sign = vec4(mcmd_Ir.x < 0.0 ? -1.0 : 1.0, mcmd_Ir.y < 0.0 ? -1.0 : 1.0, mcmd_Ir.z < 0.0 ? -1.0 : 1.0, mcmd_Ir.w < 0.0 ? -1.0 : 1.0);\n	\
          vec4 sumcoul = vec4(0.0), Ir_abs = abs(mcmd_Ir);\n		\
@@ -556,8 +556,9 @@ static const char * gl4dfMCMD_mdbuV1FS/* New */ =
          }\n								\
          fragColor = vec4(0.0, 0.0, 0.0, orig_a /* avant 1.0 */);\n	\
        } else {\n							\
-         const float maxdist = sqrt(2.0);\n				\
-         float sumn = 0.0, suma = 0.0, w, d, sc = 0.032, sf = 0.01;\n	\
+         int nw = 0;\n							\
+         const float maxdist = sqrt(2.0) / 2.0;\n			\
+         float sumn = 0.0, suma = 0.0, w, d, sc = 0.03125, sf = 0.9;\n	\
          vec4 texIr = mcmd_Ir + (use_etage4 != 0 ? 10.0 * (texture(etage4, vsoTexCoord.st) - vec4(0.5)) : vec4(0));\n \
          vec4 Ir_sign = vec4(texIr.x < 0.0 ? -1.0 : 1.0, texIr.y < 0.0 ? -1.0 : 1.0, texIr.z < 0.0 ? -1.0 : 1.0, texIr.w < 0.0 ? -1.0 : 1.0);\n	\
          vec4 sumcoul = vec4(0.0), Ir_abs = abs(texIr);\n		\
@@ -568,22 +569,22 @@ static const char * gl4dfMCMD_mdbuV1FS/* New */ =
                float ridge_river_fact = 1.0;\n				\
                if(coul.a < 1.0 && coul.a > 0.0) { \n			\
                  ridge_river_fact = -1.0;\n				\
-                 //Ir_abs /= 2.0; sc *= 2.0; sf *= 10.0;\n		\
-               } else {\n						\
-                 //Ir_abs = abs(mcmd_Ir); sc = 0.032; sf = 0.01;\n	\
                }\n							\
                d = (length(ret - vsoTexCoord) / maxdist);\n		\
                //sf=0.1;sc=0.032; plot (x<sc) ? x : sc+(1-sc)*((x-sc)**sf) / ((1-sc)**sf);\n \
                if(d > sc) \n						\
-                 d = sc + (1.0 - sc) * pow(d - sc, sf) / pow(1.0 - sc, sf);\n \
+                 //d = sc + (1.0 - sc) * pow(d - sc, sf) / pow(1.0 - sc, sf);\n \
+                 d = min(pow(d, sf) + (d - sc) * pow((d - sc) / (1.0 - sc), 1.0/sf), 10.0); //sc + (1.0 - sc) * pow(d - sc, sf) / pow(1.0 - sc, sf);\n \
+               else\n							\
+                 d = pow(d, sf);\n					\
                w = 1.0 - d;\n						\
                sumcoul += w * (vec4(1.0) - ridge_river_fact * Ir_sign * (vec4(1.0) - pow(vec4(w), Ir_abs))) * coul; \
                suma += w * ridge_river_fact;\n				\
-               sumn += w;\n						\
+               sumn += w; ++nw;\n						\
              }\n							\
            }\n								\
          }\n								\
-         if(sumn >= 1.0 - sc)\n						\
+         if((nw == 1 && sumn >= 1.0 - sc) || sumn >= 2.0 - 2.0 * sc)\n	\
            fragColor = vec4(sumcoul.rgb / sumn, suma < 0.0 ? 254.0 / 255.0 : 1.0);\n \
          else\n								\
            fragColor = vec4(0.0, 0.0, 0.0, orig_a/* avant 0.0 */);\n	\

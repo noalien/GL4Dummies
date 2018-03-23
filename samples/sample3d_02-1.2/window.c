@@ -23,7 +23,7 @@ static int _wW = 800, _wH = 600;
 /*!\brief identifiant des GLSL program */
 static GLuint _pId = 0, _pId2 = 0, _pId3 = 0;
 /*!\brief identifiant de la sphere */
-static GLuint _sphere = 0;
+static GLuint _sphere = 0, _grid = 0;
 /*!\brief nombre de longitudes et latitudes de la sphere */
 static GLuint _longitudes = 40, _latitudes = 40;
 /*!\brief arrete l'animation */
@@ -121,6 +121,9 @@ static void init(void) {
   gl4duGenMatrix(GL_FLOAT, "projectionMatrix");
   resize(_wW, _wH);
   _sphere = gl4dgGenSpheref(_longitudes, _latitudes);
+  GLfloat * map = gl4dmTriangleEdge(129, 129, 0.0);
+  _grid = gl4dgGenGrid2dFromHeightMapf(129, 129, map);
+  free(map);
 }
 
 /*!\brief Cette fonction paramétre la vue (viewport) OpenGL en
@@ -236,7 +239,7 @@ static void keydown(int keycode) {
  */
 static void draw(void) {
   int i;
-  static GLfloat a0 = 0.0;
+  static GLfloat a0 = 15.0;
   static Uint32 t0 = 0;
   GLfloat dt = 0.0, steps[2] = {1.0f / _wW, 1.0f / _wH};
   GLfloat lumPos[4], *mat;
@@ -244,17 +247,18 @@ static void draw(void) {
   dt = ((t = SDL_GetTicks()) - t0) / 1000.0;
   t0 = t;
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glEnable(GL_CULL_FACE);
+  glDisable(GL_CULL_FACE);
   glEnable(GL_DEPTH_TEST);
   glDisable(GL_BLEND);
   gl4duBindMatrix("modelViewMatrix");
   gl4duLoadIdentityf();
-  gl4duTranslatef(0, 0, -3);
+  gl4duLookAtf(0, 2, 3, 0, 0, 0, 0, 1, 0);
+  //gl4duTranslatef(0, 0, -3);
   mat = gl4duGetMatrixData();
   MMAT4XVEC4(lumPos, mat, _lumPos0);
   glUseProgram(_pId);
   gl4duPushMatrix();
-  gl4duRotatef(a0, 0, 1, 0);
+  gl4duRotatef(a0, 1, 0, 0);
   for(i = 0; i < TE_END; i++) {
     glActiveTexture(GL_TEXTURE0 + i);
     glBindTexture(GL_TEXTURE_2D, _tId[i]);
@@ -270,11 +274,13 @@ static void draw(void) {
   glUniform1i(glGetUniformLocation(_pId, "specular"), _specular);
   /* envoi de toutes les matrices stockées par GL4D */
   gl4duSendMatrices();
-  gl4dgDraw(_sphere);
+  //gl4dgDraw(_sphere);
+  gl4dgDraw(_grid);
   for(i = 0; i < TE_END; i++) {
     glActiveTexture(GL_TEXTURE0 + TE_END - 1 - i);
     glBindTexture(GL_TEXTURE_2D, 0);
   }
+  return;
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glUseProgram(_pId3);
