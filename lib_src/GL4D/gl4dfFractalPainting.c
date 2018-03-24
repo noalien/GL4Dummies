@@ -360,7 +360,7 @@ static const char * gl4dfMCMD_mdFS =
        const vec4 minc = vec4(1.0 / 255.0);\n				\
        int myLevel = int(texture(etage2, vsoTexCoord.st).r * 255.0);\n	\
        if(myLevel == level && texture(etage0, vsoTexCoord.st).r == 0.0) {\n \
-         const float maxdist = sqrt(2.0);\n				\
+         const float maxdist = sqrt(2.0) / 2.0;\n				\
          float sumw = 0.0, w;\n						\
          vec4 I_sign = vec4(mcmd_I.x < 0.0 ? -1.0 : 1.0, mcmd_I.y < 0.0 ? -1.0 : 1.0, mcmd_I.z < 0.0 ? -1.0 : 1.0, mcmd_I.w < 0.0 ? -1.0 : 1.0);\n \
          vec4 I_abs = abs(mcmd_I), v = vec4(0.0);\n			\
@@ -417,7 +417,7 @@ static const char * gl4dfMCMD_mdLocalFS =
        const vec4 minc = vec4(1.0 / 255.0);\n				\
        int myLevel = int(texture(etage2, vsoTexCoord.st).r * 255.0);\n	\
        if(myLevel == level && texture(etage0, vsoTexCoord.st).r == 0.0) {\n \
-         const float maxdist = sqrt(2.0);\n				\
+         const float maxdist = sqrt(2.0) / 2.0;\n				\
          vec4 texH  = mcmd_noise_H + (use_etage3 != 0 ? local_Hf * (texture(etage3, vsoTexCoord.st) - vec4(0.5)) : vec4(0));\n \
          vec4 texI  = mcmd_I + (use_etage4 != 0 ? 10.0 * (texture(etage4, vsoTexCoord.st) - vec4(0.5)) : vec4(0));\n \
          float sumw = 0.0, w;\n						\
@@ -638,7 +638,7 @@ static const char * gl4dfMCMD_mdbuV1FSOld =
          }\n								\
          fragColor = vec4(0.0, 0.0, 0.0, 1.0);\n			\
        } else {\n							\
-         const float maxdist = sqrt(2.0);\n				\
+         const float maxdist = sqrt(2.0) / 2.0;\n			\
          float sumn = 0.0, w, d, sc = 0.032, sf = 0.01;\n		\
          vec4 texIr = mcmd_Ir + (use_etage4 != 0 ? 10.0 * (texture(etage4, vsoTexCoord.st) - vec4(0.5)) : vec4(0));\n \
          vec4 Ir_sign = vec4(texIr.x < 0.0 ? -1.0 : 1.0, texIr.y < 0.0 ? -1.0 : 1.0, texIr.z < 0.0 ? -1.0 : 1.0, texIr.w < 0.0 ? -1.0 : 1.0);\n	\
