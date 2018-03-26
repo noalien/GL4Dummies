@@ -1,7 +1,7 @@
 #  Makefile 
 #  Auteur : Farès BELHADJ
 #  Email  : amsi@ai.univ-paris8.fr
-#  Date   : 03/02/2014
+#  Date   : 29/01/2017
 
 SHELL = /bin/sh
 # définition des commandes utilisées
@@ -13,34 +13,44 @@ MKDIR = mkdir
 CHMOD = chmod
 CP = rsync -R
 # déclaration des options du compilateur
-PG_FLAGS =
-SDL_CFLAGS = $(shell sdl2-config --cflags)
-SDL_LDFLAGS = $(shell sdl2-config --libs) -lSDL2_mixer -lSDL2_image
-CPPFLAGS = -I. $(SDL_CFLAGS)
 CFLAGS = -Wall -O3
-LDFLAGS = -lm $(SDL_LDFLAGS) -lGL4Dummies
+CPPFLAGS = -I.
+LDFLAGS = -lm
 
-UNAME := $(shell uname)
-ifeq ($(UNAME),Darwin)
-	MACOSX_DEPLOYMENT_TARGET = 10.8
-        CFLAGS += -I/usr/X11R6/include -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
-        LDFLAGS += -framework OpenGL -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
-else
-        LDFLAGS +=  -L/usr/lib -L/usr/X11R6/lib -lGL -lGLU
-endif
-
-#définition des fichiers et dossiers
+# définition des fichiers et dossiers
 PROGNAME = demoHelper
-PACKAGE=$(PROGNAME)
 VERSION = 1.4
-distdir = $(PACKAGE)-$(VERSION)
-HEADERS = audioHelper.h animations.h 
-SOURCES = audioHelper.c animations.c window.c 
+distdir = $(PROGNAME)-$(VERSION)
+HEADERS = audioHelper.h animations.h
+SOURCES = audioHelper.c animations.c window.c
 OBJ = $(SOURCES:.c=.o)
 DOXYFILE = documentation/Doxyfile
-EXTRAFILES = COPYING shaders/basic.vs shaders/mix.fs shaders/basic.fs	\
-	takeonme.mod sprite.png
+EXTRAFILES = COPYING  $(wildcard shaders/*.?s images/*) takeonme.mod sprite.png
 DISTFILES = $(SOURCES) Makefile $(HEADERS) $(DOXYFILE) $(EXTRAFILES)
+
+# Traitement automatique (ne pas modifier)
+ifneq (,$(shell ls -d /usr/local/include 2>/dev/null | tail -n 1))
+	CPPFLAGS += -I/usr/local/include
+endif
+ifneq (,$(shell ls -d $(HOME)/local/include 2>/dev/null | tail -n 1))
+	CPPFLAGS += -I$(HOME)/local/include
+endif
+ifneq (,$(shell ls -d /usr/local/lib 2>/dev/null | tail -n 1))
+	LDFLAGS += -L/usr/local/lib
+endif
+ifneq (,$(shell ls -d $(HOME)/local/lib 2>/dev/null | tail -n 1))
+	LDFLAGS += -L$(HOME)/local/lib
+endif
+ifeq ($(shell uname),Darwin)
+	MACOSX_DEPLOYMENT_TARGET = 10.8
+        CFLAGS += -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
+        LDFLAGS += -framework OpenGL -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
+else
+        LDFLAGS += -lGL
+endif
+
+CPPFLAGS += $(shell sdl2-config --cflags)
+LDFLAGS  += -lGL4Dummies $(shell sdl2-config --libs) -lSDL2_mixer -lSDL2_image
 
 all: $(PROGNAME)
 
