@@ -260,6 +260,20 @@ extern "C" {
    * globale est utilisée, voir \ref gl4dfMCMDSetIr), sinon
    * l'identifiant de la texture servira de map d'extrapolation. */
   GL4DAPI void GL4DAPIENTRY gl4dMCMDSetUseExtrapolationMap(GLuint map_tex_id);
+  /*!\brief Permet d'indiquer l'usage ou non d'une map (texture) pour
+   * récupérer les valeurs locales de noise scale.
+   *
+   * \param map_tex_id si 0, pas de valeurs locale de noise scale (la
+   * globale est utilisée, voir \ref gl4dfMCMDSetNoiseS), sinon
+   * l'identifiant de la texture servira de map de noise scale. */
+  GL4DAPI void GL4DAPIENTRY gl4dMCMDSetUseNoiseScaleMap(GLuint map_tex_id);
+  /*!\brief Permet d'indiquer l'usage ou non d'une map (texture) pour
+   * récupérer les valeurs locales de noise translate.
+   *
+   * \param map_tex_id si 0, pas de valeurs locale de noise translate (la
+   * globale est utilisée, voir \ref gl4dfMCMDSetNoiseS), sinon
+   * l'identifiant de la texture servira de map de noise translate. */
+  GL4DAPI void GL4DAPIENTRY gl4dMCMDSetUseNoiseTranslateMap(GLuint map_tex_id);
   /*!\brief Réalise un mélange entre deux textures (ou écran) en
    * entrée et l'écrit dans une texture ou à l'écran en
    * sortie. L'opération choisie pour le mélange est choisie à l'aide

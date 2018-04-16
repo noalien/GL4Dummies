@@ -25,6 +25,16 @@ void main(void) {
     vec3 L = normalize(vsoMVPos.xyz - lumpos.xyz);
     vec3 projCoords = vsoSMCoord.xyz / vsoSMCoord.w;
     float diffuse = dot(N, -L);
+    if(id != 1) {
+      if(diffuse < 0.3)
+	diffuse = 0.1;
+      else if(diffuse < 0.6)
+	diffuse = 0.5;
+      else if(diffuse < 0.9)
+	diffuse = 0.75;
+      else
+	diffuse = 1.0;
+    }
     if(texture(smTex, projCoords.xy).r  <  projCoords.z)
       diffuse *= 0.5; 
     fragColor = vec4((couleur.rgb * diffuse), couleur.a);

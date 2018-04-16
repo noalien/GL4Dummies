@@ -58,6 +58,7 @@ static void resize(int w, int h) {
   gl4duBindMatrix("projectionMatrix");
   gl4duLoadIdentityf();
   gl4duFrustumf(-0.5, 0.5, -0.5 * _windowHeight / _windowWidth, 0.5 * _windowHeight / _windowWidth, 1.0, 1000.0);
+  //gl4duOrthof(-0.5, 0.5, -0.5 * _windowHeight / _windowWidth, 0.5 * _windowHeight / _windowWidth, 0.0, 1000.0);
   gl4duBindMatrix("modelViewMatrix");
 }
 /*!\brief dessine dans le contexte OpenGL actif. */

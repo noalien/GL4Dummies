@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <GL4D/gl4df.h>
 #include <GL4D/gl4du.h>
 #include <GL4D/gl4duw_SDL2.h>
 #include "mobile.h"
@@ -100,7 +101,7 @@ static void init(void) {
   glBindTexture(GL_TEXTURE_2D, _colorTex);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _windowWidth, _windowHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
   /* Création et paramétrage de la Texture recevant la profondeur */
   glGenTextures(1, &_depthTex);
@@ -250,11 +251,18 @@ static void draw(void) {
   glViewport(0, 0, SHADOW_MAP_SIDE, SHADOW_MAP_SIDE);
   glClear(GL_DEPTH_BUFFER_BIT);
   scene(GL_TRUE);
+/*   glDrawBuffers(1, &renderings[0]); */
+/*   glBindTexture(GL_TEXTURE_2D, _smTex); */
+/*   glGetTexImage(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, GL_FLOAT, _pixels); */
+/*   glBindTexture(GL_TEXTURE_2D, _colorTex); */
+/*   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _windowWidth, _windowHeight, 0, GL_RED, GL_FLOAT, _pixels); */
+/*   gl4dfConvTex2Frame(_colorTex); */
+  //return;
   /* paramétrer le fbo pour 2 rendus couleurs + un (autre) depth */
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _colorTex, 0);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, _idTex, 0);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthTex, 0);
-  glViewport(0, 0, _windowWidth, _windowHeight);
+  glViewport(0, 0, 256, 256);//_windowWidth, _windowHeight);
   /* un seul rendu GL_COLOR_ATTACHMENT1 + effacement 0 */
   glDrawBuffers(1, &renderings[1]);
   glClearColor(0, 0, 0, 0);
@@ -270,7 +278,7 @@ static void draw(void) {
 
   /* copie du fbo à l'écran */
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-  glBlitFramebuffer(0, 0, _windowWidth, _windowHeight, 0, 0, _windowWidth, _windowHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+  glBlitFramebuffer(0, 0, 256, 256, 0, 0, _windowWidth, _windowHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
   glBlitFramebuffer(0, 0, _windowWidth, _windowHeight, 0, 0, _windowWidth, _windowHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 }
 /*!\brief appelée au moment de sortir du programme (atexit), libère les éléments utilisés */

@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <GL4D/gl4du.h>
+#include <GL4D/gl4df.h>
 #include <GL4D/gl4duw_SDL2.h>
 #include "mobile.h"
 /* Prototypes des fonctions statiques contenues dans ce fichier C */
@@ -169,7 +170,8 @@ static void draw(void) {
   gl4duBindMatrix("modelViewMatrix");
   gl4duLoadIdentityf();
   glUseProgram(_pId);
-  gl4duTranslatef(0, -2.0, -15.0);
+  gl4duLookAtf(13, 2, 15, 0, 0, 0, 0, 1, 0);
+  //gl4duTranslatef(0, -2.0, -15.0);
   gl4duPushMatrix(); {
     gl4duRotatef(-90, 1, 0, 0);
     gl4duScalef(_plan_s, _plan_s, _plan_s);
@@ -187,6 +189,11 @@ static void draw(void) {
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
   glBlitFramebuffer(0, 0, _windowWidth, _windowHeight, 0, 0, _windowWidth, _windowHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
   glBlitFramebuffer(0, 0, _windowWidth, _windowHeight, 0, 0, _windowWidth, _windowHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+/*   gl4dfScattering(0, 0, 5, 0, 0, GL_FALSE); */
+/*   gl4dfMedian(0, 0, 5, GL_FALSE); */
+/*   gl4dfBlur(0, 0, 70, 1, 0, GL_FALSE); */
+/*   gl4dfSobelSetMixMode(GL4DF_SOBEL_MIX_MULT); */
+/*   gl4dfSobel(0, 0, GL_FALSE); */
 }
 /*!\brief appelée au moment de sortir du programme (atexit), libère les éléments utilisés */
 static void quit(void) {
