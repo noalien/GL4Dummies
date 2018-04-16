@@ -442,7 +442,7 @@ static const char * gl4dfMCMD_mdLocalFS =
          const float maxdist = sqrt(2.0) / 2.0;\n				\
          vec4 texH  = mcmd_noise_H + (use_etage3 != 0 ? local_Hf * (texture(etage3, vsoTexCoord.st) - vec4(0.5)) : vec4(0));\n \
          vec4 texI  = mcmd_I + (use_etage4 != 0 ? 10.0 * (texture(etage4, vsoTexCoord.st) - vec4(0.5)) : vec4(0));\n \
-         vec4 texNS  = mcmd_noise_S + (use_etage5 != 0 ? 10.0 * (texture(etage5, vsoTexCoord.st) - vec4(0.5)) : vec4(0));\n \
+         vec4 texNS  = max(mcmd_noise_S + (use_etage5 != 0 ? 10.0 * (texture(etage5, vsoTexCoord.st) - vec4(0.5)) : vec4(0)), vec4(0));\n \
          vec4 texNT  = mcmd_noise_T + (use_etage6 != 0 ? 10.0 * (texture(etage6, vsoTexCoord.st) - vec4(0.5)) : vec4(0));\n \
          float sumw = 0.0, w;\n						\
          vec4 I_sign = vec4(texI.x < 0.0 ? -1.0 : 1.0, texI.y < 0.0 ? -1.0 : 1.0, texI.z < 0.0 ? -1.0 : 1.0, texI.w < 0.0 ? -1.0 : 1.0);\n \
