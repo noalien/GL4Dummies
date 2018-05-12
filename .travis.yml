@@ -1,0 +1,36 @@
+language: c
+sudo: true
+compiler: clang
+
+matrix:
+  include:
+    # GNU/Linux tests #############################################
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-precise-3.8
+          packages:
+            - libsdl2-dev
+    - os: linux
+      compiler: gcc
+      before_install:
+        - sudo add-apt-repository -y ppa:team-xbmc/ppa
+        - sudo apt-get update -qq
+        - sudo apt-get install -y libegl1-mesa-dev libgles2-mesa-dev
+        - sudo apt-get install -y libsdl2-dev
+
+    # OSX #######################################################
+    - os: osx
+      ruby: 2.3
+      osx_image: xcode8
+      before_install:
+        - brew update && brew install sdl2 libtool autoconf make
+        - sudo ln -s `which glibtoolize` libtoolize
+        - export PATH=$(pwd):$PATH
+
+script:
+  - make -f Makefile.autotools
+  - ./configure
+  - make -j
+  - sudo make install
