@@ -41,7 +41,7 @@ int main(int argc, char ** argv) {
 static void init(void) {
   glViewport(0, 0, _windowWidth, _windowHeight);
   _screen = gl4dpInitScreen();
-  initAudio("takeonme.mod");
+  initAudio("Isisip - Lotus Flower.mp3");
 }
 
 /*!\brief dessine dans le contexte OpenGL actif. */
