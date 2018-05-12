@@ -41,7 +41,7 @@ static void opfinit(GLuint in1, GLuint in2, GLuint out, GLboolean flipV) {
 /* appelée les autres fois (après la première qui lance init) */
 static void opffunc(GLuint in1, GLuint in2, GLuint out, GLboolean flipV) {
   GLuint fbo, rout = out;
-  GLint vp[4], w, h, pw, ph, polygonMode[2], cpId = 0, n, cfbo, ctex;
+  GLint vp[4], w, h, pw, ph, polygonMode[2], cpId, n, cfbo, ctex;
   GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND), tex = glIsEnabled(GL_TEXTURE_2D);
 
   glEnable(GL_TEXTURE_2D);
@@ -53,7 +53,6 @@ static void opffunc(GLuint in1, GLuint in2, GLuint out, GLboolean flipV) {
   glGetIntegerv(GL_FRAMEBUFFER_BINDING, &cfbo);
   glGetIntegerv(GL_TEXTURE_BINDING_2D, &ctex);
   glGetIntegerv(GL_CURRENT_PROGRAM, &cpId);
-  glGenFramebuffers(1, &fbo);
 
   /* vérifier toutes les dimensions */
   if( out == 0 /* pas de sortie, donc la sortie est l'écran */ || 
@@ -95,19 +94,22 @@ static void opffunc(GLuint in1, GLuint in2, GLuint out, GLboolean flipV) {
     glBlitFramebuffer(0, 0, w, h, vp[0], vp[1], vp[0] + vp[2], vp[1] + vp[3], GL_COLOR_BUFFER_BIT, GL_NEAREST);
   } else if(rout == _tempTexId[2])
     gl4dfConvTex2Tex(_tempTexId[2], out, GL_FALSE);
-  glBindFramebuffer(GL_FRAMEBUFFER, cfbo);
-  glDeleteFramebuffers(1, &fbo);
   glViewport(vp[0], vp[1], vp[2], vp[3]);
-  glPolygonMode(GL_FRONT_AND_BACK, polygonMode[0]);
+  glUseProgram(cpId);
+  glBindFramebuffer(GL_FRAMEBUFFER, cfbo);
   glBindTexture(GL_TEXTURE_2D, ctex);
+  glPolygonMode(GL_FRONT_AND_BACK, polygonMode[0]);
   if(!tex) glDisable(GL_TEXTURE_2D);
   if(!bl) glDisable(GL_BLEND);
   if(dt) glEnable(GL_DEPTH_TEST);
+  glDeleteFramebuffers(1, &fbo);
 }
 
 static void init(void) {
   GLint ctex, i;
   glGetIntegerv(GL_TEXTURE_BINDING_2D, &ctex);
+  if(!_tempTexId[0])
+    glGenTextures((sizeof _tempTexId / sizeof *_tempTexId), _tempTexId);
   for(i = 0; i < (sizeof _tempTexId / sizeof *_tempTexId); i++) {
     glBindTexture(GL_TEXTURE_2D, _tempTexId[i]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -155,7 +157,7 @@ static void init(void) {
 }
 
 static void quit(void) {
-  if(!_tempTexId[0]) {
+  if(_tempTexId[0]) {
     glDeleteTextures((sizeof _tempTexId / sizeof *_tempTexId), _tempTexId);
     _tempTexId[0] = 0;
   }
