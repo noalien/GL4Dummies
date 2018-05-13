@@ -79,14 +79,7 @@ static void draw(void) {
   gl4dpSetColor(RGB(255, 255, 255));
   gl4dpSetScreen(_screen);
   gl4dpClearScreen();
-  for(i = 0; i < ECHANTILLONS; i+=2) {
-    int x0, y0;
-    x0 = (i * (_wW - 1)) / (ECHANTILLONS - 1);
-    y0 = _hauteurs[i];
-    gl4dpPutPixel(x0, y0);
-  }
-  gl4dpSetColor(RGB(255, 0, 0));
-  for(i = 1; i < ECHANTILLONS; i+=2) {
+  for(i = 0; i < ECHANTILLONS; ++i) {
     int x0, y0;
     x0 = (i * (_wW - 1)) / (ECHANTILLONS - 1);
     y0 = _hauteurs[i];
@@ -100,16 +93,15 @@ static void draw(void) {
  * données audio de longueur \a len */
 static void mixCallback(void *udata, Uint8 *stream, int len) {
   if(_plan4fftw) {
-    int i, l = MIN(len >> 1, ECHANTILLONS);
+    int i, j, l = MIN(len >> 1, ECHANTILLONS);
     Sint16 *d = (Sint16 *)stream;
-    fprintf(stderr, "%d\n", len);
-    memset(_hauteurs, 0, sizeof _hauteurs);
     for(i = 0; i < l; i++)
       _in4fftw[i][0] = d[i] / ((1 << 15) - 1.0);
     fftw_execute(_plan4fftw);
-    for(i = 0; i < l >> 1; i++) {
-      _hauteurs[i] = (int)(sqrt(_out4fftw[i][0] * _out4fftw[i][0] + _out4fftw[i][1] * _out4fftw[i][1]) * 3.0 * exp(3.0 * i / (double)l));
-      _hauteurs[i] = MIN(_hauteurs[i], 255);
+    for(i = 0; i < l >> 2; i++) {
+      _hauteurs[4 * i] = (int)(sqrt(_out4fftw[i][0] * _out4fftw[i][0] + _out4fftw[i][1] * _out4fftw[i][1]) * exp(2.0 * i / (double)(l / 4.0)));
+      for(j = 1; j < 4; j++)
+	_hauteurs[4 * i + j] = MIN(_hauteurs[4 * i], 255);
     }
   }
 }
@@ -128,7 +120,7 @@ static void initAudio(const char * filename) {
     fprintf(stderr, "Mix_Init: %s\n", Mix_GetError());
     //exit(3); commenté car ne réagit correctement sur toutes les architectures
   }
-  if(Mix_OpenAudio(44100, AUDIO_S16LSB, 2, mult * ECHANTILLONS) < 0)
+  if(Mix_OpenAudio(44100, AUDIO_S16LSB, 1, mult * ECHANTILLONS) < 0)
     exit(4);  
   if(!(_mmusic = Mix_LoadMUS(filename))) {
     fprintf(stderr, "Erreur lors du Mix_LoadMUS: %s\n", Mix_GetError());
