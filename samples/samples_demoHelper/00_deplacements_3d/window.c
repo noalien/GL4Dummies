@@ -12,7 +12,7 @@ static void resize(int w, int h);
 static void draw(void);
 static void quit(void);
 /*!\brief dimensions de la fenêtre */
-static int _windowWidth = 800, _windowHeight = 600;
+static int _wW = 800, _wH = 600;
 /*!\brief identifiant du programme GLSL */
 static GLuint _pId = 0;
 /*!\brief quelques objets géométriques */
@@ -22,7 +22,7 @@ static GLuint _sphere = 0, _cube = 0, _quad = 0, _torus = 0;
  * lance la boucle principale d'affichage.*/
 int main(int argc, char ** argv) {
   if(!gl4duwCreateWindow(argc, argv, "GL4Dummies", 0, 0, 
-			 _windowWidth, _windowHeight, GL4DW_RESIZABLE | GL4DW_SHOWN))
+			 _wW, _wH, GL4DW_RESIZABLE | GL4DW_SHOWN))
     return 1;
   init();
   atexit(quit);
@@ -38,7 +38,7 @@ static void init(void) {
   _pId  = gl4duCreateProgram("<vs>shaders/dep3d.vs", "<fs>shaders/dep3d.fs", NULL);
   gl4duGenMatrix(GL_FLOAT, "modelViewMatrix");
   gl4duGenMatrix(GL_FLOAT, "projectionMatrix");
-  resize(_windowWidth, _windowHeight);
+  resize(_wW, _wH);
   _sphere = gl4dgGenSpheref(30, 30);
   _cube = gl4dgGenCubef();
   _quad = gl4dgGenQuadf();
@@ -47,11 +47,11 @@ static void init(void) {
 /*!\brief Cette fonction paramétre la vue (viewport) OpenGL en
  * fonction des dimensions de la fenêtre.*/
 static void resize(int w, int h) {
-  _windowWidth  = w; _windowHeight = h;
-  glViewport(0, 0, _windowWidth, _windowHeight);
+  _wW  = w; _wH = h;
+  glViewport(0, 0, _wW, _wH);
   gl4duBindMatrix("projectionMatrix");
   gl4duLoadIdentityf();
-  gl4duFrustumf(-0.5, 0.5, -0.5 * _windowHeight / _windowWidth, 0.5 * _windowHeight / _windowWidth, 1.0, 1000.0);
+  gl4duFrustumf(-0.5, 0.5, -0.5 * _wH / _wW, 0.5 * _wH / _wW, 1.0, 1000.0);
   gl4duBindMatrix("modelViewMatrix");
 }
 /*!\brief dessine dans le contexte OpenGL actif. */
