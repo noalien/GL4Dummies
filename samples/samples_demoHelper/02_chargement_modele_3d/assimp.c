@@ -11,6 +11,7 @@
  * \date February 14 2017
  */
 
+#include <assert.h>
 #include <GL4D/gl4duw_SDL2.h>
 #include <SDL_image.h>
 
