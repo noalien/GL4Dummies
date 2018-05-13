@@ -12,7 +12,7 @@
 #include "gl4df.h"
 #include "gl4dfCommon.h"
 
-static GLuint _medianPId = 0;
+static GLuint _medianPId = 0, _tempTexId[3] = {0};
 
 static void init(void);
 static void quit(void);
@@ -32,43 +32,49 @@ static void medianfinit(GLuint in, GLuint out, GLuint nb_iterations, GLboolean f
 
 /* appelée les autres fois (après la première qui lance init) */
 static void medianffunc(GLuint in, GLuint out, GLuint nb_iterations, GLboolean flipV) {
-  int i, n;
-  GLint vp[4], w, h;
-  GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND);
-  GLuint rin = in, cfbo, rout = out ? out : fcommGetTempTex(1);
-  GLint polygonMode[2], cpId = 0;
+  GLuint rout = out, fbo, flipflop[2];
+  GLint i, n, vp[4], w, h, cfbo, ctex, cpId, polygonMode[2];
+  GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND), tex = glIsEnabled(GL_TEXTURE_2D);
   glGetIntegerv(GL_POLYGON_MODE, polygonMode);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   glGetIntegerv(GL_VIEWPORT, vp);
-  glGetIntegerv(GL_FRAMEBUFFER_BINDING, &n);
-  cfbo = n;
+  glGetIntegerv(GL_FRAMEBUFFER_BINDING, &cfbo);
+  glGetIntegerv(GL_TEXTURE_BINDING_2D, &ctex);
   glGetIntegerv(GL_CURRENT_PROGRAM, &cpId);
   if(in == 0) { /* Pas d'entrée, donc l'entrée est le dernier draw */
-    gl4dfConvFrame2Tex(&rin);
-  } 
+    fcommMatchTex(in = _tempTexId[0], 0);
+    gl4dfConvFrame2Tex(&_tempTexId[0]);
+  } else if(in == out) {
+    fcommMatchTex(in = _tempTexId[0], out);
+    gl4dfConvTex2Tex(out, _tempTexId[0], GL_FALSE);
+  }
   if(out == 0) { /* Pas de sortie, donc sortie aux dimensions du viewport */
     w = vp[2] - vp[0]; 
     h = vp[3] - vp[1];
+    fcommMatchTex(rout = _tempTexId[1], out);
   } else {
     glBindTexture(GL_TEXTURE_2D, out);
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
   }
-  glBindTexture(GL_TEXTURE_2D, fcommGetTempTex(1));
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);  
+  fcommMatchTex(_tempTexId[2], rout);
+  flipflop[!(nb_iterations&1)] = rout;
+  flipflop[nb_iterations&1] = _tempTexId[2];
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  if(!tex) glEnable(GL_TEXTURE_2D);
+  if(dt) glDisable(GL_DEPTH_TEST);
+  if(bl) glDisable(GL_BLEND);
   glViewport(0, 0, w, h);
-  glBindFramebuffer(GL_FRAMEBUFFER, fcommGetFBO()); {
+  glGenFramebuffers(1, &fbo);
+  glBindFramebuffer(GL_FRAMEBUFFER, fbo); {
     glUseProgram(_medianPId);
     glUniform1i(glGetUniformLocation(_medianPId,  "myTex"), 0);
     glUniform1i(glGetUniformLocation(_medianPId,  "inv"), flipV);
     glUniform1i(glGetUniformLocation(_medianPId,  "width"), w);
     glUniform1i(glGetUniformLocation(_medianPId,  "height"), h);
-    if(dt) glDisable(GL_DEPTH_TEST);
-    if(bl) glDisable(GL_BLEND);
     glActiveTexture(GL_TEXTURE0);
-    for(i = 0; i < nb_iterations; i++) {
-      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, (i&1) ? rin : rout,  0);
-      glBindTexture(GL_TEXTURE_2D, (i&1) ? rout : rin);
+    for(i = 0; i < nb_iterations; ++i) {
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, flipflop[i&1],  0);
+      glBindTexture(GL_TEXTURE_2D, (i == 0) ? in : flipflop[!(i&1)]);
       gl4dgDraw(fcommGetPlane());
       glUniform1i(glGetUniformLocation(_medianPId,  "inv"), 0);
     }
@@ -81,19 +87,38 @@ static void medianffunc(GLuint in, GLuint out, GLuint nb_iterations, GLboolean f
     glBlitFramebuffer(0, 0, w, h, vp[0], vp[1], vp[0] + vp[2], vp[1] + vp[3], GL_COLOR_BUFFER_BIT, GL_LINEAR);
   }
   glViewport(vp[0], vp[1], vp[2], vp[3]);
-  glBindFramebuffer(GL_FRAMEBUFFER, cfbo);
-  glPolygonMode(GL_FRONT_AND_BACK, polygonMode[0]);
+  glBindFramebuffer(GL_FRAMEBUFFER, (GLuint)cfbo);
   glUseProgram(cpId);
-  if(dt) glEnable(GL_DEPTH_TEST);
+  glPolygonMode(GL_FRONT_AND_BACK, polygonMode[0]);
+  if(!tex) glDisable(GL_TEXTURE_2D);
   if(bl) glEnable(GL_BLEND);
+  if(dt) glEnable(GL_DEPTH_TEST);
+  glDeleteFramebuffers(1, &fbo);
 }
 
 static void init(void) {
+  GLint i, ctex;
+  glGetIntegerv(GL_TEXTURE_BINDING_2D, &ctex);
+  if(!_tempTexId[0])
+    glGenTextures((sizeof _tempTexId / sizeof *_tempTexId), _tempTexId);
+  for(i = 0; i < (sizeof _tempTexId / sizeof *_tempTexId); ++i) {
+    glBindTexture(GL_TEXTURE_2D, _tempTexId[i]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+  }
+  glBindTexture(GL_TEXTURE_2D, ctex);
   if(!_medianPId) {
     const char * imfs =
-      "<imfs>gl4df_median.fs</imfs>\n\
-       #version 330\n\
-       in  vec2 vsoTexCoord;\n\
+      "<imfs>gl4df_median.fs</imfs>\n"
+#ifdef __GLES4D__
+      "#version 300 es\n"
+#else
+      "#version 330\n"
+#endif
+      "in  vec2 vsoTexCoord;\n\
        out vec4 fragColor;\n\
        uniform sampler2D myTex;\n\
        uniform int width, height;\n\
@@ -129,5 +154,10 @@ static void init(void) {
 }
 
 static void quit(void) {
+  if(_tempTexId[0]) {
+    glDeleteTextures((sizeof _tempTexId / sizeof *_tempTexId), _tempTexId);
+    _tempTexId[0] = 0;
+  }
+  _medianPId = 0;
   medianfptr = medianfinit;
 }

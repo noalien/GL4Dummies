@@ -97,7 +97,10 @@ static void sobelffunc(GLuint in, GLuint out, GLboolean flipV) {
   if(in == 0) { /* Pas d'entrée, donc l'entrée est le dernier draw */
     fcommMatchTex(in = _tempTexId[0], 0);
     gl4dfConvFrame2Tex(&_tempTexId[0]);
-  } 
+  } else if(in == out) {
+    fcommMatchTex(in = _tempTexId[0], out);
+    gl4dfConvTex2Tex(out, _tempTexId[0], GL_FALSE);
+  }
   if(out == 0) { /* Pas de sortie, donc sortie aux dimensions du viewport */
     w = vp[2] - vp[0]; 
     h = vp[3] - vp[1];
@@ -108,6 +111,7 @@ static void sobelffunc(GLuint in, GLuint out, GLboolean flipV) {
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
   }
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  if(!tex) glEnable(GL_TEXTURE_2D);
   if(dt) glDisable(GL_DEPTH_TEST);
   if(bl) glDisable(GL_BLEND);
   glViewport(0, 0, w, h);

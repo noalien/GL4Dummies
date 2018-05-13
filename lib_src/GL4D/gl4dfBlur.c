@@ -77,6 +77,7 @@ static void blurffunc(GLuint in, GLuint out, GLuint radius, GLuint nb_iterations
   fcommMatchTex(_tempTexId[2], rout);
 
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  if(!tex) glEnable(GL_TEXTURE_2D);
   if(dt) glDisable(GL_DEPTH_TEST);
   if(bl) glDisable(GL_BLEND);
   glViewport(0, 0, _width, _height);

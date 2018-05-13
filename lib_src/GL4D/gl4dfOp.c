@@ -44,11 +44,7 @@ static void opffunc(GLuint in1, GLuint in2, GLuint out, GLboolean flipV) {
   GLint vp[4], w, h, pw, ph, polygonMode[2], cpId, n, cfbo, ctex;
   GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND), tex = glIsEnabled(GL_TEXTURE_2D);
 
-  glEnable(GL_TEXTURE_2D);
-  glEnable(GL_BLEND);
-  glDisable(GL_DEPTH_TEST);
   glGetIntegerv(GL_POLYGON_MODE, polygonMode);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   glGetIntegerv(GL_VIEWPORT, vp);
   glGetIntegerv(GL_FRAMEBUFFER_BINDING, &cfbo);
   glGetIntegerv(GL_TEXTURE_BINDING_2D, &ctex);
@@ -70,12 +66,14 @@ static void opffunc(GLuint in1, GLuint in2, GLuint out, GLboolean flipV) {
   glBindTexture(GL_TEXTURE_2D, rout);
   glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
   glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);    
+  if(!tex) glEnable(GL_TEXTURE_2D);
+  if(!bl) glEnable(GL_BLEND);
+  if(dt) glDisable(GL_DEPTH_TEST);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   glViewport(0, 0, w, h);
   glGenFramebuffers(1, &fbo);
   glBindFramebuffer(GL_FRAMEBUFFER, fbo); {
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, rout,  0);
-    glClearColor(0, 0, 0, 1);
-    glClear(GL_COLOR_BUFFER_BIT);
     glUseProgram(_opPId);
     glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, in1);
     glActiveTexture(GL_TEXTURE1); glBindTexture(GL_TEXTURE_2D, in2);
@@ -88,7 +86,6 @@ static void opffunc(GLuint in1, GLuint in2, GLuint out, GLboolean flipV) {
     glActiveTexture(GL_TEXTURE1); glBindTexture(GL_TEXTURE_2D, 0);
     glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, 0);
   }
-  glUseProgram(cpId);
   if(!out) { /* Copier à l'écran en cas de out nul */
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glBlitFramebuffer(0, 0, w, h, vp[0], vp[1], vp[0] + vp[2], vp[1] + vp[3], GL_COLOR_BUFFER_BIT, GL_NEAREST);

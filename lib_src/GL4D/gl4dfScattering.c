@@ -13,7 +13,7 @@
 #include "gl4df.h"
 #include "gl4dfCommon.h"
 
-static GLuint _scatteringPId = 0, _width = 1, _height = 1, _noiseTex = 0;
+static GLuint _scatteringPId = 0, _width = 1, _height = 1, _noiseTex = 0, _tempTexId[2] = {0};
 
 static void init(void);
 static void setDimensions(GLuint w, GLuint h);
@@ -36,36 +36,39 @@ static void scatteringfinit(GLuint in, GLuint out, GLuint radius, GLuint displac
 }
 
 static void scatteringffunc(GLuint in, GLuint out, GLuint radius, GLuint displacementmap, GLuint weightmap, GLboolean flipV) {
-  int n;
-  GLint vp[4], w, h;
-  GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND);
-  GLuint rin = in, cfbo, rout;
-  GLint polygonMode[2], cpId = 0;
+  GLuint rout = out, fbo;
+  GLint n, vp[4], w, h, cfbo, ctex, cpId, polygonMode[2];
+  GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND), tex = glIsEnabled(GL_TEXTURE_2D);
   glGetIntegerv(GL_POLYGON_MODE, polygonMode);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   glGetIntegerv(GL_VIEWPORT, vp);
-  glGetIntegerv(GL_FRAMEBUFFER_BINDING, &n);
-  cfbo = n;
+  glGetIntegerv(GL_FRAMEBUFFER_BINDING, &cfbo);
+  glGetIntegerv(GL_TEXTURE_BINDING_2D, &ctex);
   glGetIntegerv(GL_CURRENT_PROGRAM, &cpId);
   if(in == 0) { /* Pas d'entrée, donc l'entrée est le dernier draw */
-    gl4dfConvFrame2Tex(&rin);
+    fcommMatchTex(in = _tempTexId[0], 0);
+    gl4dfConvFrame2Tex(&_tempTexId[0]);
+  } else if(in == out) {
+    fcommMatchTex(in = _tempTexId[0], out);
+    gl4dfConvTex2Tex(out, _tempTexId[0], GL_FALSE);
   } 
   if(out == 0) { /* Pas de sortie, donc sortie aux dimensions du viewport */
     w = vp[2] - vp[0]; 
     h = vp[3] - vp[1];
-    rout = fcommGetTempTex(1);
-    glBindTexture(GL_TEXTURE_2D, rout);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    fcommMatchTex(rout = _tempTexId[1], out);
   } else {
-    rout = out;
     glBindTexture(GL_TEXTURE_2D, out);
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
   }
   if(w != _width || h != _height)
     setDimensions(w, h);
-  glViewport(0, 0, _width, _height);
-  glBindFramebuffer(GL_FRAMEBUFFER, fcommGetFBO()); {
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  if(!tex) glEnable(GL_TEXTURE_2D);
+  if(dt) glDisable(GL_DEPTH_TEST);
+  if(bl) glDisable(GL_BLEND);
+  glViewport(0, 0, w, h);
+  glGenFramebuffers(1, &fbo);
+  glBindFramebuffer(GL_FRAMEBUFFER, fbo); {
     GLfloat d[] = {radius / (GLfloat)_width, radius / (GLfloat)_height};
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, rout,  0);
     glUseProgram(_scatteringPId);
@@ -80,10 +83,8 @@ static void scatteringffunc(GLuint in, GLuint out, GLuint radius, GLuint displac
     glUniform1i(glGetUniformLocation(_scatteringPId,  "height"), _height);
     glUniform2fv(glGetUniformLocation(_scatteringPId,  "delta"), 1, d);
 
-    if(dt) glDisable(GL_DEPTH_TEST);
-    if(bl) glDisable(GL_BLEND);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, rin);
+    glBindTexture(GL_TEXTURE_2D, in);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, _noiseTex);
     glActiveTexture(GL_TEXTURE2);
@@ -106,21 +107,39 @@ static void scatteringffunc(GLuint in, GLuint out, GLuint radius, GLuint displac
     glBlitFramebuffer(0, 0, _width, _height, vp[0], vp[1], vp[0] + vp[2], vp[1] + vp[3], GL_COLOR_BUFFER_BIT, GL_LINEAR);
   }
   glViewport(vp[0], vp[1], vp[2], vp[3]);
-  glBindFramebuffer(GL_FRAMEBUFFER, cfbo);
-  glPolygonMode(GL_FRONT_AND_BACK, polygonMode[0]);
+  glBindFramebuffer(GL_FRAMEBUFFER, (GLuint)cfbo);
   glUseProgram(cpId);
-  if(dt) glEnable(GL_DEPTH_TEST);
+  glPolygonMode(GL_FRONT_AND_BACK, polygonMode[0]);
+  if(!tex) glDisable(GL_TEXTURE_2D);
   if(bl) glEnable(GL_BLEND);
+  if(dt) glEnable(GL_DEPTH_TEST);
+  glDeleteFramebuffers(1, &fbo);
 }
 
 static void init(void) {
-  GLint vp[4];
+  GLint vp[4], i, ctex;
   glGetIntegerv(GL_VIEWPORT, vp);
+  glGetIntegerv(GL_TEXTURE_BINDING_2D, &ctex);
+  if(!_tempTexId[0])
+    glGenTextures((sizeof _tempTexId / sizeof *_tempTexId), _tempTexId);
+  for(i = 0; i < (sizeof _tempTexId / sizeof *_tempTexId); ++i) {
+    glBindTexture(GL_TEXTURE_2D, _tempTexId[i]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+  }
+  glBindTexture(GL_TEXTURE_2D, ctex);
   if(!_scatteringPId) {
     const char * imfs =
-      "<imfs>gl4df_scattering.fs</imfs>\n\
-       #version 330\n\
-       precision mediump float;\n\
+      "<imfs>gl4df_scattering.fs</imfs>\n"
+#ifdef __GLES4D__
+      "#version 300 es\n"
+#else
+      "#version 330\n"
+#endif
+      "precision mediump float;\n\
        uniform sampler2D myTexture;\n\
        uniform sampler2D wmTexture;\n\
        uniform sampler2D noiseTexture;\n\
@@ -170,6 +189,10 @@ static void setDimensions(GLuint w, GLuint h) {
 }
 
 static void quit(void) {
+  if(_tempTexId[0]) {
+    glDeleteTextures((sizeof _tempTexId / sizeof *_tempTexId), _tempTexId);
+    _tempTexId[0] = 0;
+  }
   if(_noiseTex) {
     glDeleteTextures(1, &_noiseTex);
     _noiseTex = 0;
