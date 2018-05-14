@@ -95,7 +95,7 @@ static void draw(void) {
   gl4duLoadIdentityf();
   glUseProgram(_pId);
   glActiveTexture(GL_TEXTURE0);
-  glUniform1f(glGetUniformLocation(_pId, "tex"), 0);
+  glUniform1i(glGetUniformLocation(_pId, "tex"), 0);
   gl4duTranslatef(0, 0, -10.0);
   gl4duPushMatrix(); {
     gl4duTranslatef(0, -2.0, 0.0);

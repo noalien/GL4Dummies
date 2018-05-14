@@ -6,44 +6,34 @@
  * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
  * \date March 19 2018
  */
+#include <assert.h>
 #include <GL4D/gl4du.h>
 #include <GL4D/gl4duw_SDL2.h>
 #include <SDL_image.h>
+#include <SDL_mixer.h>
+#include <fftw3.h>
 
 /* Prototypes des fonctions statiques contenues dans ce fichier C */
 static void         init(void);
 static void         resize(int w, int h);
-static void         keyup(int keycode);
-static void         keydown(int keycode);
 static void         draw(void);
+static void         initAudio(const char * filename);
 static void         quit(void);
 
 /*!\brief dimensions de la fenêtre */
 static int _wW = 800, _wH = 600;
 /*!\brief identifiant des GLSL program */
-static GLuint _pId = 0, _pId2 = 0, _pId3 = 0;
+static GLuint _pId1 = 0, _pId2 = 0;
 /*!\brief identifiant de la sphere */
 static GLuint _sphere = 0;
 /*!\brief nombre de longitudes et latitudes de la sphere */
-static GLuint _longitudes = 40, _latitudes = 40;
-/*!\brief arrete l'animation */
-static GLuint _pause = 0;
-/*!\brief normale à la face ou au point ? */
-static GLuint _faceNormal = 0;
-/*!\brief flag pour Phong ou pas */
-static GLuint _phong = 1;
-/*!\brief flag pour savoir si la touche shift est enfoncée */
-static GLuint _shift = GL_FALSE;
-/*!\brief flag pour calculer et utiliser une normalMap */
-static GLuint _normalMap = 0;
-/*!\brief flag pour utiliser la bumpMap */
-static GLuint _bumpMap = 0;
-/*!\brief flag pour plaquer les textures jour et nuit */
-static GLuint _nightDay = 0;
-/*!\brief flag pour activer la lumière spéculaire */
-static GLuint _specular = 0;
+static GLuint _longitudes = 200, _latitudes = 200;
 /*!\brief position de la lumière relativement à la sphère éclairée */
 static GLfloat _lumPos0[4] = {-15.1, 20.0, 20.7, 1.0};
+/*!\brief nombre d'échantillons du signal sonore */
+#define ECHANTILLONS 1024
+/*!\brief amplitude des basses et aigus du signal sonore */
+static GLfloat _basses = 0, _aigus = 0;
 
 /*!\brief noms des fichiers textures à charger */
 static const char * _texture_filenames[] = { "images/land_ocean_ice_2048.png", 
@@ -71,19 +61,29 @@ enum texture_e {
 /*!\brief tableau des identifiants de texture à charger */
 static GLuint _tId[TE_END] = {0};
 
+/*!\brief pointeur vers la musique chargée par SDL_Mixer */
+static Mix_Music * _mmusic = NULL;
+/*!\brief données entrées/sorties pour la lib fftw */
+static fftw_complex * _in4fftw = NULL, * _out4fftw = NULL;
+/*!\brief donnée à précalculée utile à la lib fftw */
+static fftw_plan _plan4fftw = NULL;
+
 /*!\brief La fonction principale créé la fenêtre d'affichage,
  * initialise GL et les données, affecte les fonctions d'événements et
  * lance la boucle principale d'affichage.
  */
 int main(int argc, char ** argv) {
+  if(argc != 2) {
+    fprintf(stderr, "usage: %s <audio_file>\n", argv[0]);
+    return 2;
+  }
   if(!gl4duwCreateWindow(argc, argv, "GL4Dummies", 10, 10, 
 			 _wW, _wH, GL4DW_RESIZABLE | GL4DW_SHOWN))
     return 1;
   init();
+  initAudio(argv[1]);
   atexit(quit);
   gl4duwResizeFunc(resize);
-  gl4duwKeyUpFunc(keyup);
-  gl4duwKeyDownFunc(keydown);
   gl4duwDisplayFunc(draw);
   gl4duwMainLoop();
   return 0;
@@ -114,9 +114,8 @@ static void init(void) {
     }
   }
   glClearColor(0.0f, 0.0f, 0.1f, 0.0f);
-  _pId  = gl4duCreateProgram("<vs>shaders/basic.vs", "<gs>shaders/basic.gs", "<fs>shaders/basic.fs", NULL);
-  _pId2 = gl4duCreateProgram("<vs>shaders/sol.vs", "<fs>shaders/sol.fs", NULL);
-  _pId3 = gl4duCreateProgram("<vs>shaders/atmos.vs", "<fs>shaders/atmos.fs", NULL);
+  _pId1  = gl4duCreateProgram("<vs>shaders/full.vs", "<fs>shaders/full.fs", NULL);
+  _pId2 = gl4duCreateProgram("<vs>shaders/atmos.vs", "<fs>shaders/atmos.fs", NULL);
   gl4duGenMatrix(GL_FLOAT, "modelViewMatrix");
   gl4duGenMatrix(GL_FLOAT, "projectionMatrix");
   resize(_wW, _wH);
@@ -134,102 +133,6 @@ static void resize(int w, int h) {
   gl4duLoadIdentityf();
   gl4duFrustumf(-0.5, 0.5, -0.5 * _wH / _wW, 0.5 * _wH / _wW, 1.0, 1000.0);
   gl4duBindMatrix("modelViewMatrix");
-}
-
-static void keyup(int keycode) {
-  switch(keycode) {
-  case SDLK_RSHIFT:
-  case SDLK_LSHIFT:
-    _shift = GL_FALSE;
-    break;
-  default:
-    break;
-  }
-}
-
-static void keydown(int keycode) {
-  GLint v[2];
-  switch(keycode) {
-  case SDLK_UP:
-    if(_shift) {
-      _lumPos0[2] -= 0.1;
-    } else {
-      gl4dgDelete(_sphere);
-      _sphere = gl4dgGenSpheref(_longitudes, ++_latitudes);
-    }
-    break;
-  case SDLK_DOWN:
-    if(_shift) {
-      _lumPos0[2] += 0.1;
-    } else {
-      if(_latitudes > 2) {
-	gl4dgDelete(_sphere);
-	_sphere = gl4dgGenSpheref(_longitudes, --_latitudes);
-      }
-    }
-    break;
-  case SDLK_RIGHT:
-    if(_shift) {
-      _lumPos0[0] += 0.1;
-    } else {
-	gl4dgDelete(_sphere);
-	_sphere = gl4dgGenSpheref(++_longitudes, _latitudes);
-    }
-    break;
-  case SDLK_LEFT:
-    if(_shift) {
-      _lumPos0[0] -= 0.1;
-    } else {
-      if(_longitudes > 3) {
-	gl4dgDelete(_sphere);
-	_sphere = gl4dgGenSpheref(--_longitudes, _latitudes);
-      }
-    }
-    break;
-  case 'u':
-    _lumPos0[1] += 0.1;
-    break;
-  case 'd':
-    _lumPos0[1] -= 0.1;
-    break;
-  case 'w':
-    glGetIntegerv(GL_POLYGON_MODE, v);
-    if(v[0] == GL_FILL)
-      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    else
-      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    break;
-  case ' ':
-    _pause = !_pause;
-    break;
-  case 'p':
-    _phong = !_phong;
-    break;
-  case 's':
-    _specular = !_specular;
-    break;
-  case 't':
-    _nightDay = !_nightDay;
-    break;
-  case 'n':
-    _normalMap = !_normalMap;
-    break;
-  case 'b':
-    _bumpMap = !_bumpMap;
-    break;
-  case 'f':
-    _faceNormal = !_faceNormal;
-    break;
-  case SDLK_ESCAPE:
-  case 'q':
-    exit(0);
-  case SDLK_RSHIFT:
-  case SDLK_LSHIFT:
-    _shift = GL_TRUE;
-    break;
-  default:
-    break;
-  }
 }
 
 /*!\brief Cette fonction dessine dans le contexte OpenGL actif.
@@ -252,22 +155,18 @@ static void draw(void) {
   gl4duTranslatef(0, 0, -3);
   mat = gl4duGetMatrixData();
   MMAT4XVEC4(lumPos, mat, _lumPos0);
-  glUseProgram(_pId);
-  gl4duPushMatrix();
+  /* terre */
+  glUseProgram(_pId1);
   gl4duRotatef(a0, 0, 1, 0);
   for(i = 0; i < TE_END; i++) {
     glActiveTexture(GL_TEXTURE0 + i);
     glBindTexture(GL_TEXTURE_2D, _tId[i]);
-    glUniform1i(glGetUniformLocation(_pId, _sampler_names[i]), i);
+    glUniform1i(glGetUniformLocation(_pId1, _sampler_names[i]), i);
   }
-  glUniform2fv(glGetUniformLocation(_pId, "steps"), 1, steps);
-  glUniform4fv(glGetUniformLocation(_pId, "lumPos"), 1, lumPos);
-  glUniform1i(glGetUniformLocation(_pId, "faceNormal"), _faceNormal);
-  glUniform1i(glGetUniformLocation(_pId, "phong"), _phong);
-  glUniform1i(glGetUniformLocation(_pId, "normalMap"), _normalMap);
-  glUniform1i(glGetUniformLocation(_pId, "bumpMap"), _bumpMap);
-  glUniform1i(glGetUniformLocation(_pId, "nightDay"), _nightDay);
-  glUniform1i(glGetUniformLocation(_pId, "specular"), _specular);
+  glUniform1f(glGetUniformLocation(_pId1, "basses"), _basses);
+  glUniform1f(glGetUniformLocation(_pId1, "aigus"), _aigus);
+  glUniform2fv(glGetUniformLocation(_pId1, "steps"), 1, steps);
+  glUniform4fv(glGetUniformLocation(_pId1, "lumPos"), 1, lumPos);
   /* envoi de toutes les matrices stockées par GL4D */
   gl4duSendMatrices();
   gl4dgDraw(_sphere);
@@ -275,30 +174,95 @@ static void draw(void) {
     glActiveTexture(GL_TEXTURE0 + TE_END - 1 - i);
     glBindTexture(GL_TEXTURE_2D, 0);
   }
+  /* atmosphere */
+  glUseProgram(_pId2);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glUseProgram(_pId3);
   gl4duScalef(1.04, 1.02, 1.04);
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, _tId[TE_ECLOUD]);
-  glUniform1i(glGetUniformLocation(_pId, _sampler_names[TE_ECLOUD]), 0);
+  glUniform1i(glGetUniformLocation(_pId2, _sampler_names[TE_ECLOUD]), 0);
   gl4duSendMatrices();
   gl4dgDraw(_sphere);
 
-  gl4duPopMatrix();
+  a0 += 360.0 * dt / (24.0 /* * 60.0 */);
+}
 
-  gl4duTranslatef(_lumPos0[0], _lumPos0[1], _lumPos0[2]);
-  gl4duScalef(0.05, 0.05, 0.05);
-  glUseProgram(_pId2);
-  gl4duSendMatrices();
-  /* dessiner une troisième fois la sphère avec le _pId2 */
-  gl4dgDraw(_sphere);
-  if(!_pause)
-    a0 += 360.0 * dt / (24.0 /* * 60.0 */);
+/*!\brief appelée quand l'audio est joué et met dans \a stream les
+ * données audio de longueur \a len */
+static void mixCallback(void *udata, Uint8 *stream, int len) {
+  if(_plan4fftw) {
+    int i, j, l = MIN(len >> 1, ECHANTILLONS);
+    Sint16 *d = (Sint16 *)stream;
+    for(i = 0; i < l; i++)
+      _in4fftw[i][0] = d[i] / ((1 << 15) - 1.0);
+    fftw_execute(_plan4fftw);
+    for(i = 0, _basses = 0, _aigus = 0; i < l >> 2; i++) {
+      if(i < l >> 3)
+	_basses += sqrt(_out4fftw[i][0] * _out4fftw[i][0] + _out4fftw[i][1] * _out4fftw[i][1]);
+      else
+	_aigus  += sqrt(_out4fftw[i][0] * _out4fftw[i][0] + _out4fftw[i][1] * _out4fftw[i][1]);
+    }
+    _basses /= l >> 3;
+    _aigus  /= l >> 3;
+  }
+}
+
+/*!\brief charge le fichier audio avec les bonnes options */
+static void initAudio(const char * filename) {
+#if defined(__APPLE__)
+  int mult = 1;
+#else
+  int mult = 2;
+#endif
+  int mixFlags = MIX_INIT_MP3, res;
+  /* préparation des conteneurs de données pour la lib FFTW */
+  _in4fftw   = fftw_malloc(ECHANTILLONS *  sizeof *_in4fftw);
+  memset(_in4fftw, 0, ECHANTILLONS *  sizeof *_in4fftw);
+  assert(_in4fftw);
+  _out4fftw  = fftw_malloc(ECHANTILLONS * sizeof *_out4fftw);
+  assert(_out4fftw);
+  _plan4fftw = fftw_plan_dft_1d(ECHANTILLONS, _in4fftw, _out4fftw, FFTW_FORWARD, FFTW_ESTIMATE);
+  assert(_plan4fftw);
+  res = Mix_Init(mixFlags);
+  if( (res & mixFlags) != mixFlags ) {
+    fprintf(stderr, "Mix_Init: Erreur lors de l'initialisation de la bibliothèque SDL_Mixer\n");
+    fprintf(stderr, "Mix_Init: %s\n", Mix_GetError());
+    //exit(3); commenté car ne réagit correctement sur toutes les architectures
+  }
+  if(Mix_OpenAudio(44100, AUDIO_S16LSB, 1, mult * ECHANTILLONS) < 0)
+    exit(4);  
+  if(!(_mmusic = Mix_LoadMUS(filename))) {
+    fprintf(stderr, "Erreur lors du Mix_LoadMUS: %s\n", Mix_GetError());
+    exit(5);
+  }
+  Mix_SetPostMix(mixCallback, NULL);
+  if(!Mix_PlayingMusic())
+    Mix_PlayMusic(_mmusic, 1);
 }
 
 /*!\brief appelée au moment de sortir du programme (atexit), libère les éléments utilisés */
 static void quit(void) {
+  if(_mmusic) {
+    if(Mix_PlayingMusic())
+      Mix_HaltMusic();
+    Mix_FreeMusic(_mmusic);
+    _mmusic = NULL;
+  }
+  Mix_CloseAudio();
+  Mix_Quit();
+  if(_plan4fftw) {
+    fftw_destroy_plan(_plan4fftw);
+    _plan4fftw = NULL;
+  }
+  if(_in4fftw) {
+    fftw_free(_in4fftw); 
+    _in4fftw = NULL;
+  }
+  if(_out4fftw) {
+    fftw_free(_out4fftw); 
+    _out4fftw = NULL;
+  }
   if(_tId[0]) {
     glDeleteTextures(TE_END, _tId);
     _tId[0] = 0;

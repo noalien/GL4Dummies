@@ -15,17 +15,17 @@ CP = rsync -R
 # déclaration des options du compilateur
 CFLAGS = -Wall -O3
 CPPFLAGS = -I.
-LDFLAGS = -lm -lSDL2_mixer -lfftw3
+LDFLAGS = -lm -lSDL2_image
 
 # définition des fichiers et dossiers
-PROGNAME = musique_freq
+PROGNAME = effet_shader
 VERSION = 1.0
 distdir = $(PROGNAME)-$(VERSION)
 HEADERS = 
 SOURCES = window.c
 OBJ = $(SOURCES:.c=.o)
 DOXYFILE = documentation/Doxyfile
-EXTRAFILES = COPYING
+EXTRAFILES = COPYING $(wildcard shaders/*.?s)  $(wildcard images/*) 
 DISTFILES = $(SOURCES) Makefile $(HEADERS) $(DOXYFILE) $(EXTRAFILES)
 
 # Traitement automatique (ne pas modifier)
@@ -43,7 +43,7 @@ ifneq (,$(shell ls -d $(HOME)/local/lib 2>/dev/null | tail -n 1))
 endif
 ifeq ($(shell uname),Darwin)
 	MACOSX_DEPLOYMENT_TARGET = 10.8
-        CFLAGS += -I/opt/local/include -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
+        CFLAGS += -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
         LDFLAGS += -framework OpenGL -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 else
         LDFLAGS += -lGL

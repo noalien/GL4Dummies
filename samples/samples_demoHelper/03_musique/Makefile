@@ -25,7 +25,7 @@ HEADERS =
 SOURCES = window.c
 OBJ = $(SOURCES:.c=.o)
 DOXYFILE = documentation/Doxyfile
-EXTRAFILES = COPYING $(wildcard shaders/*.?s)  $(wildcard audio/*) 
+EXTRAFILES = COPYING $(wildcard audio/*) 
 DISTFILES = $(SOURCES) Makefile $(HEADERS) $(DOXYFILE) $(EXTRAFILES)
 
 # Traitement automatique (ne pas modifier)
