@@ -85,14 +85,15 @@ static void draw(void) {
   } gl4duPopMatrix();
   glUniform4fv(glGetUniformLocation(_pId, "couleur"), 1, bleu);
   gl4dgDraw(_cube);
-  gl4duRotatef(-3 * a++, 1, 0, 0);
+  gl4duRotatef(-3 * a, 1, 0, 0);
   gl4duSendMatrices();
   glUniform4fv(glGetUniformLocation(_pId, "couleur"), 1, jaune);
   gl4dgDraw(_torus);
   /* Décommenter pour avoir un rendu sympathique pour pas cher :) */
-  /*   gl4dfBlur(0, 0, 3, 1, 0, GL_FALSE); */
+  /*   gl4dfBlur(0, 0, 5, 1, 0, GL_FALSE); */
   /*   gl4dfSobelSetMixMode(GL4DF_SOBEL_MIX_MULT); */
   /*   gl4dfSobel(0, 0, GL_FALSE); */
+  a++;
 }
 /*!\brief appelée au moment de sortir du programme (atexit), libère les éléments utilisés */
 static void quit(void) {

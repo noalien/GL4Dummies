@@ -11,6 +11,7 @@
  */
 
 #include <GL4D/gl4duw_SDL2.h>
+#include <GL4D/gl4df.h>
 #include <SDL_image.h>
 
 /*!\brief opened window width */
@@ -22,7 +23,11 @@ static GLfloat _radius = 10, _x0 = 10, _z0 = -10, _y0 = 2.5;
 /*!\brief paramètres de l'avion */
 static GLfloat _x = 0, _y = 0, _z = 0, _alpha = 0;
 /*!\brief GLSL program Id */
-static GLuint _pId = 0;
+static GLuint _pId = 0, _pId2 = 0;
+/* une sphere pour la bounding sphere */
+static GLuint _sphere = 0;
+/* une texture pour les nuages */
+static GLuint _tId = 0;
 
 extern void assimpInit(const char * filename);
 extern void assimpDrawScene(void);
@@ -49,13 +54,36 @@ int main(int argc, char ** argv) {
   return 0;
 }
 
+static void loadTexture(GLuint id, const char * filename) {
+  SDL_Surface * t;
+  glBindTexture(GL_TEXTURE_2D, id);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  if( (t = IMG_Load(filename)) != NULL ) {
+#ifdef __APPLE__
+    int mode = t->format->BytesPerPixel == 4 ? GL_BGRA : GL_BGR;
+#else
+    int mode = t->format->BytesPerPixel == 4 ? GL_RGBA : GL_RGB;
+#endif       
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, t->w, t->h, 0, mode, GL_UNSIGNED_BYTE, t->pixels);
+    SDL_FreeSurface(t);
+  } else {
+    fprintf(stderr, "can't open file %s : %s\n", filename, SDL_GetError());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+  }
+}
+
 static void init(void) {
   glEnable(GL_DEPTH_TEST);
   _pId = gl4duCreateProgram("<vs>shaders/model.vs", "<fs>shaders/model.fs", NULL);
+  _pId2 = gl4duCreateProgram("<vs>shaders/model.vs", "<fs>shaders/clouds.fs", NULL);
   gl4duGenMatrix(GL_FLOAT, "modelViewMatrix");
   gl4duGenMatrix(GL_FLOAT, "projectionMatrix");
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
+  _sphere = gl4dgGenSpheref(30, 30);
+  glGenTextures(1, &_tId);
+  loadTexture(_tId, "images/nuages.jpg");
   resize(_wW, _wH);
 }
 
@@ -95,20 +123,37 @@ static void draw(void) {
   GLfloat lum[4] = {0.0, 0.0, 5.0, 1.0};
   glClearColor(0.0f, 0.7f, 1.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glUseProgram(_pId);
-
-  glUniform4fv(glGetUniformLocation(_pId, "lumpos"), 1, lum);
+  glUseProgram(_pId2);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, _tId);
+  glUniform1i(glGetUniformLocation(_pId, "tex"), 0);
 
   gl4duBindMatrix("modelViewMatrix");
   gl4duLoadIdentityf();
   /* je regarde l'avion depuis 1, 0, -1 */
   gl4duLookAtf(1, 0, -1, _x, _y, _z, 0.0, 1.0, 0.0);
+  gl4duPushMatrix(); {
+    gl4duScalef(400, 400, 400);
+    gl4duSendMatrices();
+  } gl4duPopMatrix();
+  glDisable(GL_CULL_FACE);
+  /* je dessine la bounding sphere avec _pId2 */
+  gl4dgDraw(_sphere);
+
+  glUseProgram(_pId);
+  glUniform4fv(glGetUniformLocation(_pId, "lumpos"), 1, lum);
+
+  glEnable(GL_CULL_FACE);
   /* je place l'avions */
   gl4duTranslatef(_x, _y, _z);
   /* je le tourne selon sa trajectoire */
   gl4duRotatef(_alpha * 180.0f / M_PI, 0, 1, 0);
+  gl4duSendMatrices();
   /* je dessine l'avion */
   assimpDrawScene();
+  gl4dfBlur(0, 0, 5, 1, 0, GL_FALSE);
+  gl4dfSobelSetMixMode(GL4DF_SOBEL_MIX_MULT);
+  gl4dfSobel(0, 0, GL_FALSE);
 }
 
 static void quit(void) {
