@@ -34,10 +34,10 @@ static int    _maxLevel = -1;
 static GLfloat _rand_threshold = 1.0f, _seed = 0.0f;
 static GLboolean _skeletonize = GL_FALSE, _change_seed = GL_FALSE, _mcmd_take_color = GL_FALSE;
 static GLfloat _mcmd_Ir[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-static GLfloat _mcmd_noise_H[4] = { 1.0f, 1.0f, 1.0f, 1.0f }, 
-  _mcmd_noise_S[4] = { 1.0f, 1.0f, 1.0f, 1.0f }, 
-  _mcmd_noise_T[4] = { 0.0f, 0.0f, 0.0f, 0.0f }, 
-  _mcmd_noise_phase_change[4] = { 0.0f, 0.0f, 0.0f, 0.0f }, 
+static GLfloat _mcmd_noise_H[4] = { 1.0f, 1.0f, 1.0f, 1.0f },
+  _mcmd_noise_S[4] = { 1.0f, 1.0f, 1.0f, 1.0f },
+  _mcmd_noise_T[4] = { 0.0f, 0.0f, 0.0f, 0.0f },
+  _mcmd_noise_phase_change[4] = { 0.0f, 0.0f, 0.0f, 0.0f },
   _mcmd_I[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 MKFWINIT3(fractalPainting, void, GLuint, GLuint, GLboolean);
@@ -49,16 +49,16 @@ void gl4dfMCMD(GLuint in, GLuint out, GLboolean flipV) {
 void gl4dfMCMDDimensions(GLuint width, GLuint height) {
   int d = (int)ceil(log(width) / log(2.0));
   if(width != (1 << d)) {
-    fprintf(stderr, 
-	    "%s:%d: les dimensions du MCMD sont des puissances de 2. Conversion a la puissance de 2 superieure.\n", 
-	    __FILE__, __LINE__);
+    fprintf(stderr,
+      "%s:%d: les dimensions du MCMD sont des puissances de 2. Conversion a la puissance de 2 superieure.\n",
+      __FILE__, __LINE__);
     width = (1 << d);
   }
   d = (int)ceil(log(height) / log(2.0));
   if(height != (1 << d)) {
-    fprintf(stderr, 
-	    "%s:%d: les dimensions du MCMD sont des puissances de 2. Conversion a la puissance de 2 superieure.\n", 
-	    __FILE__, __LINE__);
+    fprintf(stderr,
+      "%s:%d: les dimensions du MCMD sont des puissances de 2. Conversion a la puissance de 2 superieure.\n",
+      __FILE__, __LINE__);
     height = (1 << d);
   }
   _width = width;
@@ -78,12 +78,12 @@ static void fractalPaintingffunc(GLuint in, GLuint out, GLboolean flipV) {
   GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND), tex = glIsEnabled(GL_TEXTURE_2D);
   GLfloat H[4], Hf;
   GLuint fbo, md = ( _mcmd_H_map_tex_id || _mcmd_I_map_tex_id ||
-		     _mcmd_NS_map_tex_id || _mcmd_NT_map_tex_id ) ? 4 : 0;
+         _mcmd_NS_map_tex_id || _mcmd_NT_map_tex_id ) ? 4 : 0;
   if(_subdivision_method == 0) { /* Triangle-Edge */
     for(i = 0, Hf = 1.0f; i < 4; ++i)
       H[i] = _mcmd_noise_H[i];
   } else { /* Diamond-Square */
-    for(i = 0, Hf = 0.5f; i < 4; ++i) 
+    for(i = 0, Hf = 0.5f; i < 4; ++i)
       H[i] = 0.5f * _mcmd_noise_H[i];
   }
   glEnable(GL_TEXTURE_2D);
@@ -101,7 +101,7 @@ static void fractalPaintingffunc(GLuint in, GLuint out, GLboolean flipV) {
       gl4dfConvFrame2Tex(&_tempTexId[2]);
     } else
       gl4dfConvTex2Tex(in, _tempTexId[2], GL_FALSE);
-  } else { 
+  } else {
     if(in == 0) { /* Pas d'entrée, donc l'entrée est le dernier draw */
       gl4dfConvFrame2Tex(&_tempTexId[1]);
     } else
@@ -149,7 +149,7 @@ static void fractalPaintingffunc(GLuint in, GLuint out, GLboolean flipV) {
     }
     glActiveTexture(GL_TEXTURE4); glBindTexture(GL_TEXTURE_2D, 0);
     glActiveTexture(GL_TEXTURE3); glBindTexture(GL_TEXTURE_2D, 0);
-    glActiveTexture(GL_TEXTURE0); 
+    glActiveTexture(GL_TEXTURE0);
     /* fin mdbu */
     /* debut md */
     glUseProgram(_pId[md]);
@@ -266,7 +266,7 @@ void gl4dfMCMDSetMDBUVersion(GLuint version) {
 void gl4dfMCMDSetSubdivisionMethod(GLuint method) {
   _subdivision_method = method % 2;
    init();
-   fractalPaintingfptr = fractalPaintingffunc;  
+   fractalPaintingfptr = fractalPaintingffunc;
 }
 
 void gl4dMCMDSetUseRoughnessMap(GLuint map_tex_id) {
@@ -299,7 +299,7 @@ void gl4dMCMDSetUseNoiseTranslateMap(GLuint map_tex_id) {
   //  gl4dfMCMDSetMDBUVersion(1);
 }
 
-static const char * gl4dfMCMD_select4mcmdFS = 
+static const char * gl4dfMCMD_select4mcmdFS =
   "<imfs>gl4dfMCMD_select4mcmd.fs</imfs>\n\
      #version 330\n							\
      in vec2 vsoTexCoord;\n						\
@@ -309,12 +309,12 @@ static const char * gl4dfMCMD_select4mcmdFS =
      uniform float rand_threshold;\n					\
      const int ossize = 9;\n						\
      const vec2 G[ossize] = vec2[]( vec2(1.0,  1.0), vec2(0.0,  2.0), vec2(-1.0,  1.0), \n \
-     			       vec2(2.0,  0.0), vec2(0.0,  0.0), vec2(-2.0,  0.0), \n \
-     			       vec2(1.0, -1.0), vec2(0.0, -2.0), vec2(-1.0, -1.0) );\n \
+                 vec2(2.0,  0.0), vec2(0.0,  0.0), vec2(-2.0,  0.0), \n \
+                 vec2(1.0, -1.0), vec2(0.0, -2.0), vec2(-1.0, -1.0) );\n \
      vec2 step = vec2(1.0 / float(width - 1), 1.0 / float(height - 1));\n \
      vec2 offset[ossize] = vec2[](vec2(-step.x , -step.y), vec2( 0.0, -step.y), vec2( step.x , -step.y), \n \
-     			     vec2(-step.x, 0.0),       vec2( 0.0, 0.0),      vec2( step.x, 0.0), \n \
-     			     vec2(-step.x,   step.y), vec2( 0.0, step.y),  vec2( step.x ,  step.y));\n \
+               vec2(-step.x, 0.0),       vec2( 0.0, 0.0),      vec2( step.x, 0.0), \n \
+               vec2(-step.x,   step.y), vec2( 0.0, step.y),  vec2( step.x ,  step.y));\n \
      float luminance(vec3 rgb) {\n					\
        return dot(vec3(0.299, 0.587, 0.114), rgb);\n			\
      }\n								\
@@ -346,7 +346,7 @@ static const char * gl4dfMCMD_select4mcmdFS =
          fragColor = vec4(0.0, 0.0, 0.0, 1.0);\n			\
      }";
 
-static const char * gl4dfMCMD_mdFS = 
+static const char * gl4dfMCMD_mdFS =
   "<imfs>gl4dfMCMD_md.fs</imfs>\n\
      #version 330\n							\
      in vec2 vsoTexCoord;\n						\
@@ -403,7 +403,7 @@ static const char * gl4dfMCMD_mdFS =
          fragColor = texture(etage0, vsoTexCoord.st);\n			\
      }";
 
-static const char * gl4dfMCMD_mdLocalFS = 
+static const char * gl4dfMCMD_mdLocalFS =
   "<imfs>gl4dfMCMD_mdLocal.fs</imfs>\n\
      #version 330\n							\
      in vec2 vsoTexCoord;\n						\
@@ -464,7 +464,7 @@ static const char * gl4dfMCMD_mdLocalFS =
          fragColor = texture(etage0, vsoTexCoord.st);\n			\
      }";
 
-static const char * gl4dfMCMD_mdbuV0FS = 
+static const char * gl4dfMCMD_mdbuV0FS =
   "<imfs>gl4dfMCMD_mdbuV0.fs</imfs>\n\
      #version 330\n							\
      in vec2 vsoTexCoord;\n						\
@@ -503,7 +503,7 @@ static const char * gl4dfMCMD_mdbuV0FS =
          for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n \
            if(ret.x >= 0.0 && ret.x <= 1.0 && ret.y >= 0.0 && ret.y <= 1.0) {\n	\
              coul = texture(etage0, ret);\n				\
-     	     if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
+           if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
                fragColor = texture(etage3, vsoTexCoord.st);\n		\
                return;\n						\
              }\n							\
@@ -532,7 +532,7 @@ static const char * gl4dfMCMD_mdbuV0FS =
        }\n								\
      }";
 
-static const char * gl4dfMCMD_mdbuV1FS/* New */ = 
+static const char * gl4dfMCMD_mdbuV1FS/* New */ =
   "<imfs>gl4dfMCMD_mdbuV1.fs</imfs>\n\
      #version 330\n							\
      in vec2 vsoTexCoord;\n						\
@@ -572,7 +572,7 @@ static const char * gl4dfMCMD_mdbuV1FS/* New */ =
          for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n \
            if(ret.x >= 0.0 && ret.x <= 1.0 && ret.y >= 0.0 && ret.y <= 1.0) {\n	\
              coul = texture(etage0, ret);\n				\
-     	     if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
+           if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
                fragColor = texture(etage3, vsoTexCoord.st);\n		\
                return;\n						\
              }\n							\
@@ -615,7 +615,7 @@ static const char * gl4dfMCMD_mdbuV1FS/* New */ =
        }\n								\
      }";
 
-static const char * gl4dfMCMD_mdbuV1FSOld = 
+static const char * gl4dfMCMD_mdbuV1FSOld =
   "<imfs>gl4dfMCMD_mdbuV1.fs</imfs>\n\
      #version 330\n							\
      in vec2 vsoTexCoord;\n						\
@@ -654,7 +654,7 @@ static const char * gl4dfMCMD_mdbuV1FSOld =
          for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n \
            if(ret.x >= 0.0 && ret.x <= 1.0 && ret.y >= 0.0 && ret.y <= 1.0) {\n	\
              coul = texture(etage0, ret);\n				\
-     	     if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
+           if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
                fragColor = texture(etage3, vsoTexCoord.st);\n		\
                return;\n						\
              }\n							\
@@ -738,9 +738,9 @@ static void quit(void) {
     (cmap)[4 * (i) + 3] = ((v))       & 0xFF;	\
   } while(0)
 #define getChildPos(cmap, i) ( (((unsigned long)((cmap)[4 * (i) + 0])) << 24) | \
-			       (((unsigned long)((cmap)[4 * (i) + 1])) << 16) |	\
-			       (((unsigned long)((cmap)[4 * (i) + 2])) <<  8) |	\
-			       (((unsigned long)((cmap)[4 * (i) + 3])) <<  0) )
+             (((unsigned long)((cmap)[4 * (i) + 1])) << 16) |	\
+             (((unsigned long)((cmap)[4 * (i) + 2])) <<  8) |	\
+             (((unsigned long)((cmap)[4 * (i) + 3])) <<  0) )
 
 typedef struct ll_t ll_t;
 struct ll_t {
@@ -814,7 +814,7 @@ static inline void setParentDataY(GLubyte * parentData, GLushort value, GLushort
 
 static void triangleEdge(GLubyte * parentData, GLubyte * levelData, ll_t ** llmap, GLushort mapWidth, GLushort mapHeight, int x0, int y0, int w, int h, int current_level, int computing_level) {
   int x[10], y[10], i, w_2, w_21, h_2, h_21;
-  w_2 = w >> 1; w_21 = w_2 + (w & 1); 
+  w_2 = w >> 1; w_21 = w_2 + (w & 1);
   h_2 = h >> 1; h_21 = h_2 + (h & 1);
 
   if(current_level < computing_level) { /* "!=" car jamais ">" */
@@ -847,12 +847,12 @@ static void triangleEdge(GLubyte * parentData, GLubyte * levelData, ll_t ** llma
       setParentDataX(parentData, x[i + 1], mapWidth, x[i], y[i], 1);
       setParentDataY(parentData, y[i + 1], mapWidth, x[i], y[i], 1);
       if(InMap(x[i], y[i], mapWidth, mapHeight)) {
-	llInsert(&(llmap[y[i - 1] * mapWidth + x[i - 1]]), x[i], y[i]);
-	//\todo VOIR pourquoi il y a une assertion failed !
-	assert(x[i - 1] != x[i] || y[i - 1] != y[i]);
-	llInsert(&(llmap[y[i + 1] * mapWidth + x[i + 1]]), x[i], y[i]);
-	//\todo VOIR pourquoi il y a une assertion failed !
-	assert(x[i + 1] != x[i] || y[i + 1] != y[i]);
+  llInsert(&(llmap[y[i - 1] * mapWidth + x[i - 1]]), x[i], y[i]);
+  //\todo VOIR pourquoi il y a une assertion failed !
+  assert(x[i - 1] != x[i] || y[i - 1] != y[i]);
+  llInsert(&(llmap[y[i + 1] * mapWidth + x[i + 1]]), x[i], y[i]);
+  //\todo VOIR pourquoi il y a une assertion failed !
+  assert(x[i + 1] != x[i] || y[i + 1] != y[i]);
       }
     }
   }
@@ -864,8 +864,8 @@ static void triangleEdge(GLubyte * parentData, GLubyte * levelData, ll_t ** llma
     }
     if(InMap(x[9], y[9], mapWidth, mapHeight)) {
       for(i = 0; i < 4; ++i) {
-	llInsert(&(llmap[y[i << 1] * mapWidth + x[i << 1]]), x[9], y[9]);
-	assert(x[i << 1] != x[9] || y[i << 1] != y[9]);
+  llInsert(&(llmap[y[i << 1] * mapWidth + x[i << 1]]), x[9], y[9]);
+  assert(x[i << 1] != x[9] || y[i << 1] != y[9]);
       }
     }
   }
@@ -873,7 +873,7 @@ static void triangleEdge(GLubyte * parentData, GLubyte * levelData, ll_t ** llma
 
 static void diamondSquare(GLubyte * parentData, GLubyte * levelData, ll_t ** llmap, GLushort mapWidth, GLushort mapHeight, int x0, int y0, int w, int h, int current_level, int computing_level) {
   int x[14], y[14], i, w_2, w_21, h_2, h_21;
-  w_2 = w >> 1; w_21 = w_2 + (w & 1); 
+  w_2 = w >> 1; w_21 = w_2 + (w & 1);
   h_2 = h >> 1; h_21 = h_2 + (h & 1);
 
   if(current_level < computing_level) { /* "!=" car jamais ">" */
@@ -905,30 +905,30 @@ static void diamondSquare(GLubyte * parentData, GLubyte * levelData, ll_t ** llm
       return;
     for(i = d; i < 8; i += p) {
       if(getParentDataX(parentData, mapWidth, x[i], y[i], 0) == UNDEFINED_PARENT) {
-	levelData[y[i] * mapWidth + x[i]] = current_level;
-	setParentDataX(parentData, x[i - 1], mapWidth, x[i], y[i], 0);
-	setParentDataY(parentData, y[i - 1], mapWidth, x[i], y[i], 0);
-	setParentDataX(parentData, x[i + 1], mapWidth, x[i], y[i], 1);
-	setParentDataY(parentData, y[i + 1], mapWidth, x[i], y[i], 1);
-	setParentDataX(parentData,     x[9], mapWidth, x[i], y[i], 2);
-	setParentDataY(parentData,     y[9], mapWidth, x[i], y[i], 2);
-	if(InMap(x[i], y[i], mapWidth, mapHeight)) {
-	  llInsert(&(llmap[y[i - 1] * mapWidth + x[i - 1]]), x[i], y[i]);
-	  assert(x[i - 1] != x[i] || y[i - 1] != y[i]);
-	  llInsert(&(llmap[y[i + 1] * mapWidth + x[i + 1]]), x[i], y[i]);
-	  assert(x[i + 1] != x[i] || y[i + 1] != y[i]);
-	  llInsert(&(llmap[y[9] * mapWidth + x[9]]),         x[i], y[i]);
-	  assert(x[9] != x[i] || y[9] != y[i]);
-	}
-	if(x[i + 9 - ((i - 1) >> 1)] >= 0 && x[i + 9 - ((i - 1) >> 1)] < mapWidth && 
-	   y[i + 9 - ((i - 1) >> 1)] >= 0 && y[i + 9 - ((i - 1) >> 1)] < mapHeight) {
-	  setParentDataX(parentData, x[i + 9 - ((i - 1) >> 1)], mapWidth, x[i], y[i], 3);
-	  setParentDataY(parentData, y[i + 9 - ((i - 1) >> 1)], mapWidth, x[i], y[i], 3);
-	  if(InMap(x[i], y[i], mapWidth, mapHeight)) {
-	    llInsert(&(llmap[y[i + 9 - ((i - 1) >> 1)] * mapWidth + x[i + 9 - ((i - 1) >> 1)]]), x[i], y[i]);
-	    assert(x[i + 9 - ((i - 1) >> 1)] != x[i] || y[i + 9 - ((i - 1) >> 1)] != y[i]);
-	  }
-	}
+  levelData[y[i] * mapWidth + x[i]] = current_level;
+  setParentDataX(parentData, x[i - 1], mapWidth, x[i], y[i], 0);
+  setParentDataY(parentData, y[i - 1], mapWidth, x[i], y[i], 0);
+  setParentDataX(parentData, x[i + 1], mapWidth, x[i], y[i], 1);
+  setParentDataY(parentData, y[i + 1], mapWidth, x[i], y[i], 1);
+  setParentDataX(parentData,     x[9], mapWidth, x[i], y[i], 2);
+  setParentDataY(parentData,     y[9], mapWidth, x[i], y[i], 2);
+  if(InMap(x[i], y[i], mapWidth, mapHeight)) {
+    llInsert(&(llmap[y[i - 1] * mapWidth + x[i - 1]]), x[i], y[i]);
+    assert(x[i - 1] != x[i] || y[i - 1] != y[i]);
+    llInsert(&(llmap[y[i + 1] * mapWidth + x[i + 1]]), x[i], y[i]);
+    assert(x[i + 1] != x[i] || y[i + 1] != y[i]);
+    llInsert(&(llmap[y[9] * mapWidth + x[9]]),         x[i], y[i]);
+    assert(x[9] != x[i] || y[9] != y[i]);
+  }
+  if(x[i + 9 - ((i - 1) >> 1)] >= 0 && x[i + 9 - ((i - 1) >> 1)] < mapWidth &&
+     y[i + 9 - ((i - 1) >> 1)] >= 0 && y[i + 9 - ((i - 1) >> 1)] < mapHeight) {
+    setParentDataX(parentData, x[i + 9 - ((i - 1) >> 1)], mapWidth, x[i], y[i], 3);
+    setParentDataY(parentData, y[i + 9 - ((i - 1) >> 1)], mapWidth, x[i], y[i], 3);
+    if(InMap(x[i], y[i], mapWidth, mapHeight)) {
+      llInsert(&(llmap[y[i + 9 - ((i - 1) >> 1)] * mapWidth + x[i + 9 - ((i - 1) >> 1)]]), x[i], y[i]);
+      assert(x[i + 9 - ((i - 1) >> 1)] != x[i] || y[i + 9 - ((i - 1) >> 1)] != y[i]);
+    }
+  }
       }
     }
   } else if(w_2 || h_2) { /* Square */
@@ -937,12 +937,12 @@ static void diamondSquare(GLubyte * parentData, GLubyte * levelData, ll_t ** llm
     if(getParentDataX(parentData, mapWidth, x[9], y[9], 0) == UNDEFINED_PARENT) {
       levelData[y[9] * mapWidth + x[9]] = current_level;
       for(i = 0; i < 4; i++) {
-	setParentDataX(parentData, x[i << 1], mapWidth, x[9], y[9], i);
-	setParentDataY(parentData, y[i << 1], mapWidth, x[9], y[9], i);
-	if(InMap(x[i << 1], y[i << 1], mapWidth, mapHeight)) {
-	  llInsert(&(llmap[y[i << 1] * mapWidth + x[i << 1]]), x[9], y[9]);
-	  assert(x[i << 1] != x[9] || y[i << 1] != y[9]);
-	}
+  setParentDataX(parentData, x[i << 1], mapWidth, x[9], y[9], i);
+  setParentDataY(parentData, y[i << 1], mapWidth, x[9], y[9], i);
+  if(InMap(x[i << 1], y[i << 1], mapWidth, mapHeight)) {
+    llInsert(&(llmap[y[i << 1] * mapWidth + x[i << 1]]), x[9], y[9]);
+    assert(x[i << 1] != x[9] || y[i << 1] != y[9]);
+  }
       }
     }
   }
@@ -960,12 +960,12 @@ static void subdivision2Tex(GLubyte ** parentData, GLubyte ** levelData, GLushor
   *levelData = malloc(w * h * sizeof ** levelData); assert(*levelData);
   *childData = malloc((*childDataSize = 2) * sizeof ** childData);  assert(*childData);
   *childPos  = malloc(4 * w * h * sizeof ** childPos); assert(*childPos);
-  
+
   memset(*parentData, 0xFF, 4 * w * 4 * h * sizeof ** parentData);
   memset(*levelData, 0xFF, w * h * sizeof ** levelData);
   for(i = 0, n = nbLevels(w, h); i < n; i++)
     _subdivision_func[_subdivision_method](*parentData, *levelData, llmap, w, h, 0, 0,  w - 1,  h - 1, 0, i);
-  
+
   for(i = 0, l = 0; i < w * h; i++) {
     ll_t * ptr;
     putChildPos(*childPos, i, l);
@@ -973,13 +973,13 @@ static void subdivision2Tex(GLubyte ** parentData, GLubyte ** levelData, GLushor
       (*childData)[l++] = ptr ? ptr->x : UNDEFINED_CHILD;
       (*childData)[l++] = ptr ? ptr->y : UNDEFINED_CHILD;
       if(l == *childDataSize) {
-	(*childData) = realloc(*childData, (*childDataSize <<= 1) * sizeof ** childData);
-	assert(*childData);
+  (*childData) = realloc(*childData, (*childDataSize <<= 1) * sizeof ** childData);
+  assert(*childData);
       }
       if(!ptr)
-	break;
+  break;
       else if(maxsl < ++sl)
-	maxsl = sl;
+  maxsl = sl;
     }
   }
   /* fprintf(stderr, "max children = %d\n", maxsl); */
@@ -990,9 +990,9 @@ static int mdTexData(unsigned int w, unsigned int h) {
   int i, l = 0;
   GLushort * childData;
   GLubyte * childPos, * parentData = NULL, * levelData = NULL;
-  
+
   subdivision2Tex(&parentData, &levelData, &childData, &_buTreeSize, &childPos, w, h);
-  
+
   glBindTexture(GL_TEXTURE_2D, _mdTexId[3]);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -1000,11 +1000,18 @@ static int mdTexData(unsigned int w, unsigned int h) {
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   _buTreeWidth  = (int)sqrt(_buTreeSize);
   _buTreeHeight = (int)ceil(_buTreeSize / (double)_buTreeWidth);
-  childData = realloc(childData, _buTreeWidth * _buTreeHeight * sizeof *childData);
-  assert(childData);
+  {
+    GLushort * temp_childData = childData;
+    childData = realloc(childData, _buTreeWidth * _buTreeHeight * sizeof *childData);
+    if(childData == NULL) {
+      free(temp_childData);
+      fprintf("At %s:%d: failed to realloc memory, aborting...\n", __FILE__, __LINE__ - 2);
+      exit(1);
+    }
+  }
   glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, _buTreeWidth, _buTreeHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, childData);
   free(childData);
-  
+
   glBindTexture(GL_TEXTURE_2D, _mdTexId[2]);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -1012,7 +1019,7 @@ static int mdTexData(unsigned int w, unsigned int h) {
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, childPos);
   free(childPos);
-  
+
   glBindTexture(GL_TEXTURE_2D, _mdTexId[1]);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);

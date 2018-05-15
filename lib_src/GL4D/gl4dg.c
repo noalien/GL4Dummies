@@ -170,7 +170,7 @@ void gl4dgClean(void) {
     int i;
     for(i = 0; i < _garray_size; i++)
       if(_garray[i].vao || _garray[i].geom)
-	freeGeom(&_garray[i]);
+  freeGeom(&_garray[i]);
     free(_garray);
     _garray = NULL;
   }
@@ -205,9 +205,9 @@ GLuint gl4dgGenSpheref(GLuint slices, GLuint stacks) {
   glGenBuffers(2, s->buffers);
   glBindBuffer(GL_ARRAY_BUFFER, s->buffers[0]);
   glBufferData(GL_ARRAY_BUFFER, 5 * (slices + 1) * (stacks + 1) * sizeof *idata, idata, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (5 * sizeof *idata), (const void *)0);  
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (5 * sizeof *idata), (const void *)0);  
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (5 * sizeof *idata), (const void *)(3 * sizeof *idata));  
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (5 * sizeof *idata), (const void *)0);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (5 * sizeof *idata), (const void *)0);
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (5 * sizeof *idata), (const void *)(3 * sizeof *idata));
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, s->buffers[1]);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, s->index_row_count * s->index_nb_rows * sizeof *index, index, GL_STATIC_DRAW);
   free(idata);
@@ -243,9 +243,9 @@ GLuint gl4dgGenConef(GLuint slices, GLboolean base) {
   glGenBuffers(1, &(c->buffer));
   glBindBuffer(GL_ARRAY_BUFFER, c->buffer);
   glBufferData(GL_ARRAY_BUFFER, (16 * (slices + 1) + (base ? 8 : 0) * (slices + 2)) * sizeof *data, data, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)0);  
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(3 * sizeof *data));  
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(6 * sizeof *data));  
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)0);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(3 * sizeof *data));
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(6 * sizeof *data));
   free(data);
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -269,9 +269,9 @@ GLuint gl4dgGenFanConef(GLuint slices, GLboolean base) {
   glGenBuffers(1, &(c->buffer));
   glBindBuffer(GL_ARRAY_BUFFER, c->buffer);
   glBufferData(GL_ARRAY_BUFFER, (base ? 16 : 8) * (slices + 1 + /* le sommet ou le centre de la base */ 1) * sizeof *data, data, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)0);  
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(3 * sizeof *data));  
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(6 * sizeof *data));  
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)0);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(3 * sizeof *data));
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(6 * sizeof *data));
   free(data);
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -295,9 +295,9 @@ GLuint gl4dgGenCylinderf(GLuint slices, GLboolean base) {
   glGenBuffers(1, &(c->buffer));
   glBindBuffer(GL_ARRAY_BUFFER, c->buffer);
   glBufferData(GL_ARRAY_BUFFER, (16 * (slices + 1) + (base ? 16 : 0) * (slices + 2)) * sizeof *data, data, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)0);  
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(3 * sizeof *data));  
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(6 * sizeof *data));  
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)0);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(3 * sizeof *data));
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(6 * sizeof *data));
   free(data);
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -321,9 +321,9 @@ GLuint gl4dgGenDiskf(GLuint slices) {
   glGenBuffers(1, &(c->buffer));
   glBindBuffer(GL_ARRAY_BUFFER, c->buffer);
   glBufferData(GL_ARRAY_BUFFER, 8 * (slices + 1 + /* le centre du disk */ 1) * sizeof *data, data, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)0);  
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(3 * sizeof *data));  
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(6 * sizeof *data));  
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)0);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(3 * sizeof *data));
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(6 * sizeof *data));
   free(data);
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -350,9 +350,9 @@ GLuint gl4dgGenTorusf(GLuint slices, GLuint stacks, GLfloat radius) {
   glGenBuffers(2, s->buffers);
   glBindBuffer(GL_ARRAY_BUFFER, s->buffers[0]);
   glBufferData(GL_ARRAY_BUFFER, 8 * (slices + 1) * (stacks + 1) * sizeof *idata, idata, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *idata), (const void *)0);  
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *idata), (const void *)(3 * sizeof *idata));  
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *idata), (const void *)(6 * sizeof *idata));  
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *idata), (const void *)0);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *idata), (const void *)(3 * sizeof *idata));
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *idata), (const void *)(6 * sizeof *idata));
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, s->buffers[1]);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, s->index_row_count * s->index_nb_rows * sizeof *index, index, GL_STATIC_DRAW);
   free(idata);
@@ -386,9 +386,9 @@ GLuint gl4dgGenGrid2dFromHeightMapf(GLuint width, GLuint height, GLfloat * heigh
   glGenBuffers(2, s->buffers);
   glBindBuffer(GL_ARRAY_BUFFER, s->buffers[0]);
   glBufferData(GL_ARRAY_BUFFER, 8 * width * height * sizeof *idata, idata, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *idata), (const void *)0);  
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *idata), (const void *)(3 * sizeof *idata));  
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *idata), (const void *)(6 * sizeof *idata));  
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *idata), (const void *)0);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *idata), (const void *)(3 * sizeof *idata));
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *idata), (const void *)(6 * sizeof *idata));
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, s->buffers[1]);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, s->index_row_count * s->index_nb_rows * sizeof *index, index, GL_STATIC_DRAW);
   free(idata);
@@ -440,9 +440,9 @@ void gl4dgDraw(GLuint id) {
       glDrawArrays(GL_TRIANGLE_FAN, 0, ((gcone_t *)(_garray[id].geom))->slices + 2);
     if(((gcone_t *)(_garray[id].geom))->base) {
       if(_garray[id].type == GE_CONE)
-	glDrawArrays(GL_TRIANGLE_FAN, 2 * (((gcone_t *)(_garray[id].geom))->slices + 1), ((gcone_t *)(_garray[id].geom))->slices + 2);
+  glDrawArrays(GL_TRIANGLE_FAN, 2 * (((gcone_t *)(_garray[id].geom))->slices + 1), ((gcone_t *)(_garray[id].geom))->slices + 2);
       else
-	glDrawArrays(GL_TRIANGLE_FAN, ((gcone_t *)(_garray[id].geom))->slices + 2, ((gcone_t *)(_garray[id].geom))->slices + 2);
+  glDrawArrays(GL_TRIANGLE_FAN, ((gcone_t *)(_garray[id].geom))->slices + 2, ((gcone_t *)(_garray[id].geom))->slices + 2);
     }
     glBindVertexArray(0);
     break;
@@ -451,8 +451,8 @@ void gl4dgDraw(GLuint id) {
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 2 * (((gcylinder_t *)(_garray[id].geom))->slices + 1));
     if(((gcylinder_t *)(_garray[id].geom))->base) {
       glDrawArrays(GL_TRIANGLE_FAN, 2 * (((gcylinder_t *)(_garray[id].geom))->slices + 1), ((gcylinder_t *)(_garray[id].geom))->slices + 2);
-      glDrawArrays(GL_TRIANGLE_FAN, 2 * (((gcylinder_t *)(_garray[id].geom))->slices + 1) + ((gcylinder_t *)(_garray[id].geom))->slices + 2, 
-		   ((gcylinder_t *)(_garray[id].geom))->slices + 2);
+      glDrawArrays(GL_TRIANGLE_FAN, 2 * (((gcylinder_t *)(_garray[id].geom))->slices + 1) + ((gcylinder_t *)(_garray[id].geom))->slices + 2,
+       ((gcylinder_t *)(_garray[id].geom))->slices + 2);
     }
     glBindVertexArray(0);
     break;
@@ -519,7 +519,15 @@ static GLuint genId(void) {
   int i;
   if(llEmpty(_glist)) {
     int s = _garray_size;
-    _garray = realloc(_garray, (_garray_size *= 2) * sizeof *_garray);
+    {
+      geom_t * temp_garray = _garray;
+      _garray = realloc(_garray, (_garray_size *= 2) * sizeof *_garray);
+      if(_garray == NULL) {
+        fprintf(stderr, "At %s:%d: Failed to realloc memory, aborting...", __FILE__, __LINE__ - 2);
+        free(temp_garray);
+        exit(1);
+      }
+    }
     assert(_garray);
     for(i = _garray_size - 1 ; i >= s; i--) {
       _garray[i].id   = i;
@@ -535,39 +543,39 @@ static GLuint genId(void) {
 static GLuint mkStaticf(geom_e type) {
   static GLfloat quad_data[] = {
     -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-     1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 
+     1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
     -1.0f,  1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
      1.0f,  1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f
   };
   static GLfloat cube_data[] = {
     /* front */
     -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-     1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 
+     1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
     -1.0f,  1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
      1.0f,  1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
     /* back */
      1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-    -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 
+    -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,
      1.0f,  1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f,
     -1.0f,  1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
     /* right */
     1.0f, -1.0f,  1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-    1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 
+    1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
     1.0f,  1.0f,  1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
     1.0f,  1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
     /* left */
     -1.0f, -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-    -1.0f, -1.0f,  1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 
+    -1.0f, -1.0f,  1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
     -1.0f,  1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
     -1.0f,  1.0f,  1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
     /* top */
     -1.0f, 1.0f,  1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-     1.0f, 1.0f,  1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 
+     1.0f, 1.0f,  1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
     -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
      1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
     /* bottom */
     -1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-     1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 
+     1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,
     -1.0f, -1.0f,  1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f,
      1.0f, -1.0f,  1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f
   };
@@ -594,9 +602,9 @@ static GLuint mkStaticf(geom_e type) {
     assert(0);
     break;
   }
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *quad_data), (const void *)0);  
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *quad_data), (const void *)(3 * sizeof *quad_data));  
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *quad_data), (const void *)(6 * sizeof *quad_data));  
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *quad_data), (const void *)0);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *quad_data), (const void *)(3 * sizeof *quad_data));
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *quad_data), (const void *)(6 * sizeof *quad_data));
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   return ++i;
@@ -616,10 +624,10 @@ static GLfloat * mkSphereVerticesf(GLuint slices, GLuint stacks) {
     r = cos(theta);
     for(j = 0; j <= (int)slices; j++) {
       phi = j * c2MPI_Long;
-      data[k++] = -r * cos(phi); 
-      data[k++] = y; 
+      data[k++] = -r * cos(phi);
+      data[k++] = y;
       data[k++] = r * sin(phi);
-      data[k++] = phi / (2.0 * M_PI); 
+      data[k++] = phi / (2.0 * M_PI);
       data[k++] = (theta + M_PI_2) / M_PI;
     }
   }
@@ -699,13 +707,13 @@ static GL4Dvaoindex * mkRegularGridStripIndices(GLuint width, GLuint height) {
 
 static inline void fcvNormals(GLfloat * p, GLfloat y, int i) {
   p[i] = 2.0f * p[i - 3] / sqrt(5.0);
-  p[i + 1] = 1.0f / sqrt(5.0); 
+  p[i + 1] = 1.0f / sqrt(5.0);
   p[i + 2] = 2.0f * p[i - 1] / sqrt(5.0);
 }
 
 static inline void fcvbNormals(GLfloat * p, GLfloat y, int i) {
   p[i] = 0;
-  p[i + 1] = y; 
+  p[i + 1] = y;
   p[i + 2] = 0;
 }
 
@@ -729,17 +737,17 @@ static inline void fcvbNormals(GLfloat * p, GLfloat y, int i) {
       (d)[(i)++] = sin(sens * phi);					\
       (normals)((d), (ye), (i)); (i) += 3;				\
       if(phi < _1pi_4 || phi > _7pi_4) {				\
-	(d)[(i)++] = 1.0;						\
-	(d)[(i)++] = 0.5 + tan(phi) / 2.0;				\
+  (d)[(i)++] = 1.0;						\
+  (d)[(i)++] = 0.5 + tan(phi) / 2.0;				\
       } else if(phi < _3pi_4) {						\
-	(d)[(i)++] = 0.5 - tan(phi - GL4DM_PI_2) / 2.0;			\
-	(d)[(i)++] = 1.0;						\
+  (d)[(i)++] = 0.5 - tan(phi - GL4DM_PI_2) / 2.0;			\
+  (d)[(i)++] = 1.0;						\
       } else if(phi < _5pi_4) {						\
-	(d)[(i)++] = 0.0;						\
-	(d)[(i)++] = 0.5 - tan(phi) / 2.0;				\
+  (d)[(i)++] = 0.0;						\
+  (d)[(i)++] = 0.5 - tan(phi) / 2.0;				\
       } else {								\
-	(d)[(i)++] = 0.5 + tan(phi - GL4DM_PI_2) / 2.0;			\
-	(d)[(i)++] = 0.0;						\
+  (d)[(i)++] = 0.5 + tan(phi - GL4DM_PI_2) / 2.0;			\
+  (d)[(i)++] = 0.0;						\
       }									\
     }									\
   } while(0)
@@ -757,8 +765,8 @@ static GLfloat * mkConeVerticesf(GLuint slices, GLboolean base) {
     data[k++] = 0; data[k++] = 1; data[k++] = 0;
     data[k++] = (s = j / (GLdouble)slices); data[k++] = 1;
     phi = j * c2MPI_Long;
-    data[k++] = -cos(phi); 
-    data[k++] = -1; 
+    data[k++] = -cos(phi);
+    data[k++] = -1;
     data[k++] = sin(phi);
     fcvNormals(data, 0, k); k += 3;
     data[k++] = s; data[k++] = 0;
@@ -788,14 +796,14 @@ static GLfloat * mkCylinderVerticesf(GLuint slices, GLboolean base) {
   assert(data);
   for(j = 0; j <= (int)slices; j++) {
     phi = j * c2MPI_Long;
-    data[k++] = -cos(phi); 
-    data[k++] = 1; 
+    data[k++] = -cos(phi);
+    data[k++] = 1;
     data[k++] = sin(phi);
     fcvNormals(data, 0, k); k += 3;
     data[k++] = (s = j / (GLdouble)slices); data[k++] = 1;
-    data[k] = data[k - 8]; k++; 
-    data[k++] = -1; 
-    data[k] = data[k - 8]; k++; 
+    data[k] = data[k - 8]; k++;
+    data[k++] = -1;
+    data[k] = data[k - 8]; k++;
     fcvNormals(data, 0, k); k += 3;
     data[k++] = s; data[k++] = 0;
   }
@@ -831,14 +839,14 @@ static GLfloat * mkTorusVerticesf(GLuint slices, GLuint stacks, GLfloat radius) 
       phi = j * c2MPI_Long;
       x = -cos(phi);
       z = sin(phi);
-      data[k++] = (1 - radius + r) * x; 
-      data[k++] = y; 
+      data[k++] = (1 - radius + r) * x;
+      data[k++] = y;
       data[k++] = (1 - radius + r) * z;
-      data[k + 0] = data[k - 3] - (1 - radius) * x; 
-      data[k + 1] = 0; 
-      data[k + 2] = data[k - 1] - (1 - radius) * z; 
+      data[k + 0] = data[k - 3] - (1 - radius) * x;
+      data[k + 1] = 0;
+      data[k + 2] = data[k - 1] - (1 - radius) * z;
       MVEC3NORMALIZE(&data[k]); k += 3;
-      data[k++] = phi   / (2.0 * M_PI); 
+      data[k++] = phi   / (2.0 * M_PI);
       data[k++] = theta / (2.0 * M_PI);
     }
   }
@@ -856,10 +864,10 @@ static GLfloat * mkGrid2dVerticesf(GLuint width, GLuint height, GLfloat * height
       z = 1.0 - 2.0 * (tz = i / (height - 1.0));
       iw = i * width;
       for(j = 0; j < (int)width; j++) {
-	x = -1.0 + 2.0 * (tx = j / (width - 1.0));
-	data[k++] = x; data[k++] = 2.0 * heightmap[iw + j] - 1.0; data[k++] = z;
-	k += 3;
-	data[k++] = tx; data[k++] = tz;
+  x = -1.0 + 2.0 * (tx = j / (width - 1.0));
+  data[k++] = x; data[k++] = 2.0 * heightmap[iw + j] - 1.0; data[k++] = z;
+  k += 3;
+  data[k++] = tx; data[k++] = tz;
       }
     }
     mkGrid2dNormalsf(width, height, data);
@@ -867,10 +875,10 @@ static GLfloat * mkGrid2dVerticesf(GLuint width, GLuint height, GLfloat * height
     for(i = 0, k = 0; i < (int)height; i++) {
       z = -1.0 + 2.0 * (tz = i / (height - 1.0));
       for(j = 0; j < (int)width; j++) {
-	x = -1.0 + 2.0 * (tx = j / (width - 1.0));
-	data[k++] = x;  data[k++] = 0; data[k++] = z;
-	data[k++] = 0;  data[k++] = 1; data[k++] = 0; 
-	data[k++] = tx; data[k++] = tz;
+  x = -1.0 + 2.0 * (tx = j / (width - 1.0));
+  data[k++] = x;  data[k++] = 0; data[k++] = z;
+  data[k++] = 0;  data[k++] = 1; data[k++] = 0;
+  data[k++] = tx; data[k++] = tz;
       }
     }
   }
@@ -895,7 +903,7 @@ static void mkGrid2dNormalsf(GLuint width, GLuint height, GLfloat * data) {
       for(i = 0; i < 6; i++) {
         data[8 * (x + zw) + 3] += n[3 * i + 0];
         data[8 * (x + zw) + 4] += n[3 * i + 1];
-        data[8 * (x + zw) + 5] += n[3 * i + 2]; 
+        data[8 * (x + zw) + 5] += n[3 * i + 2];
       }
       data[8 * (x + zw) + 3] /= 6.0;
       data[8 * (x + zw) + 4] /= 6.0;
