@@ -15,17 +15,17 @@ CP = rsync -R
 # déclaration des options du compilateur
 CFLAGS = -Wall -O3
 CPPFLAGS = -I.
-LDFLAGS = -lm -lSDL2_image -lSDL2_mixer -lfftw3
+LDFLAGS = -lm
 
 # définition des fichiers et dossiers
-PROGNAME = musique_et_geometrie
+PROGNAME = demoHelper
 VERSION = 1.0
 distdir = $(PROGNAME)-$(VERSION)
-HEADERS = 
-SOURCES = window.c
+HEADERS = audioHelper.h animations.h
+SOURCES = audioHelper.c animations.c window.c
 OBJ = $(SOURCES:.c=.o)
 DOXYFILE = documentation/Doxyfile
-EXTRAFILES = COPYING $(wildcard shaders/*.?s images/*)
+EXTRAFILES = COPYING  $(wildcard shaders/*.?s images/*)
 DISTFILES = $(SOURCES) Makefile $(HEADERS) $(DOXYFILE) $(EXTRAFILES)
 
 # Traitement automatique (ne pas modifier)
@@ -43,14 +43,14 @@ ifneq (,$(shell ls -d $(HOME)/local/lib 2>/dev/null | tail -n 1))
 endif
 ifeq ($(shell uname),Darwin)
 	MACOSX_DEPLOYMENT_TARGET = 10.8
-        CFLAGS += -I/opt/local/include -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
+        CFLAGS += -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
         LDFLAGS += -framework OpenGL -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 else
         LDFLAGS += -lGL
 endif
 
 CPPFLAGS += $(shell sdl2-config --cflags)
-LDFLAGS  += -lGL4Dummies $(shell sdl2-config --libs)
+LDFLAGS  += -lGL4Dummies $(shell sdl2-config --libs) -lSDL2_mixer -lSDL2_image
 
 all: $(PROGNAME)
 

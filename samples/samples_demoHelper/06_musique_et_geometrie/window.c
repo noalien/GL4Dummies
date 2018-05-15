@@ -192,7 +192,7 @@ static void draw(void) {
  * données audio de longueur \a len */
 static void mixCallback(void *udata, Uint8 *stream, int len) {
   if(_plan4fftw) {
-    int i, j, l = MIN(len >> 1, ECHANTILLONS);
+    int i, l = MIN(len >> 1, ECHANTILLONS);
     Sint16 *d = (Sint16 *)stream;
     for(i = 0; i < l; i++)
       _in4fftw[i][0] = d[i] / ((1 << 15) - 1.0);
@@ -226,7 +226,7 @@ static void initAudio(const char * filename) {
   assert(_plan4fftw);
   res = Mix_Init(mixFlags);
   if( (res & mixFlags) != mixFlags ) {
-    fprintf(stderr, "Mix_Init: Erreur lors de l'initialisation de la bibliothèque SDL_Mixer\n");
+    fprintf(stderr, "Mix_Init: Erreur lors de l'initialisation de la bibliotheque SDL_Mixer\n");
     fprintf(stderr, "Mix_Init: %s\n", Mix_GetError());
     //exit(3); commenté car ne réagit correctement sur toutes les architectures
   }
