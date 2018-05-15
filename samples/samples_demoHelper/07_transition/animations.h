@@ -21,6 +21,7 @@ extern "C" {
 
   extern void transition_vide(void (* a0)(int), void (* a1)(int), Uint32 t, Uint32 et, int state);
   extern void fondu(void (* a0)(int), void (* a1)(int), Uint32 t, Uint32 et, int state);
+  extern void fondui(void (* a0)(int), void (* a1)(int), Uint32 t, Uint32 et, int state);
   extern void bidon00(int state);
   extern void bidon01(int state);
   extern void bidon02(int state);
