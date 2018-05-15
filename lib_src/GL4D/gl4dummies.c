@@ -283,8 +283,8 @@ int mv(const char * src, const char * dst) {
   if(in == NULL) {
     return 0;
   }
-  FILE * out = fopen(dst, "wb");
-  if(out == NULL) {
+  FILE *out = fopen(dst, "wb");
+  if (out == NULL) {
     fclose(in);
     return 0;
   }

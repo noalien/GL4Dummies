@@ -1005,7 +1005,7 @@ static int mdTexData(unsigned int w, unsigned int h) {
     childData = realloc(childData, _buTreeWidth * _buTreeHeight * sizeof *childData);
     if(childData == NULL) {
       free(temp_childData);
-      fprintf("At %s:%d: failed to realloc memory, aborting...\n", __FILE__, __LINE__ - 2);
+      fprintf(stderr, "At %s:%d: failed to realloc memory, aborting...\n", __FILE__, __LINE__ - 2);
       exit(1);
     }
   }
