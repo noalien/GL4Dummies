@@ -27,11 +27,11 @@ static void keydown(int keycode);
  * ce tableau se termine toujours par l'élémént {0, NULL, NULL,
  * NULL} */
 static GL4DHanime _animations[] = {
-  { 8000, bidon00, NULL, NULL },
-  { 4000, bidon00, bidon01, fondu },
-  { 2000, bidon01, NULL, NULL },
-  { 4000, bidon01, bidon02, fondu },
-  { 2000, bidon02, NULL, NULL },
+  //  { 8000, bidon00, NULL, NULL },
+  //  { 4000, bidon00, bidon01, fondu },
+  { 5000, bidon01, NULL, NULL },
+  { 5000, bidon01, bidon02, fondui },
+  { 5000, bidon02, NULL, NULL },
   {    0, NULL, NULL, NULL } /* Toujours laisser à la fin */
 };
 
