@@ -25,7 +25,7 @@ HEADERS = assimp.h
 SOURCES = assimp.c window.c
 OBJ = $(SOURCES:.c=.o)
 DOXYFILE = documentation/Doxyfile
-EXTRAFILES = COPYING $(wildcard shaders/*.?s) $(wildcard models/piper_pa18/*)
+EXTRAFILES = COPYING $(wildcard shaders/*.?s) $(wildcard images/*) $(wildcard models/piper_pa18/*)
 DISTFILES = $(SOURCES) Makefile $(HEADERS) $(DOXYFILE) $(EXTRAFILES)
 
 # Traitement automatique (ne pas modifier)
