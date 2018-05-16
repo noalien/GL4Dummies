@@ -1,8 +1,8 @@
 /*!\file earth.c
  *
- * \brief Terre en GL / GL4Dummies + Texture + Lumière positionnelle +
- * Phong + Spéculaire
- * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
+ * \brief Terre en GL / GL4Dummies + Texture + LumiÃ¨re positionnelle +
+ * Phong + SpÃ©culaire
+ * \author FarÃ¨s BELHADJ, amsi@ai.univ-paris8.fr
  * \date April 15 2016 */
 #include <math.h>
 #include <stdio.h>
@@ -14,9 +14,9 @@
 
 /*!\brief identifiant du programme GLSL */
 static GLuint _pId = 0;
-/*!\brief position de la lumière relativement à la sphère éclairée */
+/*!\brief position de la lumiÃ¨re relativement Ã  la sphÃ¨re Ã©clairÃ©e */
 static GLfloat _lumPos0[4] = {1500.0, 20.0, 30.0, 1.0};
-/*!\brief tableau des identifiants de texture à charger */
+/*!\brief tableau des identifiants de texture Ã  charger */
 static GLuint _tId[3] = {0};
 /*!\brief pour les deux astres : terre et lune */
 static GLuint _sphere = {0};
@@ -85,7 +85,7 @@ void earth_draw(void) {
   glUniform1i(glGetUniformLocation(_pId, "tex1"), 1);
   glUniform4fv(glGetUniformLocation(_pId, "lumPos"), 1, lumPos);
   glUniform1i(glGetUniformLocation(_pId, "specular"), 1);
-  /* envoi de toutes les matrices stockées par GL4D */
+  /* envoi de toutes les matrices stockÃ©es par GL4D */
   gl4duPushMatrix(); {
     gl4duRotatef(a0, 0, 1, 0);
     gl4duSendMatrices();

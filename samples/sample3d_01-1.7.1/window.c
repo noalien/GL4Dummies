@@ -2,7 +2,7 @@
  *
  * \brief Walk in a labyrinth with floor marking and compass.
  *
- * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
+ * \author FarÃ¨s BELHADJ, amsi@ai.univ-paris8.fr
  * \date March 05 2018
  */
 #include <GL4D/gl4dg.h>
@@ -266,8 +266,8 @@ static void keydown(int keycode) {
   case 'a': {
     _anisotropic = !_anisotropic;
     /* l'Anisotropic sous GL ne fonctionne que si la version de la
-       bibliothèque le supporte ; supprimer le bloc ci-après si
-       problème à la compilation. */
+       bibliothÃ¨que le supporte ; supprimer le bloc ci-aprÃ¨s si
+       problÃ¨me Ã  la compilation. */
 #ifdef GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT
     GLfloat max;
     glBindTexture(GL_TEXTURE_2D, _planeTexId);

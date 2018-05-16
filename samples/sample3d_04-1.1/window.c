@@ -1,7 +1,7 @@
 /*!\file window.c
- * \brief géométries lumière diffuse et transformations de base en
+ * \brief gÃ©omÃ©tries lumiÃ¨re diffuse et transformations de base en
  * GL4Dummies + simulation de mobiles et gestion du picking des objets
- * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
+ * \author FarÃ¨s BELHADJ, amsi@ai.univ-paris8.fr
  * \date March 10 2017 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,11 +16,11 @@ static void mouse(int button, int state, int x, int y);
 static void motion(int x, int y);
 static void draw(void);
 static void quit(void);
-/*!\brief dimensions de la fenêtre */
+/*!\brief dimensions de la fenÃªtre */
 static int _windowWidth = 800, _windowHeight = 600;
 /*!\brief identifiant du programme GLSL */
 static GLuint _pId = 0;
-/*!\brief quelques objets géométriques */
+/*!\brief quelques objets gÃ©omÃ©triques */
 static GLuint _sphere = 0, _quad = 0;
 /*!\brief scale du plan */
 static GLfloat _plan_s = 5.0f;
@@ -32,14 +32,14 @@ static GLuint _colorTex = 0;
 static GLuint _depthTex = 0;
 /*!\brief Texture recevant les identifiants d'objets */
 static GLuint _idTex = 0;
-/*!\brief nombre de mobiles créés dans la scène */
+/*!\brief nombre de mobiles crÃ©Ã©s dans la scÃ¨ne */
 static GLuint _nb_mobiles = 10;
-/*!\brief identifiant du mobile sélectionné */
+/*!\brief identifiant du mobile sÃ©lectionnÃ© */
 static int _picked_mobile = -1;
-/*!\brief copie CPU de la mémoire texture d'identifiants */
+/*!\brief copie CPU de la mÃ©moire texture d'identifiants */
 static GLfloat * _pixels = NULL;
-/*!\brief La fonction principale créé la fenêtre d'affichage,
- * initialise GL et les données, affecte les fonctions d'événements et
+/*!\brief La fonction principale crÃ©Ã© la fenÃªtre d'affichage,
+ * initialise GL et les donnÃ©es, affecte les fonctions d'Ã©vÃ©nements et
  * lance la boucle principale d'affichage.*/
 int main(int argc, char ** argv) {
   if(!gl4duwCreateWindow(argc, argv, "GL4D - Picking", 0, 0, _windowWidth, _windowHeight, GL4DW_SHOWN))
@@ -53,7 +53,7 @@ int main(int argc, char ** argv) {
   gl4duwMainLoop();
   return 0;
 }
-/*!\brief initialise les paramètres OpenGL */
+/*!\brief initialise les paramÃ¨tres OpenGL */
 static void init(void) {
   glEnable(GL_DEPTH_TEST);
   _pId  = gl4duCreateProgram("<vs>shaders/basic.vs", "<fs>shaders/basic.fs", NULL);
@@ -70,28 +70,28 @@ static void init(void) {
   _quad = gl4dgGenQuadf();
   mobileInit(_nb_mobiles, _plan_s, _plan_s);
 
-  /* Création et paramétrage de la Texture recevant la couleur */
+  /* CrÃ©ation et paramÃ©trage de la Texture recevant la couleur */
   glGenTextures(1, &_colorTex);
   glBindTexture(GL_TEXTURE_2D, _colorTex);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _windowWidth, _windowHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
-  /* Création et paramétrage de la Texture recevant la profondeur */
+  /* CrÃ©ation et paramÃ©trage de la Texture recevant la profondeur */
   glGenTextures(1, &_depthTex);
   glBindTexture(GL_TEXTURE_2D, _depthTex);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, _windowWidth, _windowHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
 
-  /* Création et paramétrage de la Texture recevant les identifiants d'objets */
+  /* CrÃ©ation et paramÃ©trage de la Texture recevant les identifiants d'objets */
   glGenTextures(1, &_idTex);
   glBindTexture(GL_TEXTURE_2D, _idTex);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, _windowWidth, _windowHeight, 0, GL_RED, GL_UNSIGNED_INT, NULL);
 
-  /* Création et paramétrage (attacher les textures) du Framebuffer Object */
+  /* CrÃ©ation et paramÃ©trage (attacher les textures) du Framebuffer Object */
   glGenFramebuffers(1, &_fbo);
   glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,    GL_TEXTURE_2D, _colorTex, 0);
@@ -105,7 +105,7 @@ static void init(void) {
 static void mouse(int button, int state, int x, int y) {
   if(button == GL4D_BUTTON_LEFT) {
     y = _windowHeight - y;
-    /* ça n'est plus glReadPixels */
+    /* Ã§a n'est plus glReadPixels */
     glBindTexture(GL_TEXTURE_2D, _idTex);
     glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, _pixels);
     if(x >= 0 && x < _windowWidth && y >=0 && y < _windowHeight)
@@ -120,11 +120,11 @@ static void mouse(int button, int state, int x, int y) {
 static void motion(int x, int y) {
   if(_picked_mobile >= 0 && _picked_mobile < _nb_mobiles) {
     GLfloat m[16], tmpp[16], tmpm[16], * gl4dm;
-    /* p est la coordonnée de la souris entre -1 et +1 */
+    /* p est la coordonnÃ©e de la souris entre -1 et +1 */
     GLfloat p[] = { 2.0f * x / (GLfloat)_windowWidth - 1.0f,
 		    -(2.0f * y / (GLfloat)_windowHeight - 1.0f), 
 		    0.0f, 1.0 }, ip[4], mcoords[4] = {0, 0, 0, 1}, mscr[4];
-    /* récupération des coordonnées spaciales du mobile */
+    /* rÃ©cupÃ©ration des coordonnÃ©es spaciales du mobile */
     mobileGetCoords(_picked_mobile, mcoords);
     /* copie de la matrice de projection dans tmpp */
     gl4duBindMatrix("projectionMatrix");
@@ -136,17 +136,17 @@ static void motion(int x, int y) {
     memcpy(tmpm, gl4dm, sizeof tmpm);
     /* m est tmpp x tmpm */
     MMAT4XMAT4(m, tmpp, tmpm);
-    /* modelisation et projection de la coordonnée du mobile dans mscr */
+    /* modelisation et projection de la coordonnÃ©e du mobile dans mscr */
     MMAT4XVEC4(mscr, m, mcoords);
     MVEC4WEIGHT(mscr);
-    /* ajout de la profondeur à l'écran du mobile comme profondeur du click */
+    /* ajout de la profondeur Ã  l'Ã©cran du mobile comme profondeur du click */
     p[2] = mscr[2];
     /* inversion de m */
     MMAT4INVERSE(m);
-    /* ip est la tranformée inverse de la coordonnée du click (donc coordonnée spaciale du click) */
+    /* ip est la tranformÃ©e inverse de la coordonnÃ©e du click (donc coordonnÃ©e spaciale du click) */
     MMAT4XVEC4(ip, m, p);
     MVEC4WEIGHT(ip);
-    /* affectation de ip comme nouvelle coordonnée spaciale du mobile */
+    /* affectation de ip comme nouvelle coordonnÃ©e spaciale du mobile */
     mobileSetCoords(_picked_mobile, ip);
   }
 }
@@ -195,7 +195,7 @@ static void draw(void) {
 /*   gl4dfSobelSetMixMode(GL4DF_SOBEL_MIX_MULT); */
 /*   gl4dfSobel(0, 0, GL_FALSE); */
 }
-/*!\brief appelée au moment de sortir du programme (atexit), libère les éléments utilisés */
+/*!\brief appelÃ©e au moment de sortir du programme (atexit), libÃ¨re les Ã©lÃ©ments utilisÃ©s */
 static void quit(void) {
   if(_fbo) {
     glDeleteTextures(1, &_colorTex);

@@ -1,6 +1,6 @@
 /*!\file window.c
  * \brief affichage du spectre sonore
- * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
+ * \author FarÃ¨s BELHADJ, amsi@ai.univ-paris8.fr
  * \date April 15 2016 */
 #include <stdio.h>
 #include <GL4D/gl4du.h>
@@ -12,19 +12,19 @@ static void init(void);
 static void draw(void);
 static void initAudio(const char * file);
 static void quit(void);
-/*!\brief nombre d'échantillons du signal sonore */
+/*!\brief nombre d'Ã©chantillons du signal sonore */
 #define ECHANTILLONS 1024
-/*!\brief amplitude des échantillons du signal sonore */
+/*!\brief amplitude des Ã©chantillons du signal sonore */
 static Sint16 _hauteurs[ECHANTILLONS];
-/*!\brief dimensions de la fenêtre */
+/*!\brief dimensions de la fenÃªtre */
 static int _windowWidth = ECHANTILLONS, _windowHeight = 256;
-/*!\brief id du screen à créer */
+/*!\brief id du screen Ã  crÃ©er */
 static GLuint _screen = 0;
-/*!\brief pointeur vers la musique chargée par SDL_Mixer */
+/*!\brief pointeur vers la musique chargÃ©e par SDL_Mixer */
 static Mix_Music * _mmusic = NULL;
 
-/*!\brief La fonction principale créé la fenêtre d'affichage,
- * initialise GL et les données, affecte les fonctions d'événements et
+/*!\brief La fonction principale crÃ©Ã© la fenÃªtre d'affichage,
+ * initialise GL et les donnÃ©es, affecte les fonctions d'Ã©vÃ©nements et
  * lance la boucle principale d'affichage.*/
 int main(int argc, char ** argv) {
   if(!gl4duwCreateWindow(argc, argv, "GL4Dummies", 10, 10, 
@@ -37,7 +37,7 @@ int main(int argc, char ** argv) {
   return 0;
 }
 
-/*!\brief initialise les paramètres OpenGL */
+/*!\brief initialise les paramÃ¨tres OpenGL */
 static void init(void) {
   glViewport(0, 0, _windowWidth, _windowHeight);
   _screen = gl4dpInitScreen();
@@ -74,10 +74,10 @@ static void draw(void) {
   gl4dpUpdateScreen(NULL);
 }
 
-/*!\brief Cette fonction est appelée quand l'audio est joué et met 
- * dans \a stream les données audio de longueur \a len.
- * \param udata pour user data, données passées par l'utilisateur, ici NULL.
- * \param stream flux de données audio.
+/*!\brief Cette fonction est appelÃ©e quand l'audio est jouÃ© et met 
+ * dans \a stream les donnÃ©es audio de longueur \a len.
+ * \param udata pour user data, donnÃ©es passÃ©es par l'utilisateur, ici NULL.
+ * \param stream flux de donnÃ©es audio.
  * \param len longueur de \a stream. */
 static void mixCallback(void *udata, Uint8 *stream, int len) {
   int i;
@@ -88,7 +88,7 @@ static void mixCallback(void *udata, Uint8 *stream, int len) {
   return;
 }
 
-/*!\brief Cette fonction initialise les paramètres SDL_Mixer et charge
+/*!\brief Cette fonction initialise les paramÃ¨tres SDL_Mixer et charge
  *  le fichier audio.*/
 static void initAudio(const char * file) {
   int mixFlags = MIX_INIT_OGG | MIX_INIT_MOD, res;
@@ -109,7 +109,7 @@ static void initAudio(const char * file) {
     Mix_PlayMusic(_mmusic, 1);
 }
 
-/*!\brief appelée au moment de sortir du programme (atexit), libère les éléments utilisés */
+/*!\brief appelÃ©e au moment de sortir du programme (atexit), libÃ¨re les Ã©lÃ©ments utilisÃ©s */
 static void quit(void) {
   if(_mmusic) {
     if(Mix_PlayingMusic())

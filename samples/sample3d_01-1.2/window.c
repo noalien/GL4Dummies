@@ -1,7 +1,7 @@
 /*!\file window.c
  *
- * \brief introduction aux textures (plus ce qui a été vu avant) 
- * \author Farès BELHADJ, amsi@ai.univ-paris8.fr 
+ * \brief introduction aux textures (plus ce qui a Ã©tÃ© vu avant) 
+ * \author FarÃ¨s BELHADJ, amsi@ai.univ-paris8.fr 
  * \date February 15 2018
  */
 
@@ -14,7 +14,7 @@ static void init(void);
 static void draw(void);
 static void quit(void);
 
-/*!\brief largeur et hauteur de la fenêtre */
+/*!\brief largeur et hauteur de la fenÃªtre */
 static int _wW = 800, _wH = 600;
 /*!\brief identifiant du Vertex Array Object */
 static GLuint _vao = 0;
@@ -25,8 +25,8 @@ static GLuint _pId = 0;
 /*!\brief identifiant d'une texture */
 static GLuint _texId = 0;
 
-/*!\brief créé la fenêtre d'affichage, initialise GL et les données,
- * affecte les fonctions d'événements et lance la boucle principale
+/*!\brief crÃ©Ã© la fenÃªtre d'affichage, initialise GL et les donnÃ©es,
+ * affecte les fonctions d'Ã©vÃ©nements et lance la boucle principale
  * d'affichage.
  */
 int main(int argc, char ** argv) {
@@ -39,33 +39,33 @@ int main(int argc, char ** argv) {
   gl4duwMainLoop();
   return 0;
 }
-/*!\brief initialise les paramètres OpenGL et les données. 
+/*!\brief initialise les paramÃ¨tres OpenGL et les donnÃ©es. 
  *
- * Exercice (corrigé en 1.2) : remplacer la texture ci-dessous par un
- * damier noir et blanc de 50x50 cases en utilisant très peu de
- * données. Puis (corrigé en 1.3) remplacer le vao créé manuellement
- * par le quadrilatère générable par gl4dgGenQuadf et modifier le
+ * Exercice (corrigÃ© en 1.2) : remplacer la texture ci-dessous par un
+ * damier noir et blanc de 50x50 cases en utilisant trÃ¨s peu de
+ * donnÃ©es. Puis (corrigÃ© en 1.3) remplacer le vao crÃ©Ã© manuellement
+ * par le quadrilatÃ¨re gÃ©nÃ©rable par gl4dgGenQuadf et modifier le
  * shader pour n'afficher que la texture car les couleurs n'existent
- * pas dans ce qui est généré par les fonctions gl4dgGenXXXXX où : (1)
- * la première donnée est un vec3 coordonnée 3D ; (2) la seconde est
- * un vec3 vecteur normal 3D ; (3) la troisième est un vec2 coordonnée
- * de texture 2D normalisée. Ce dernier point ne permet plus de
- * répéter la texture, corriger le problème en trouvant une solution
- * (corrigé en 1.4). Enfin (corrigé en 1.5), placer le quadrilatère
+ * pas dans ce qui est gÃ©nÃ©rÃ© par les fonctions gl4dgGenXXXXX oÃ¹ : (1)
+ * la premiÃ¨re donnÃ©e est un vec3 coordonnÃ©e 3D ; (2) la seconde est
+ * un vec3 vecteur normal 3D ; (3) la troisiÃ¨me est un vec2 coordonnÃ©e
+ * de texture 2D normalisÃ©e. Ce dernier point ne permet plus de
+ * rÃ©pÃ©ter la texture, corriger le problÃ¨me en trouvant une solution
+ * (corrigÃ© en 1.4). Enfin (corrigÃ© en 1.5), placer le quadrilatÃ¨re
  * horizontalement et agrandisser-le d'un facteur au moins 50. Tenter
  * de faire du MipMapping ou de l'anisotropic filtering.
  */
 static void init(void) {
-  /* indices pour réaliser le maillage des géométrie, envoyés dans le
+  /* indices pour rÃ©aliser le maillage des gÃ©omÃ©trie, envoyÃ©s dans le
    * VBO ELEMENT_ARRAY_BUFFER */
   GLuint idata[] = {
-    /* un quadrilatère en triangle strip (d'où inversion entre 3 et 2) */
+    /* un quadrilatÃ¨re en triangle strip (d'oÃ¹ inversion entre 3 et 2) */
     0, 1, 3, 2
   };
-  /* données-sommets envoyée dans le VBO ARRAY_BUFFER */
+  /* donnÃ©es-sommets envoyÃ©e dans le VBO ARRAY_BUFFER */
   GLfloat data[] = {
-    /* un sommet est composé d'une coordonnée 3D, d'une couleur 3D et
-     * d'une coordonnée de texture 2D */
+    /* un sommet est composÃ© d'une coordonnÃ©e 3D, d'une couleur 3D et
+     * d'une coordonnÃ©e de texture 2D */
     /* sommet  0 */ -1, -1, 0, 1, 0, 0,  0,  0,
     /* sommet  1 */  1, -1, 0, 0, 1, 0, 50,  0,
     /* sommet  2 */  1,  1, 0, 0, 0, 1, 50, 50,
@@ -73,145 +73,145 @@ static void init(void) {
   };
   const GLuint B = RGB(255, 255, 255), N = 0;
   GLuint tex[] = { B, N, N, B };
-  /* Génération d'un identifiant de VAO */
+  /* GÃ©nÃ©ration d'un identifiant de VAO */
   glGenVertexArrays(1, &_vao);
-  /* Lier le VAO-machine-GL à l'identifiant VAO généré */
+  /* Lier le VAO-machine-GL Ã  l'identifiant VAO gÃ©nÃ©rÃ© */
   glBindVertexArray(_vao);
   /* Activation des 3 premiers indices d'attribut de sommet */
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
   glEnableVertexAttribArray(2);
-  /* Génération de deux identifiants de VBO un pour ARRAY_BUFFER, un
+  /* GÃ©nÃ©ration de deux identifiants de VBO un pour ARRAY_BUFFER, un
    * pour ELEMENT_ARRAY_BUFFER */
   glGenBuffers(2, _buffer);
-  /* Lier le VBO-ARRAY_BUFFER à l'identifiant du premier VBO généré */
+  /* Lier le VBO-ARRAY_BUFFER Ã  l'identifiant du premier VBO gÃ©nÃ©rÃ© */
   glBindBuffer(GL_ARRAY_BUFFER, _buffer[0]);
-  /* Transfert des données VBO-ARRAY_BUFFER */
+  /* Transfert des donnÃ©es VBO-ARRAY_BUFFER */
   glBufferData(GL_ARRAY_BUFFER, sizeof data, data, GL_STATIC_DRAW);
-  /* Paramétrage 3 premiers indices d'attribut de sommet */
+  /* ParamÃ©trage 3 premiers indices d'attribut de sommet */
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof *data, (const void *)0);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof *data, (const void *)(3 * sizeof *data));
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof *data, (const void *)(6 * sizeof *data));
-  /* Lier le VBO-ELEMENT_ARRAY_BUFFER à l'identifiant du second VBO généré */
+  /* Lier le VBO-ELEMENT_ARRAY_BUFFER Ã  l'identifiant du second VBO gÃ©nÃ©rÃ© */
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _buffer[1]);
-  /* Transfert des données d'indices VBO-ELEMENT_ARRAY_BUFFER */
+  /* Transfert des donnÃ©es d'indices VBO-ELEMENT_ARRAY_BUFFER */
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof idata, idata, GL_STATIC_DRAW);
-  /* dé-lier le VAO puis les VAO */
+  /* dÃ©-lier le VAO puis les VAO */
   glBindVertexArray(0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
-  /* générer un identifiant de texture */
+  /* gÃ©nÃ©rer un identifiant de texture */
   glGenTextures(1, &_texId);
   /* lier l'identifiant de texture comme texture 2D (1D ou 3D
    * possibles) */
   glBindTexture(GL_TEXTURE_2D, _texId);
-  /* paramétrer la texture, voir la doc de la fonction glTexParameter
+  /* paramÃ©trer la texture, voir la doc de la fonction glTexParameter
    * sur
    * https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexParameter.xhtml */
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  /* envoi de la donnée texture depuis la RAM CPU vers la RAM GPU voir
+  /* envoi de la donnÃ©e texture depuis la RAM CPU vers la RAM GPU voir
    * la doc de glTexImage2D (voir aussi glTexImage1D et glTexImage3D)
    * sur
    * https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexImage2D.xhtml */
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
-  /* dé-lier la texture 2D */
+  /* dÃ©-lier la texture 2D */
   glBindTexture(GL_TEXTURE_2D, 0);
 
-  /* Création du programme shader (voir le dossier shader) */
+  /* CrÃ©ation du programme shader (voir le dossier shader) */
   _pId = gl4duCreateProgram("<vs>shaders/basic.vs", "<fs>shaders/basic.fs", NULL);
   /* Set de la couleur (RGBA) d'effacement OpenGL */
   glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
   /* activation de la texture 2D */
   glEnable(GL_TEXTURE_2D);
   /* activation du test de profondeur afin de prendre en compte la
-   * notion de devant-derrière. */
+   * notion de devant-derriÃ¨re. */
   glEnable(GL_DEPTH_TEST);
-  /* Création des matrices GL4Dummies, une pour la projection, une
-   * pour la modélisation et une pour la vue */
+  /* CrÃ©ation des matrices GL4Dummies, une pour la projection, une
+   * pour la modÃ©lisation et une pour la vue */
   gl4duGenMatrix(GL_FLOAT, "projectionMatrix");
   gl4duGenMatrix(GL_FLOAT, "modelMatrix");
   gl4duGenMatrix(GL_FLOAT, "viewMatrix");
-  /* on active la matrice de projection créée précédemment */
+  /* on active la matrice de projection crÃ©Ã©e prÃ©cÃ©demment */
   gl4duBindMatrix("projectionMatrix");
-  /* la matrice en cours reçoit identité (matrice avec des 1 sur la
+  /* la matrice en cours reÃ§oit identitÃ© (matrice avec des 1 sur la
    * diagonale et que des 0 sur le reste) */
   gl4duLoadIdentityf();
   /* on multiplie la matrice en cours par une matrice de projection
    * orthographique ou perspective */
-  /* décommenter pour orthographique gl4duOrthof(-1, 1, -1, 1, 0, 100); */
+  /* dÃ©commenter pour orthographique gl4duOrthof(-1, 1, -1, 1, 0, 100); */
   gl4duFrustumf(-1, 1, -1, 1, 2, 100);
-  /* dans quelle partie de l'écran on effectue le rendu */
+  /* dans quelle partie de l'Ã©cran on effectue le rendu */
   glViewport(0, 0, _wW, _wH);
 }
 /*!\brief Cette fonction dessine dans le contexte OpenGL actif. */
 static void draw(void) {
-  /* une variable d'angle, maintenant elle passe ne degrés */
+  /* une variable d'angle, maintenant elle passe ne degrÃ©s */
   static GLfloat angle = 0.0f;
   /* effacement du buffer de couleur, nous rajoutons aussi le buffer
    * de profondeur afin de bien rendre les fragments qui sont devant
-   * au dessus de ceux qui sont derrière. Commenter le
-   * "|GL_DEPTH_BUFFER_BIT" pour voir la différence. Nous avons ajouté
+   * au dessus de ceux qui sont derriÃ¨re. Commenter le
+   * "|GL_DEPTH_BUFFER_BIT" pour voir la diffÃ©rence. Nous avons ajoutÃ©
    * l'activation du test de profondeur dans la fonction init via
    * l'appel glEnable(GL_DEPTH_TEST). */
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   /* activation du programme _pId */
   glUseProgram(_pId);
-  /* lier (mettre en avant ou "courante") la matrice vue créée dans
+  /* lier (mettre en avant ou "courante") la matrice vue crÃ©Ã©e dans
    * init */
   gl4duBindMatrix("viewMatrix");
-  /* Charger la matrice identité dans la matrice courante (liée) */
+  /* Charger la matrice identitÃ© dans la matrice courante (liÃ©e) */
   gl4duLoadIdentityf();
-  /* Composer la matrice vue courante en simulant une "caméra" à
+  /* Composer la matrice vue courante en simulant une "camÃ©ra" Ã 
    * l'aide de la fonction LookAt(xyz_position_cam,
    * xyz_ou_elle_regarde, xyz_son_vecteur_haut) */
   gl4duLookAtf(0, 0, 3, 0, 0, 0, 0, 1, 0);
-  /* lier (mettre en avant ou "courante") la matrice modèle créée dans
+  /* lier (mettre en avant ou "courante") la matrice modÃ¨le crÃ©Ã©e dans
    * init */
   gl4duBindMatrix("modelMatrix");
-  /* Charger la matrice identité dans la matrice courante (liée) */
+  /* Charger la matrice identitÃ© dans la matrice courante (liÃ©e) */
   gl4duLoadIdentityf();
-  /* on transmet la variable d'angle en l'intégrant dans la matrice
-   * modèle. Soit composer la matrice courante avec une rotation
+  /* on transmet la variable d'angle en l'intÃ©grant dans la matrice
+   * modÃ¨le. Soit composer la matrice courante avec une rotation
    * "angle" autour de l'axe y (0, 1, 0) */
   gl4duRotatef(angle, 0, 1, 0);
-  /* on incrémente angle d'un 1/60 de 1/4 de tour soit (360° x 1/60). Tester
-   * l'application en activant/désactivant la synchronisation
+  /* on incrÃ©mente angle d'un 1/60 de 1/4 de tour soit (360Â° x 1/60). Tester
+   * l'application en activant/dÃ©sactivant la synchronisation
    * verticale de votre carte graphique. Que se passe-t-il ? Trouver
-   * une solution pour que résultat soit toujours le même. */
+   * une solution pour que rÃ©sultat soit toujours le mÃªme. */
   angle += 0.25f * (1.0f / 60.0f) * 360.0f;
   /* Envoyer, au shader courant, toutes les matrices connues dans
    * GL4Dummies */
   gl4duSendMatrices();
-  /* activer l'étage de textures 0, plusieurs étages sont disponibles,
-   * nous pouvons lier une texture par type et par étage */
+  /* activer l'Ã©tage de textures 0, plusieurs Ã©tages sont disponibles,
+   * nous pouvons lier une texture par type et par Ã©tage */
   glActiveTexture(GL_TEXTURE0);
   /* lier la texture _texId comme texture 2D */
   glBindTexture(GL_TEXTURE_2D, _texId);
   /* envoyer une info au program shader indiquant que tex est une
-   * texture d'étage 0, voir le type (sampler2D) de la variable tex
+   * texture d'Ã©tage 0, voir le type (sampler2D) de la variable tex
    * dans le shader */
   glUniform1i(glGetUniformLocation(_pId, "tex"), 0);
-  /* envoi d'un booléen pour inverser l'axe y des coordonnées de
-   * textures (plus efficace à faire dans le vertex shader */
+  /* envoi d'un boolÃ©en pour inverser l'axe y des coordonnÃ©es de
+   * textures (plus efficace Ã  faire dans le vertex shader */
   glUniform1i(glGetUniformLocation(_pId, "inv"), 1); 
-  /* Lier le VAO-machine-GL à l'identifiant VAO _vao */
+  /* Lier le VAO-machine-GL Ã  l'identifiant VAO _vao */
   glBindVertexArray(_vao);
   /* Dessiner le VAO comme une bande d'un triangle avec 4 sommets
-   * commençant à 0
+   * commenÃ§ant Ã  0
    *
    * Attention ! Maintenant nous dessinons avec DrawElement qui
-   * utilise les indices des sommets poassés pour mailler */
+   * utilise les indices des sommets poassÃ©s pour mailler */
   glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, (const GLvoid *)0);
-  /* dé-lier le VAO */
+  /* dÃ©-lier le VAO */
   glBindVertexArray(0);
-  /* désactiver le programme shader */
+  /* dÃ©sactiver le programme shader */
   glUseProgram(0);
 }
-/*!\brief appelée au moment de sortir du programme (atexit), elle
- *  libère les éléments OpenGL utilisés.*/
+/*!\brief appelÃ©e au moment de sortir du programme (atexit), elle
+ *  libÃ¨re les Ã©lÃ©ments OpenGL utilisÃ©s.*/
 static void quit(void) {
   /* suppression de la texture _texId en GPU */
   if(_texId)
@@ -222,6 +222,6 @@ static void quit(void) {
   /* suppression du VBO _buffer en GPU, maintenant il y en a deux */
   if(_buffer[0])
     glDeleteBuffers(2, _buffer);
-  /* nettoyage des éléments utilisés par la bibliothèque GL4Dummies */
+  /* nettoyage des Ã©lÃ©ments utilisÃ©s par la bibliothÃ¨que GL4Dummies */
   gl4duClean(GL4DU_ALL);
 }

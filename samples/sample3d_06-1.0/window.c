@@ -1,9 +1,9 @@
 /*!\file window.c
  *
  * \brief utilisation de GL4Dummies et Lib Assimp pour chargement de
- * scènes.
+ * scÃ¨nes.
  *
- * \author Farès Belhadj amsi@ai.univ-paris8.fr
+ * \author FarÃ¨s Belhadj amsi@ai.univ-paris8.fr
  * \date February 14 2017
  */
 
@@ -45,7 +45,7 @@ static cam_t _cam = {0, 0, 1.0, 0};
 static GLboolean _pause = GL_TRUE;
 
 /*!\brief rotation angles according to axis (0 = x, 1 = y, 2 = z) 
- * \todo améliorer l'interface et ajouter rotations/zoom à la souris */
+ * \todo amÃ©liorer l'interface et ajouter rotations/zoom Ã  la souris */
 static GLfloat rot[3] = {0, 0, 0};
 
 extern void assimpInit(const char * filename);

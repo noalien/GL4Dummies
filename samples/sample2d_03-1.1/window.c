@@ -1,7 +1,7 @@
 /*!\file window.c
  *
  * \brief Mobiles simulation with 100% GPU rendering.
- * \author Farès BELHADJ, amsi@ai.univ-paris8.fr 
+ * \author FarÃ¨s BELHADJ, amsi@ai.univ-paris8.fr 
  * \date February 15 2017
  */
 #include <assert.h>
@@ -25,7 +25,7 @@ static GLuint _tId = 0;
 static GLuint _quad = 0;
 /*!\brief number of mobiles to simulate */
 static const int _nb_mobiles = 200;
-/*!\brief toggle Voronoï mode */
+/*!\brief toggle VoronoÃ¯ mode */
 static GLboolean _voronoi = GL_FALSE;
 
 /*!\brief main function, creates the window, initialise OpenGL

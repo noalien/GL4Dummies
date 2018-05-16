@@ -1,8 +1,8 @@
 /*!\file window.c
- * \brief géométries lumière diffuse et transformations de base en
+ * \brief gÃ©omÃ©tries lumiÃ¨re diffuse et transformations de base en
  * GL4Dummies + simulation de mobiles et gestion du picking des objets
- * + ombre portée utilisant le shadow-mapping
- * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
+ * + ombre portÃ©e utilisant le shadow-mapping
+ * \author FarÃ¨s BELHADJ, amsi@ai.univ-paris8.fr
  * \date March 10 2017 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,13 +17,13 @@ static void mouse(int button, int state, int x, int y);
 static void motion(int x, int y);
 static void draw(void);
 static void quit(void);
-/*!\brief dimensions de la fenêtre */
+/*!\brief dimensions de la fenÃªtre */
 static int _windowWidth = 800, _windowHeight = 600;
 /*!\brief identifiant du programme de coloriage GLSL */
 static GLuint _shPID = 0;
 /*!\brief identifiant du programme shadow map GLSL */
 static GLuint _smPID = 0;
-/*!\brief quelques objets géométriques */
+/*!\brief quelques objets gÃ©omÃ©triques */
 static GLuint _sphere = 0, _quad = 0;
 /*!\brief scale du plan */
 static GLfloat _plan_s = 5.0f;
@@ -37,20 +37,20 @@ static GLuint _depthTex = 0;
 static GLuint _idTex = 0;
 /*!\brief Texture recevant la shadow map */
 static GLuint _smTex = 0;
-/*!\brief nombre de mobiles créés dans la scène */
+/*!\brief nombre de mobiles crÃ©Ã©s dans la scÃ¨ne */
 static GLuint _nb_mobiles = 30;
-/*!\brief identifiant du mobile sélectionné */
+/*!\brief identifiant du mobile sÃ©lectionnÃ© */
 static int _picked_mobile = -1;
-/*!\brief coordonnées du mobile sélectionné */
+/*!\brief coordonnÃ©es du mobile sÃ©lectionnÃ© */
 static GLfloat _picked_mobile_coords[4] = {0};
-/*!\brief copie CPU de la mémoire texture d'identifiants */
+/*!\brief copie CPU de la mÃ©moire texture d'identifiants */
 static GLfloat * _pixels = NULL;
-/*!\brief position de la lumière, relative aux objets */
+/*!\brief position de la lumiÃ¨re, relative aux objets */
 static GLfloat _lumpos[] = { 9, 3, 0, 1 };
 #define SHADOW_MAP_SIDE 1024
 
-/*!\brief La fonction principale créé la fenêtre d'affichage,
- * initialise GL et les données, affecte les fonctions d'événements et
+/*!\brief La fonction principale crÃ©Ã© la fenÃªtre d'affichage,
+ * initialise GL et les donnÃ©es, affecte les fonctions d'Ã©vÃ©nements et
  * lance la boucle principale d'affichage.*/
 int main(int argc, char ** argv) {
   if(!gl4duwCreateWindow(argc, argv, "GL4D - Picking", 0, 0, _windowWidth, _windowHeight, GL4DW_SHOWN))
@@ -64,7 +64,7 @@ int main(int argc, char ** argv) {
   gl4duwMainLoop();
   return 0;
 }
-/*!\brief initialise les paramètres OpenGL */
+/*!\brief initialise les paramÃ¨tres OpenGL */
 static void init(void) {
   glEnable(GL_DEPTH_TEST);
   _shPID  = gl4duCreateProgram("<vs>shaders/basic.vs", "<fs>shaders/basic.fs", NULL);
@@ -89,41 +89,41 @@ static void init(void) {
   _quad = gl4dgGenQuadf();
   mobileInit(_nb_mobiles, _plan_s, _plan_s);
 
-  /* Création et paramétrage de la Texture de shadow map */
+  /* CrÃ©ation et paramÃ©trage de la Texture de shadow map */
   glGenTextures(1, &_smTex);
   glBindTexture(GL_TEXTURE_2D, _smTex);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_MAP_SIDE, SHADOW_MAP_SIDE, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
-  /* Création et paramétrage de la Texture recevant la couleur */
+  /* CrÃ©ation et paramÃ©trage de la Texture recevant la couleur */
   glGenTextures(1, &_colorTex);
   glBindTexture(GL_TEXTURE_2D, _colorTex);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
-  /* Création et paramétrage de la Texture recevant la profondeur */
+  /* CrÃ©ation et paramÃ©trage de la Texture recevant la profondeur */
   glGenTextures(1, &_depthTex);
   glBindTexture(GL_TEXTURE_2D, _depthTex);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, _windowWidth, _windowHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
 
-  /* Création et paramétrage de la Texture recevant les identifiants d'objets */
+  /* CrÃ©ation et paramÃ©trage de la Texture recevant les identifiants d'objets */
   glGenTextures(1, &_idTex);
   glBindTexture(GL_TEXTURE_2D, _idTex);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, _windowWidth, _windowHeight, 0, GL_RED, GL_UNSIGNED_INT, NULL);
 
-  /* Création du Framebuffer Object */
+  /* CrÃ©ation du Framebuffer Object */
   glGenFramebuffers(1, &_fbo);
 
   _pixels = malloc(_windowWidth * _windowHeight * sizeof *_pixels);
   assert(_pixels);
 }
-/*!\brief call-back au click (tous les boutons avec state à down (1) ou up (0)) */
+/*!\brief call-back au click (tous les boutons avec state Ã  down (1) ou up (0)) */
 static void mouse(int button, int state, int x, int y) {
   if(button == GL4D_BUTTON_LEFT) {
     y = _windowHeight - y;
@@ -133,10 +133,10 @@ static void mouse(int button, int state, int x, int y) {
       _picked_mobile = (int)((_nb_mobiles + 2.0f) * _pixels[y * _windowWidth + x]) - 3;
     if(_picked_mobile >= 0 && _picked_mobile < _nb_mobiles) {
       mobileSetFreeze(_picked_mobile, state);
-      if(state) { /* au click, récupération de la coordonnée espace-écran du mobile */
+      if(state) { /* au click, rÃ©cupÃ©ration de la coordonnÃ©e espace-Ã©cran du mobile */
 	GLfloat m[16], tmpp[16], tmpm[16], * gl4dm;
 	GLfloat mcoords[] = {0, 0, 0, 1};
-	/* récupération des coordonnées spaciales du mobile */
+	/* rÃ©cupÃ©ration des coordonnÃ©es spaciales du mobile */
 	mobileGetCoords(_picked_mobile, mcoords);
 	/* copie de la matrice de projection dans tmpp */
 	gl4duBindMatrix("cameraProjectionMatrix");
@@ -148,7 +148,7 @@ static void mouse(int button, int state, int x, int y) {
 	memcpy(tmpm, gl4dm, sizeof tmpm);
 	/* m est tmpp x tmpm */
 	MMAT4XMAT4(m, tmpp, tmpm);
-	/* modelisation et projection de la coordonnée du mobile dans _picked_mobile_coords */
+	/* modelisation et projection de la coordonnÃ©e du mobile dans _picked_mobile_coords */
 	MMAT4XVEC4(_picked_mobile_coords, m, mcoords);
 	MVEC4WEIGHT(_picked_mobile_coords);
       }
@@ -161,7 +161,7 @@ static void mouse(int button, int state, int x, int y) {
 static void motion(int x, int y) {
   if(_picked_mobile >= 0 && _picked_mobile < _nb_mobiles) {
     GLfloat m[16], tmpp[16], tmpm[16], * gl4dm;
-    /* p est la coordonnée de la souris entre -1 et +1 */
+    /* p est la coordonnÃ©e de la souris entre -1 et +1 */
     GLfloat p[] = { 2.0f * x / (GLfloat)_windowWidth - 1.0f,
 		    -(2.0f * y / (GLfloat)_windowHeight - 1.0f), 
 		    0.0f, 1.0 }, ip[4];
@@ -177,19 +177,19 @@ static void motion(int x, int y) {
     MMAT4XMAT4(m, tmpp, tmpm);
     /* inversion de m */
     MMAT4INVERSE(m);
-    /* ajout de la profondeur à l'écran du mobile comme profondeur du click */
+    /* ajout de la profondeur Ã  l'Ã©cran du mobile comme profondeur du click */
     p[2] = _picked_mobile_coords[2];
-    /* ip est la tranformée inverse de la coordonnée du click (donc coordonnée spaciale du click) */
+    /* ip est la tranformÃ©e inverse de la coordonnÃ©e du click (donc coordonnÃ©e spaciale du click) */
     MMAT4XVEC4(ip, m, p);
     MVEC4WEIGHT(ip);
-    /* affectation de ip comme nouvelle coordonnée spaciale du mobile */
+    /* affectation de ip comme nouvelle coordonnÃ©e spaciale du mobile */
     mobileSetCoords(_picked_mobile, ip);
   }
 }
 
-/*!\brief la scène est soit dessinée du point de vu de la lumière (sm
- *  = GL_TRUE donc shadow map) soit dessinée du point de vue de la
- *  caméra */
+/*!\brief la scÃ¨ne est soit dessinÃ©e du point de vu de la lumiÃ¨re (sm
+ *  = GL_TRUE donc shadow map) soit dessinÃ©e du point de vue de la
+ *  camÃ©ra */
 static inline void scene(GLboolean sm) {
   glEnable(GL_CULL_FACE);
   if(sm) {
@@ -211,7 +211,7 @@ static inline void scene(GLboolean sm) {
     gl4duBindMatrix("cameraViewMatrix");
     gl4duLoadIdentityf();
     gl4duLookAtf(0, 4, 18, 0, 2, 0, 0, 1, 0);
-    /* lumière positionnelle */
+    /* lumiÃ¨re positionnelle */
     mat = gl4duGetMatrixData();
     MMAT4XVEC4(lp, mat, _lumpos);
     MVEC4WEIGHT(lp);
@@ -243,11 +243,11 @@ static inline void scene(GLboolean sm) {
 static void draw(void) {
   GLenum renderings[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
   glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
-  /* désactiver le rendu de couleur et ne laisser que le depth, dans _smTex */
+  /* dÃ©sactiver le rendu de couleur et ne laisser que le depth, dans _smTex */
   glDrawBuffer(GL_NONE);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,    GL_TEXTURE_2D, 0, 0);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _smTex, 0);
-  /* viewport de la shadow map et dessin de la scène du point de vue de la lumière */
+  /* viewport de la shadow map et dessin de la scÃ¨ne du point de vue de la lumiÃ¨re */
   glViewport(0, 0, SHADOW_MAP_SIDE, SHADOW_MAP_SIDE);
   glClear(GL_DEPTH_BUFFER_BIT);
   scene(GL_TRUE);
@@ -258,7 +258,7 @@ static void draw(void) {
 /*   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _windowWidth, _windowHeight, 0, GL_RED, GL_FLOAT, _pixels); */
 /*   gl4dfConvTex2Frame(_colorTex); */
   //return;
-  /* paramétrer le fbo pour 2 rendus couleurs + un (autre) depth */
+  /* paramÃ©trer le fbo pour 2 rendus couleurs + un (autre) depth */
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _colorTex, 0);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, _idTex, 0);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthTex, 0);
@@ -276,12 +276,12 @@ static void draw(void) {
 
   scene(GL_FALSE);
 
-  /* copie du fbo à l'écran */
+  /* copie du fbo Ã  l'Ã©cran */
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
   glBlitFramebuffer(0, 0, 256, 256, 0, 0, _windowWidth, _windowHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
   glBlitFramebuffer(0, 0, _windowWidth, _windowHeight, 0, 0, _windowWidth, _windowHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 }
-/*!\brief appelée au moment de sortir du programme (atexit), libère les éléments utilisés */
+/*!\brief appelÃ©e au moment de sortir du programme (atexit), libÃ¨re les Ã©lÃ©ments utilisÃ©s */
 static void quit(void) {
   if(_fbo) {
     glDeleteTextures(1, &_colorTex);

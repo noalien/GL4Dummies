@@ -1,7 +1,7 @@
 /*!\file mobile.c
  *
- * \brief Bibliothèque de gestion de mobiles
- * \author Farès BELHADJ, amsi@ai.univ-paris8.fr 
+ * \brief BibliothÃ¨que de gestion de mobiles
+ * \author FarÃ¨s BELHADJ, amsi@ai.univ-paris8.fr 
  * \date Februry 23 2016
  */
 #include <time.h>
@@ -73,7 +73,7 @@ void mobileInit(int n, int w, int h) {
 }
 
 static void frottements(int i, float kx, float ky) {
-  const float dt = 1.0 / 60.0; /* pour que le frottement ne dépende pas de la puissance de la machine */
+  const float dt = 1.0 / 60.0; /* pour que le frottement ne dÃ©pende pas de la puissance de la machine */
   double x = fabs(_mobile[i].vx), y = fabs(_mobile[i].vy);
   _mobile[i].vx = MAX(x - kx * x * x * dt * dt - 2.0 * kx, 0.0) * SIGN(_mobile[i].vx);
   _mobile[i].vy = MAX(y - ky * y * y * dt * dt - 2.0 * ky, 0.0) * SIGN(_mobile[i].vy);

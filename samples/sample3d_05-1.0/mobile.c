@@ -1,7 +1,7 @@
 /*!\file mobile.c
  *
- * \brief Bibliothèque de gestion de mobiles
- * \author Farès BELHADJ, amsi@ai.univ-paris8.fr 
+ * \brief BibliothÃ¨que de gestion de mobiles
+ * \author FarÃ¨s BELHADJ, amsi@ai.univ-paris8.fr 
  * \date March 10 2017
  */
 #include <stdlib.h>

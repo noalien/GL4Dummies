@@ -1,11 +1,11 @@
 /*!\file window.c
  *
- * \brief GL4Dummies, exemple 3D avec fabrication indexée d'un
+ * \brief GL4Dummies, exemple 3D avec fabrication indexÃ©e d'un
  * triangle plein, un cube unitaire en fil de fer et le dessin des
  * trois axes x y et z.  plus des transformations spaciales
- * projection/modélisation utilisant les fonction gl4duXXX
+ * projection/modÃ©lisation utilisant les fonction gl4duXXX
  * 
- * \author Farès BELHADJ,
+ * \author FarÃ¨s BELHADJ,
  * amsi@ai.univ-paris8.fr \date February 11 2018
  */
 
@@ -17,7 +17,7 @@ static void init(void);
 static void draw(void);
 static void quit(void);
 
-/*!\brief largeur et hauteur de la fenêtre */
+/*!\brief largeur et hauteur de la fenÃªtre */
 static int _wW = 800, _wH = 600;
 /*!\brief identifiant du (futur) Vertex Array Object */
 static GLuint _vao = 0;
@@ -26,8 +26,8 @@ static GLuint _buffer[2] = { 0 };
 /*!\brief identifiant du (futur) GLSL program */
 static GLuint _pId = 0;
 
-/*!\brief créé la fenêtre d'affichage, initialise GL et les données,
- * affecte les fonctions d'événements et lance la boucle principale
+/*!\brief crÃ©Ã© la fenÃªtre d'affichage, initialise GL et les donnÃ©es,
+ * affecte les fonctions d'Ã©vÃ©nements et lance la boucle principale
  * d'affichage.
  */
 int main(int argc, char ** argv) {
@@ -40,9 +40,9 @@ int main(int argc, char ** argv) {
   gl4duwMainLoop();
   return 0;
 }
-/*!\brief initialise les paramètres OpenGL et les données. */
+/*!\brief initialise les paramÃ¨tres OpenGL et les donnÃ©es. */
 static void init(void) {
-  /* indices pour réaliser le maillage des géométrie, envoyés dans le
+  /* indices pour rÃ©aliser le maillage des gÃ©omÃ©trie, envoyÃ©s dans le
    * VBO ELEMENT_ARRAY_BUFFER */
   GLuint idata[] = {
     /* le triangle rouge-vert-bleu */
@@ -59,21 +59,21 @@ static void init(void) {
     7, 3, 6, 10,
     /* face droite du cube unitaire  */
     8, 9, 5, 4,
-    /* l'axe des x (abscisses) : une flèche */
+    /* l'axe des x (abscisses) : une flÃ¨che */
     11, 12, 13, 12, 14,
-    /* l'axe des y (ordonnées) : une flèche */
+    /* l'axe des y (ordonnÃ©es) : une flÃ¨che */
     11, 15, 16, 15, 17,
-    /* l'axe des z (profondeur) : une flèche */
+    /* l'axe des z (profondeur) : une flÃ¨che */
     11, 18, 19, 18, 20
   };
-  /* données-sommets envoyée dans le VBO ARRAY_BUFFER */
+  /* donnÃ©es-sommets envoyÃ©e dans le VBO ARRAY_BUFFER */
   GLfloat data[] = {
-    /* 3 coordonnées de sommets en 3D chacune suivie de sa couleur
+    /* 3 coordonnÃ©es de sommets en 3D chacune suivie de sa couleur
      * pour un triangle */
     /* sommet  0 */ -1.5f, -1.5f, 0.0f, 1.0f, 0.0f, 0.0f, 
     /* sommet  1 */ 1.5f, -1.5f, 0.0f, 0.0f, 1.0f, 0.0f,
     /* sommet  2 */ 0.0f,  1.5f, 0.0f, 0.0f, 0.0f, 1.0f,
-    /* 8 coordonnées de sommets en 3D chacune suivie de sa couleur
+    /* 8 coordonnÃ©es de sommets en 3D chacune suivie de sa couleur
      * pour les sommets du cube unitaire */
     /* sommet  3 */ -1, 1, 1, 0.5, 0, 0,
     /* sommet  4 */ 1, 1, 1, 0, 0.5, 0,
@@ -84,7 +84,7 @@ static void init(void) {
     /* sommet  9 */ 1, -1, -1, 0, 0, 1,
     /* sommet 10 */ -1, -1, -1, 1, 1, 0,
     /* sommet 11 */ 0, 0, 0, 0, 0, 0,
-    /* 3x5 sommets pour les 3 flèches représentant les axes */
+    /* 3x5 sommets pour les 3 flÃ¨ches reprÃ©sentant les axes */
     /* sommet 12 */ 3, 0, 0, 1, 0, 0,
     /* sommet 13 */ 2.9f, 0.1f, 0, 1, 0, 0,
     /* sommet 14 */ 2.9f, -0.1f, 0, 1, 0, 0,
@@ -95,106 +95,106 @@ static void init(void) {
     /* sommet 19 */ 0, 0.1f, 2.9f, 0, 0, 1,
     /* sommet 20 */ 0, -0.1f, 2.9f, 0, 0, 1
   };
-  /* Création du programme shader (voir le dossier shader) */
+  /* CrÃ©ation du programme shader (voir le dossier shader) */
   _pId = gl4duCreateProgram("<vs>shaders/basic.vs", "<fs>shaders/basic.fs", NULL);
   /* Set de la couleur (RGBA) d'effacement OpenGL */
   glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
   /* activation du test de profondeur afin de prendre en compte la
-   * notion de devant-derrière. */
+   * notion de devant-derriÃ¨re. */
   glEnable(GL_DEPTH_TEST);
   /* activation du lissage de dessin de lignes ; permet d'utiliser
    * aussi le glLineWidth (voir dans le draw) */
   glEnable(GL_LINE_SMOOTH);
-  /* décommenter la ligne du bas pour l'activation de l'option
-   * permettant de cacher les faces arrières */
+  /* dÃ©commenter la ligne du bas pour l'activation de l'option
+   * permettant de cacher les faces arriÃ¨res */
   /* glEnable(GL_CULL_FACE); */
-  /* décommenter la ligne du bas si inversion du sens pour face
+  /* dÃ©commenter la ligne du bas si inversion du sens pour face
    * avant */
   /* glFrontFace(GL_CW); */
-  /* Création des matrices GL4Dummies, une pour la projection, une
-   * pour la modélisation et une pour la vue */
+  /* CrÃ©ation des matrices GL4Dummies, une pour la projection, une
+   * pour la modÃ©lisation et une pour la vue */
   gl4duGenMatrix(GL_FLOAT, "projectionMatrix");
   gl4duGenMatrix(GL_FLOAT, "modelMatrix");
   gl4duGenMatrix(GL_FLOAT, "viewMatrix");
-  /* on active la matrice de projection créée précédemment */
+  /* on active la matrice de projection crÃ©Ã©e prÃ©cÃ©demment */
   gl4duBindMatrix("projectionMatrix");
-  /* la matrice en cours reçoit identité (matrice avec des 1 sur la
+  /* la matrice en cours reÃ§oit identitÃ© (matrice avec des 1 sur la
    * diagonale et que des 0 sur le reste) */
   gl4duLoadIdentityf();
   /* on multiplie la matrice en cours par une matrice de projection
    * orthographique ou perspective */
-  /* décommenter pour orthographique gl4duOrthof(-1, 1, -1, 1, 0, 100); */
+  /* dÃ©commenter pour orthographique gl4duOrthof(-1, 1, -1, 1, 0, 100); */
   gl4duFrustumf(-1, 1, -1, 1, 2, 100);
-  /* dans quelle partie de l'écran on effectue le rendu */
+  /* dans quelle partie de l'Ã©cran on effectue le rendu */
   glViewport(0, 0, _wW, _wH);
-  /* Génération d'un identifiant de VAO */
+  /* GÃ©nÃ©ration d'un identifiant de VAO */
   glGenVertexArrays(1, &_vao);
-  /* Lier le VAO-machine-GL à l'identifiant VAO généré */
+  /* Lier le VAO-machine-GL Ã  l'identifiant VAO gÃ©nÃ©rÃ© */
   glBindVertexArray(_vao);
   /* Activation des 2 premiers indices d'attribut de sommet */
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
-  /* Génération de deux identifiants de VBO un pour ARRAY_BUFFER, un
+  /* GÃ©nÃ©ration de deux identifiants de VBO un pour ARRAY_BUFFER, un
    * pour ELEMENT_ARRAY_BUFFER */
   glGenBuffers(2, _buffer);
-  /* Lier le VBO-ARRAY_BUFFER à l'identifiant du premier VBO généré */
+  /* Lier le VBO-ARRAY_BUFFER Ã  l'identifiant du premier VBO gÃ©nÃ©rÃ© */
   glBindBuffer(GL_ARRAY_BUFFER, _buffer[0]);
-  /* Transfert des données VBO-ARRAY_BUFFER */
+  /* Transfert des donnÃ©es VBO-ARRAY_BUFFER */
   glBufferData(GL_ARRAY_BUFFER, sizeof data, data, GL_STATIC_DRAW);
-  /* Paramétrage 2 premiers indices d'attribut de sommet */
+  /* ParamÃ©trage 2 premiers indices d'attribut de sommet */
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof *data, (const void *)0);  
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof *data, (const void *)(3 * sizeof *data));
-  /* Lier le VBO-ELEMENT_ARRAY_BUFFER à l'identifiant du second VBO généré */
+  /* Lier le VBO-ELEMENT_ARRAY_BUFFER Ã  l'identifiant du second VBO gÃ©nÃ©rÃ© */
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _buffer[1]);
-  /* Transfert des données d'indices VBO-ELEMENT_ARRAY_BUFFER */
+  /* Transfert des donnÃ©es d'indices VBO-ELEMENT_ARRAY_BUFFER */
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof idata, idata, GL_STATIC_DRAW);
-  /* dé-lier le VAO puis les VAO */
+  /* dÃ©-lier le VAO puis les VAO */
   glBindVertexArray(0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 /*!\brief Cette fonction dessine dans le contexte OpenGL actif. */
 static void draw(void) {
-  /* une variable d'angle, maintenant elle passe ne degrés */
+  /* une variable d'angle, maintenant elle passe ne degrÃ©s */
   static GLfloat angle = 0.0f;
   /* effacement du buffer de couleur, nous rajoutons aussi le buffer
    * de profondeur afin de bien rendre les fragments qui sont devant
-   * au dessus de ceux qui sont derrière. Commenter le
-   * "|GL_DEPTH_BUFFER_BIT" pour voir la différence. Nous avons ajouté
+   * au dessus de ceux qui sont derriÃ¨re. Commenter le
+   * "|GL_DEPTH_BUFFER_BIT" pour voir la diffÃ©rence. Nous avons ajoutÃ©
    * l'activation du test de profondeur dans la fonction init via
    * l'appel glEnable(GL_DEPTH_TEST). */
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   /* activation du programme _pId */
   glUseProgram(_pId);
-  /* lier (mettre en avant ou "courante") la matrice vue créée dans
+  /* lier (mettre en avant ou "courante") la matrice vue crÃ©Ã©e dans
    * init */
   gl4duBindMatrix("viewMatrix");
-  /* Charger la matrice identité dans la matrice courante (liée) */
+  /* Charger la matrice identitÃ© dans la matrice courante (liÃ©e) */
   gl4duLoadIdentityf();
-  /* Composer la matrice vue courante en simulant une "caméra" à
+  /* Composer la matrice vue courante en simulant une "camÃ©ra" Ã 
    * l'aide de la fonction LookAt(xyz_position_cam,
    * xyz_ou_elle_regarde, xyz_son_vecteur_haut) */
   gl4duLookAtf(3, 3, 6, 0, 0, 0, 0, 1, 0);
-  /* lier (mettre en avant ou "courante") la matrice modèle créée dans
+  /* lier (mettre en avant ou "courante") la matrice modÃ¨le crÃ©Ã©e dans
    * init */
   gl4duBindMatrix("modelMatrix");
-  /* Charger la matrice identité dans la matrice courante (liée) */
+  /* Charger la matrice identitÃ© dans la matrice courante (liÃ©e) */
   gl4duLoadIdentityf();
   /* Envoyer, au shader courant, toutes les matrices connues dans
-   * GL4Dummies, ici on intègre pas la rotation qui vient après */
+   * GL4Dummies, ici on intÃ¨gre pas la rotation qui vient aprÃ¨s */
   gl4duSendMatrices();
-  /* modifier l'épaisseur d'une ligne dessinée quand c'est supporté
-   * par l'implémentation */
+  /* modifier l'Ã©paisseur d'une ligne dessinÃ©e quand c'est supportÃ©
+   * par l'implÃ©mentation */
   glLineWidth(3.0f);
-  /* Lier le VAO-machine-GL à l'identifiant VAO _vao */
+  /* Lier le VAO-machine-GL Ã  l'identifiant VAO _vao */
   glBindVertexArray(_vao);
   /* Dessiner la partie du VAO concernant le cube unitaire comme des
-   * line loop pour chaque face de 4 sommets en commençant par
-   * l'indice 3 (+4 à chaque fois, sur 6 faces). Pour tester, vous
+   * line loop pour chaque face de 4 sommets en commenÃ§ant par
+   * l'indice 3 (+4 Ã  chaque fois, sur 6 faces). Pour tester, vous
    * pouvez remplacer tous les GL_LINE_LOOP par des GL_TRIANGLE_FAN
    *
    * Attention ! Maintenant nous dessinons avec DrawElement qui
-   * utilise les indices des sommets passés pour mailler. Remarquer la
+   * utilise les indices des sommets passÃ©s pour mailler. Remarquer la
    * progression des indices de 4 en 4 */
   glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, (const GLvoid *)(3 * sizeof(GLuint)));
   glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, (const GLvoid *)(7 * sizeof(GLuint)));
@@ -204,41 +204,41 @@ static void draw(void) {
   glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, (const GLvoid *)(23 * sizeof(GLuint)));
 
   /* Dessiner la partie du VAO concernant les 3 axes comme des line
-   * strip pour chaque axe 5 sommets sont utilisés à chaque fois
-   * (indice + 5 à chaque fois).
+   * strip pour chaque axe 5 sommets sont utilisÃ©s Ã  chaque fois
+   * (indice + 5 Ã  chaque fois).
    *
    * Attention ! Maintenant nous dessinons avec DrawElement qui
-   * utilise les indices des sommets passés pour mailler. Remarquer la
+   * utilise les indices des sommets passÃ©s pour mailler. Remarquer la
    * progression des indices de 5 en 5 */
   glDrawElements(GL_LINE_STRIP, 5, GL_UNSIGNED_INT, (const GLvoid *)(27 * sizeof(GLuint)));
   glDrawElements(GL_LINE_STRIP, 5, GL_UNSIGNED_INT, (const GLvoid *)(32 * sizeof(GLuint)));
   glDrawElements(GL_LINE_STRIP, 5, GL_UNSIGNED_INT, (const GLvoid *)(37 * sizeof(GLuint)));
 
-  /* on transmet la variable d'angle en l'intégrant dans la matrice
-   * modèle. Soit composer la matrice courante avec une rotation
+  /* on transmet la variable d'angle en l'intÃ©grant dans la matrice
+   * modÃ¨le. Soit composer la matrice courante avec une rotation
    * "angle" autour de l'axe y (0, 1, 0) */
   gl4duRotatef(angle, 0, 1, 0);
-  /* on incrémente angle d'un 1/60 de tour soit (360° x 1/60). Tester
-   * l'application en activant/désactivant la synchronisation
+  /* on incrÃ©mente angle d'un 1/60 de tour soit (360Â° x 1/60). Tester
+   * l'application en activant/dÃ©sactivant la synchronisation
    * verticale de votre carte graphique. Que se passe-t-il ? Trouver
-   * une solution pour que résultat soit toujours le même. */
+   * une solution pour que rÃ©sultat soit toujours le mÃªme. */
   angle += (1.0f / 60.0f) * 360.0f;
   /* Envoyer, au shader courant, toutes les matrices connues dans
    * GL4Dummies */
   gl4duSendMatrices();
   /* Dessiner le VAO comme une bande d'un triangle avec 3 sommets
-   * commençant à 0
+   * commenÃ§ant Ã  0
    *
    * Attention ! Maintenant nous dessinons avec DrawElement qui
-   * utilise les indices des sommets poassés pour mailler */
+   * utilise les indices des sommets poassÃ©s pour mailler */
   glDrawElements(GL_TRIANGLE_STRIP, 3, GL_UNSIGNED_INT, (const GLvoid *)0);
-  /* dé-lier le VAO */
+  /* dÃ©-lier le VAO */
   glBindVertexArray(0);
-  /* désactiver le programme shader */
+  /* dÃ©sactiver le programme shader */
   glUseProgram(0);
 }
-/*!\brief appelée au moment de sortir du programme (atexit), elle
- *  libère les éléments OpenGL utilisés.*/
+/*!\brief appelÃ©e au moment de sortir du programme (atexit), elle
+ *  libÃ¨re les Ã©lÃ©ments OpenGL utilisÃ©s.*/
 static void quit(void) {
   /* suppression du VAO _vao en GPU */
   if(_vao)
@@ -246,6 +246,6 @@ static void quit(void) {
   /* suppression du VBO _buffer en GPU, maintenant il y en a deux */
   if(_buffer[0])
     glDeleteBuffers(2, _buffer);
-  /* nettoyage des éléments utilisés par la bibliothèque GL4Dummies */
+  /* nettoyage des Ã©lÃ©ments utilisÃ©s par la bibliothÃ¨que GL4Dummies */
   gl4duClean(GL4DU_ALL);
 }

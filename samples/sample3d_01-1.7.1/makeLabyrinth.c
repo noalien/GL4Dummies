@@ -2,7 +2,7 @@
  *
  * \brief Labyrinth generator.
  *
- * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
+ * \author FarÃ¨s BELHADJ, amsi@ai.univ-paris8.fr
  * \date February 20 2018
  */
 #include <stdlib.h>

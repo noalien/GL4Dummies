@@ -1,6 +1,6 @@
 /*!\file window.c
  * \brief effet 2D en shader
- * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
+ * \author FarÃ¨s BELHADJ, amsi@ai.univ-paris8.fr
  * \date May 14 2018 */
 #include <stdio.h>
 #include <GL4D/gl4du.h>
@@ -13,14 +13,14 @@ static void loadTexture(GLuint id, const char * filename);
 static void resize(int w, int h);
 static void draw(void);
 static void quit(void);
-/*!\brief dimensions de la fenêtre */
+/*!\brief dimensions de la fenÃªtre */
 static int _wW = 800, _wH = 600;
 /*!\brief identifiant du programme GLSL */
 static GLuint _pId = 0;
 /*!\brief identifiants ... */
 static GLuint _quad = 0, _tex = 0;
-/*!\brief La fonction principale créé la fenêtre d'affichage,
- * initialise GL et les données, affecte les fonctions d'événements et
+/*!\brief La fonction principale crÃ©Ã© la fenÃªtre d'affichage,
+ * initialise GL et les donnÃ©es, affecte les fonctions d'Ã©vÃ©nements et
  * lance la boucle principale d'affichage.*/
 int main(int argc, char ** argv) {
   if(!gl4duwCreateWindow(argc, argv, "GL4Dummies", 0, 0, 
@@ -33,12 +33,12 @@ int main(int argc, char ** argv) {
   gl4duwMainLoop();
   return 0;
 }
-/*!\brief initialise les paramètres OpenGL et les données */
+/*!\brief initialise les paramÃ¨tres OpenGL et les donnÃ©es */
 static void init(void) {
   _pId  = gl4duCreateProgram("<vs>shaders/effet.vs", "<fs>shaders/effet.fs", NULL);
   resize(_wW, _wH);
   _quad = gl4dgGenQuadf();
-  /* génération d'un identifiant de texture */
+  /* gÃ©nÃ©ration d'un identifiant de texture */
   glGenTextures(1, &_tex);
   /* chargement et transfert d'image dans une texture OpenGL */
   loadTexture(_tex, "images/water.jpg");
@@ -62,8 +62,8 @@ static void loadTexture(GLuint id, const char * filename) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
   }
 }
-/*!\brief Cette fonction paramétre la vue (viewport) OpenGL en
- * fonction des dimensions de la fenêtre.*/
+/*!\brief Cette fonction paramÃ©tre la vue (viewport) OpenGL en
+ * fonction des dimensions de la fenÃªtre.*/
 static void resize(int w, int h) {
   _wW  = w; _wH = h;
   glViewport(0, 0, _wW, _wH);
@@ -78,7 +78,7 @@ static void draw(void) {
   glBindTexture(GL_TEXTURE_2D, _tex);
   gl4dgDraw(_quad);
 }
-/*!\brief appelée au moment de sortir du programme (atexit), libère les éléments utilisés */
+/*!\brief appelÃ©e au moment de sortir du programme (atexit), libÃ¨re les Ã©lÃ©ments utilisÃ©s */
 static void quit(void) {
   /* suppression d'identifiant de texture */
   glDeleteTextures(1, &_tex);

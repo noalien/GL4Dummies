@@ -1,6 +1,6 @@
 /*!\file base.c
- * \brief géométries lumière diffuse et transformations de base en GL4Dummies
- * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
+ * \brief gÃ©omÃ©tries lumiÃ¨re diffuse et transformations de base en GL4Dummies
+ * \author FarÃ¨s BELHADJ, amsi@ai.univ-paris8.fr
  * \date April 15 2016 */
 #include <stdio.h>
 #include <GL4D/gl4du.h>
@@ -8,7 +8,7 @@
 
 /*!\brief identifiant du programme GLSL */
 static GLuint _pId = 0;
-/*!\brief quelques objets géométriques */
+/*!\brief quelques objets gÃ©omÃ©triques */
 static GLuint _sphere = 0, _cube = 0, _quad = 0;
 
 void base_init(void) {

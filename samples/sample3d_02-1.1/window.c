@@ -1,13 +1,13 @@
 /*!\file window.c
  *
- * \brief Lumière positionnelle + Gouraud + Phong et introduction au
+ * \brief LumiÃ¨re positionnelle + Gouraud + Phong et introduction au
  * geometry shader
  *
- * Exercice : ajouter le support de la lumière spéculaire (voir doc
- * wikipédia sur la lumière spéculaire et utiliser la fonction reflect
+ * Exercice : ajouter le support de la lumiÃ¨re spÃ©culaire (voir doc
+ * wikipÃ©dia sur la lumiÃ¨re spÃ©culaire et utiliser la fonction reflect
  * de GLSL).
  *
- * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
+ * \author FarÃ¨s BELHADJ, amsi@ai.univ-paris8.fr
  * \date March 11 2018
  */
 
@@ -22,7 +22,7 @@ static void         keydown(int keycode);
 static void         draw(void);
 static void         quit(void);
 
-/*!\brief dimensions de la fenêtre */
+/*!\brief dimensions de la fenÃªtre */
 static int _wW = 800, _wH = 600;
 /*!\brief identifiant des GLSL program */
 static GLuint _pId = 0, _pId2 = 0;
@@ -32,17 +32,17 @@ static GLuint _sphere = 0;
 static GLuint _longitudes = 10, _latitudes = 10;
 /*!\brief arrete l'animation */
 static GLuint _pause = 0;
-/*!\brief normale à la face ou au point ? */
+/*!\brief normale Ã  la face ou au point ? */
 static GLuint _faceNormal = 0;
 /*!\brief flag pour Phong ou pas (Gouraud) */
 static GLuint _phong = 0;
-/*!\brief flag pour savoir si la touche shift est enfoncée */
+/*!\brief flag pour savoir si la touche shift est enfoncÃ©e */
 static GLuint _shift = GL_FALSE;
-/*!\brief position de la lumière relativement à la sphère éclairée */
+/*!\brief position de la lumiÃ¨re relativement Ã  la sphÃ¨re Ã©clairÃ©e */
 static GLfloat _lumPos0[4] = {1.1, 0.0, 0.7, 1.0};
 
-/*!\brief La fonction principale créé la fenêtre d'affichage,
- * initialise GL et les données, affecte les fonctions d'événements et
+/*!\brief La fonction principale crÃ©Ã© la fenÃªtre d'affichage,
+ * initialise GL et les donnÃ©es, affecte les fonctions d'Ã©vÃ©nements et
  * lance la boucle principale d'affichage.
  */
 int main(int argc, char ** argv) {
@@ -59,7 +59,7 @@ int main(int argc, char ** argv) {
   return 0;
 }
 
-/*!\brief initialise les paramètres OpenGL */
+/*!\brief initialise les paramÃ¨tres OpenGL */
 static void init(void) {
   glClearColor(0.0f, 0.4f, 0.9f, 0.0f);
   _sphere = gl4dgGenSpheref(_longitudes, _latitudes);
@@ -70,8 +70,8 @@ static void init(void) {
   resize(_wW, _wH);
 }
 
-/*!\brief Cette fonction paramétre la vue (viewport) OpenGL en
- * fonction des dimensions de la fenêtre.
+/*!\brief Cette fonction paramÃ©tre la vue (viewport) OpenGL en
+ * fonction des dimensions de la fenÃªtre.
  */
 static void resize(int w, int h) {
   _wW  = w;
@@ -188,7 +188,7 @@ static void draw(void) {
   gl4duBindMatrix("modelViewMatrix");
   gl4duLoadIdentityf();
   gl4duTranslatef(0, 0, -3);
-  /* on récupère l'état de la matrice courante */
+  /* on rÃ©cupÃ¨re l'Ã©tat de la matrice courante */
   mat = gl4duGetMatrixData();
   /* lumPos = mat x _lumPos0 */
   MMAT4XVEC4(lumPos, mat, _lumPos0);
@@ -198,23 +198,23 @@ static void draw(void) {
   glUniform4fv(glGetUniformLocation(_pId, "lumPos"), 1, lumPos);
   glUniform1i(glGetUniformLocation(_pId, "faceNormal"), _faceNormal);
   glUniform1i(glGetUniformLocation(_pId, "phong"), _phong);
-  /* envoi de toutes les matrices stockées par GL4D */
+  /* envoi de toutes les matrices stockÃ©es par GL4D */
   gl4duSendMatrices();
-  /* dessiner une première fois la sphère avec le _pId */
+  /* dessiner une premiÃ¨re fois la sphÃ¨re avec le _pId */
   gl4dgDraw(_sphere);
   gl4duPopMatrix();
   gl4duTranslatef(_lumPos0[0], _lumPos0[1], _lumPos0[2]);
   gl4duScalef(0.05, 0.05, 0.05);
   glUseProgram(_pId2);
   gl4duSendMatrices();
-  /* dessiner une seconde fois la sphère avec le _pId2 */
+  /* dessiner une seconde fois la sphÃ¨re avec le _pId2 */
   gl4dgDraw(_sphere);
   if(!_pause)
     a0 += 360 * dt;
 }
 
-/*!\brief appelée au moment de sortir du programme (atexit), libère
- * les éléments utilisés */
+/*!\brief appelÃ©e au moment de sortir du programme (atexit), libÃ¨re
+ * les Ã©lÃ©ments utilisÃ©s */
 static void quit(void) {
   gl4duClean(GL4DU_ALL);
 }

@@ -1,11 +1,11 @@
 /*!\file window.c
  *
- * \brief premier exemple de code GL4Dummies/OpenGL avec création et
- * utilisation d'un shader sur une géométrie de quadrilatère. Le
- * quadrilatère subit un changement d'échelle variable utilisant une
- * sinusoïdale.
+ * \brief premier exemple de code GL4Dummies/OpenGL avec crÃ©ation et
+ * utilisation d'un shader sur une gÃ©omÃ©trie de quadrilatÃ¨re. Le
+ * quadrilatÃ¨re subit un changement d'Ã©chelle variable utilisant une
+ * sinusoÃ¯dale.
  *
- * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
+ * \author FarÃ¨s BELHADJ, amsi@ai.univ-paris8.fr
  * \date March 11, 2018
  */
 #include <GL4D/gl4du.h>
@@ -14,14 +14,14 @@
 static void init(void);
 static void draw(void);
 static void quit(void);
-/*!\brief largeur et hauteur de la fenêtre */
+/*!\brief largeur et hauteur de la fenÃªtre */
 static int _wW = 800, _wH = 600;
-/*!\brief identifiant du quadrilatère faisant office de "rectangle écran" */
+/*!\brief identifiant du quadrilatÃ¨re faisant office de "rectangle Ã©cran" */
 static GLuint _quad = 0;
 /*!\brief identifiant du (futur) GLSL program */
 static GLuint _pId = 0;
-/*!\brief créé la fenêtre d'affichage, initialise GL et les données,
- * affecte les fonctions d'événements et lance la boucle principale
+/*!\brief crÃ©Ã© la fenÃªtre d'affichage, initialise GL et les donnÃ©es,
+ * affecte les fonctions d'Ã©vÃ©nements et lance la boucle principale
  * d'affichage. */
 int main(int argc, char ** argv) {
   if(!gl4duwCreateWindow(argc, argv, "GL4Dummies", 20, 20, 
@@ -33,16 +33,16 @@ int main(int argc, char ** argv) {
   gl4duwMainLoop();
   return 0;
 }
-/*!\brief initialise les paramètres OpenGL et les données. 
+/*!\brief initialise les paramÃ¨tres OpenGL et les donnÃ©es. 
  */
 static void init(void) {
-  /* Création du programme shader (voir le dossier shader) */
+  /* CrÃ©ation du programme shader (voir le dossier shader) */
   _pId = gl4duCreateProgram("<vs>shaders/basic.vs", "<fs>shaders/basic.fs", NULL);
   /* Set de la couleur (RGBA) d'effacement OpenGL */
   glClearColor(1.2f, 0.2f, 0.2f, 1.0f);
-  /* dans quelle partie de l'écran on effectue le rendu */
+  /* dans quelle partie de l'Ã©cran on effectue le rendu */
   glViewport(0, 0, _wW, _wH);
-  /* génération de la géométrie du quadrilatère */
+  /* gÃ©nÃ©ration de la gÃ©omÃ©trie du quadrilatÃ¨re */
   _quad = gl4dgGenQuadf();
 }
 /*!\brief Cette fonction dessine dans le contexte OpenGL actif. */
@@ -53,17 +53,17 @@ static void draw(void) {
   /* activation du programme de rendu _pId */
   glUseProgram(_pId);
   /* envoi de la valeur de la variable c dans la variable uniform
-   * count du côté shader (GPU). Puis c incrémente de 1 pour l'appel
+   * count du cÃ´tÃ© shader (GPU). Puis c incrÃ©mente de 1 pour l'appel
    * suivant. */
   glUniform1i(glGetUniformLocation(_pId, "count"), c++);
-  /* dessin de la géométrie du quadrilatère */
+  /* dessin de la gÃ©omÃ©trie du quadrilatÃ¨re */
   gl4dgDraw(_quad);
-  /* désactiver le programme shader */
+  /* dÃ©sactiver le programme shader */
   glUseProgram(0);
 }
-/*!\brief appelée au moment de sortir du programme (atexit), elle
- *  libère les éléments OpenGL utilisés.*/
+/*!\brief appelÃ©e au moment de sortir du programme (atexit), elle
+ *  libÃ¨re les Ã©lÃ©ments OpenGL utilisÃ©s.*/
 static void quit(void) {
-  /* nettoyage des éléments utilisés par la bibliothèque GL4Dummies */
+  /* nettoyage des Ã©lÃ©ments utilisÃ©s par la bibliothÃ¨que GL4Dummies */
   gl4duClean(GL4DU_ALL);
 }

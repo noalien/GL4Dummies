@@ -1,7 +1,7 @@
 /*!\file window.c
  *
- * \brief GL4Dummies, exemple 3D simple avec dessin d'un quadrilatère
- * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
+ * \brief GL4Dummies, exemple 3D simple avec dessin d'un quadrilatÃ¨re
+ * \author FarÃ¨s BELHADJ, amsi@ai.univ-paris8.fr
  * \date February 11 2018
  */
 
@@ -13,7 +13,7 @@ static void init(void);
 static void draw(void);
 static void quit(void);
 
-/*!\brief largeur et hauteur de la fenêtre */
+/*!\brief largeur et hauteur de la fenÃªtre */
 static int _wW = 800, _wH = 600;
 /*!\brief identifiant du (futur) Vertex Array Object */
 static GLuint _vao = 0;
@@ -22,8 +22,8 @@ static GLuint _buffer = 0;
 /*!\brief identifiant du (futur) GLSL program */
 static GLuint _pId = 0;
 
-/*!\brief créé la fenêtre d'affichage, initialise GL et les données,
- * affecte les fonctions d'événements et lance la boucle principale
+/*!\brief crÃ©Ã© la fenÃªtre d'affichage, initialise GL et les donnÃ©es,
+ * affecte les fonctions d'Ã©vÃ©nements et lance la boucle principale
  * d'affichage.
  */
 int main(int argc, char ** argv) {
@@ -36,21 +36,21 @@ int main(int argc, char ** argv) {
   gl4duwMainLoop();
   return 0;
 }
-/*!\brief initialise les paramètres OpenGL et les données. 
+/*!\brief initialise les paramÃ¨tres OpenGL et les donnÃ©es. 
  *
- * Exercice (corrigé en 1.3) : utiliser GL4Dummies (voir manuel + doc
- * de référence concernant gl4du.h) pour créer
+ * Exercice (corrigÃ© en 1.3) : utiliser GL4Dummies (voir manuel + doc
+ * de rÃ©fÃ©rence concernant gl4du.h) pour crÃ©er
  * (gl4duGenMatrix/gl4duBindMatrix) une matrice de projection
  * (orthogonale (gl4duOrthof) ou perspective (gl4duFrustumf)) et une
- * matrice de modélisation et de vue. De plus, les fonctions
+ * matrice de modÃ©lisation et de vue. De plus, les fonctions
  * gl4duLoadIdentityf, gl4duTranslatef, gl4duRotatef, gl4duSendMatrix
- * ou gl4duSendMatrices peuvent être utiles ; ne pas oublier de
- * récupérer les matrices dans le vertex shader et de les appliquer.
+ * ou gl4duSendMatrices peuvent Ãªtre utiles ; ne pas oublier de
+ * rÃ©cupÃ©rer les matrices dans le vertex shader et de les appliquer.
  */
 static void init(void) {
-  /* données envoyées par tranches sommet-attributs dans le VBO */
+  /* donnÃ©es envoyÃ©es par tranches sommet-attributs dans le VBO */
   GLfloat data[] = {
-    /* 4 coordonnées de sommets en 2D chacune suivie de sa couleur */
+    /* 4 coordonnÃ©es de sommets en 2D chacune suivie de sa couleur */
     -1.0f, -1.0f, 
     1.0f, 0.0f, 0.0f, 
     1.0f, -1.0f,
@@ -60,29 +60,29 @@ static void init(void) {
     1.0f, 1.0f,
     1.0f, 1.0f, 0.0f
   };
-  /* Création du programme shader (voir le dossier shader) */
+  /* CrÃ©ation du programme shader (voir le dossier shader) */
   _pId = gl4duCreateProgram("<vs>shaders/basic.vs", "<fs>shaders/basic.fs", NULL);
   /* Set de la couleur (RGBA) d'effacement OpenGL */
   glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-  /* dans quelle partie de l'écran on effectue le rendu */
+  /* dans quelle partie de l'Ã©cran on effectue le rendu */
   glViewport(0, 0, _wW, _wH);
-  /* Génération d'un identifiant de VAO */
+  /* GÃ©nÃ©ration d'un identifiant de VAO */
   glGenVertexArrays(1, &_vao);
-  /* Lier le VAO-machine-GL à l'identifiant VAO généré */
+  /* Lier le VAO-machine-GL Ã  l'identifiant VAO gÃ©nÃ©rÃ© */
   glBindVertexArray(_vao);
   /* Activation des 2 premiers indices d'attribut de sommet */
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
-  /* Génération d'un identifiant de VBO */
+  /* GÃ©nÃ©ration d'un identifiant de VBO */
   glGenBuffers(1, &_buffer);
-  /* Lier le VBO-machine-GL à l'identifiant VBO généré */
+  /* Lier le VBO-machine-GL Ã  l'identifiant VBO gÃ©nÃ©rÃ© */
   glBindBuffer(GL_ARRAY_BUFFER, _buffer);
-  /* Transfert des données VBO */
+  /* Transfert des donnÃ©es VBO */
   glBufferData(GL_ARRAY_BUFFER, sizeof data, data, GL_STATIC_DRAW);
-  /* Paramétrage 2 premiers indices d'attribut de sommet */
+  /* ParamÃ©trage 2 premiers indices d'attribut de sommet */
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof *data, (const void *)0);  
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof *data, (const void *)(2 * sizeof *data));
-  /* dé-lier le VAO et VBO */
+  /* dÃ©-lier le VAO et VBO */
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -96,22 +96,22 @@ static void draw(void) {
   glUseProgram(_pId);
   /* on transmet la variable uniform d'angle */
   glUniform1f(glGetUniformLocation(_pId, "angle"), angle);
-  /* on incrémente angle d'un 1/60 de tour. Tester l'application en
-   * activant/désactivant la synchronisation verticale de votre carte
+  /* on incrÃ©mente angle d'un 1/60 de tour. Tester l'application en
+   * activant/dÃ©sactivant la synchronisation verticale de votre carte
    * graphique. Que se passe-t-il ? Trouver une solution pour que
-   * résultat soit toujours le même. */
+   * rÃ©sultat soit toujours le mÃªme. */
   angle += (1.0f / 60.0f) * 2.0f * M_PI;
-  /* Lier le VAO-machine-GL à l'identifiant VAO _vao */
+  /* Lier le VAO-machine-GL Ã  l'identifiant VAO _vao */
   glBindVertexArray(_vao);
-  /* Dessiner le VAO comme une bande de deux triangles avec 4 sommets commençant à 0 */
+  /* Dessiner le VAO comme une bande de deux triangles avec 4 sommets commenÃ§ant Ã  0 */
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-  /* dé-lier le VAO */
+  /* dÃ©-lier le VAO */
   glBindVertexArray(0);
-  /* désactiver le programme shader */
+  /* dÃ©sactiver le programme shader */
   glUseProgram(0);
 }
-/*!\brief appelée au moment de sortir du programme (atexit), elle
- *  libère les éléments OpenGL utilisés.*/
+/*!\brief appelÃ©e au moment de sortir du programme (atexit), elle
+ *  libÃ¨re les Ã©lÃ©ments OpenGL utilisÃ©s.*/
 static void quit(void) {
   /* suppression du VAO _vao en GPU */
   if(_vao)
@@ -119,6 +119,6 @@ static void quit(void) {
   /* suppression du VBO _buffer en GPU */
   if(_buffer)
     glDeleteBuffers(1, &_buffer);
-  /* nettoyage des éléments utilisés par la bibliothèque GL4Dummies */
+  /* nettoyage des Ã©lÃ©ments utilisÃ©s par la bibliothÃ¨que GL4Dummies */
   gl4duClean(GL4DU_ALL);
 }

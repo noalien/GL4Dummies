@@ -1,9 +1,9 @@
 /*!\file window.c
  *
- * \brief Lumière positionnelle + Phong + Bump mapping + Normal
+ * \brief LumiÃ¨re positionnelle + Phong + Bump mapping + Normal
  * mapping + textures et geometry shader
  *
- * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
+ * \author FarÃ¨s BELHADJ, amsi@ai.univ-paris8.fr
  * \date March 19 2018
  */
 #include <assert.h>
@@ -20,7 +20,7 @@ static void         draw(void);
 static void         initAudio(const char * filename);
 static void         quit(void);
 
-/*!\brief dimensions de la fenêtre */
+/*!\brief dimensions de la fenÃªtre */
 static int _wW = 800, _wH = 600;
 /*!\brief identifiant des GLSL program */
 static GLuint _pId1 = 0, _pId2 = 0;
@@ -28,21 +28,21 @@ static GLuint _pId1 = 0, _pId2 = 0;
 static GLuint _sphere = 0;
 /*!\brief nombre de longitudes et latitudes de la sphere */
 static GLuint _longitudes = 200, _latitudes = 200;
-/*!\brief position de la lumière relativement à la sphère éclairée */
+/*!\brief position de la lumiÃ¨re relativement Ã  la sphÃ¨re Ã©clairÃ©e */
 static GLfloat _lumPos0[4] = {-15.1, 20.0, 20.7, 1.0};
-/*!\brief nombre d'échantillons du signal sonore */
+/*!\brief nombre d'Ã©chantillons du signal sonore */
 #define ECHANTILLONS 1024
 /*!\brief amplitude des basses et aigus du signal sonore */
 static GLfloat _basses = 0, _aigus = 0;
 
-/*!\brief noms des fichiers textures à charger */
+/*!\brief noms des fichiers textures Ã  charger */
 static const char * _texture_filenames[] = { "images/land_ocean_ice_2048.png", 
 					     "images/land_ocean_ice_lights_2048.png", 
 					     "images/land_bump.png", 
 					     "images/land_cloud_combined_2048.png", 
 					     "images/land_ocean_ice_2048_glossmap.png" };
 
-/*!\brief noms des variables uniform sampler2D à affecter à charque
+/*!\brief noms des variables uniform sampler2D Ã  affecter Ã  charque
  * texture */
 static const char * _sampler_names[] = { "eday", 
 					 "enight", 
@@ -58,18 +58,18 @@ enum texture_e {
   TE_EGLOSS, /* land_ocean_ice_2048_glossmap.png */
   TE_END
 };
-/*!\brief tableau des identifiants de texture à charger */
+/*!\brief tableau des identifiants de texture Ã  charger */
 static GLuint _tId[TE_END] = {0};
 
-/*!\brief pointeur vers la musique chargée par SDL_Mixer */
+/*!\brief pointeur vers la musique chargÃ©e par SDL_Mixer */
 static Mix_Music * _mmusic = NULL;
-/*!\brief données entrées/sorties pour la lib fftw */
+/*!\brief donnÃ©es entrÃ©es/sorties pour la lib fftw */
 static fftw_complex * _in4fftw = NULL, * _out4fftw = NULL;
-/*!\brief donnée à précalculée utile à la lib fftw */
+/*!\brief donnÃ©e Ã  prÃ©calculÃ©e utile Ã  la lib fftw */
 static fftw_plan _plan4fftw = NULL;
 
-/*!\brief La fonction principale créé la fenêtre d'affichage,
- * initialise GL et les données, affecte les fonctions d'événements et
+/*!\brief La fonction principale crÃ©Ã© la fenÃªtre d'affichage,
+ * initialise GL et les donnÃ©es, affecte les fonctions d'Ã©vÃ©nements et
  * lance la boucle principale d'affichage.
  */
 int main(int argc, char ** argv) {
@@ -89,7 +89,7 @@ int main(int argc, char ** argv) {
   return 0;
 }
 
-/*!\brief initialise les paramètres OpenGL */
+/*!\brief initialise les paramÃ¨tres OpenGL */
 static void init(void) {
   int i;
   if(!_tId[0]) {
@@ -122,8 +122,8 @@ static void init(void) {
   _sphere = gl4dgGenSpheref(_longitudes, _latitudes);
 }
 
-/*!\brief Cette fonction paramétre la vue (viewport) OpenGL en
- * fonction des dimensions de la fenêtre.
+/*!\brief Cette fonction paramÃ©tre la vue (viewport) OpenGL en
+ * fonction des dimensions de la fenÃªtre.
  */
 static void resize(int w, int h) {
   _wW  = w;
@@ -167,7 +167,7 @@ static void draw(void) {
   glUniform1f(glGetUniformLocation(_pId1, "aigus"), _aigus);
   glUniform2fv(glGetUniformLocation(_pId1, "steps"), 1, steps);
   glUniform4fv(glGetUniformLocation(_pId1, "lumPos"), 1, lumPos);
-  /* envoi de toutes les matrices stockées par GL4D */
+  /* envoi de toutes les matrices stockÃ©es par GL4D */
   gl4duSendMatrices();
   gl4dgDraw(_sphere);
   for(i = 0; i < TE_END; i++) {
@@ -188,8 +188,8 @@ static void draw(void) {
   a0 += 360.0 * dt / (24.0 /* * 60.0 */);
 }
 
-/*!\brief appelée quand l'audio est joué et met dans \a stream les
- * données audio de longueur \a len */
+/*!\brief appelÃ©e quand l'audio est jouÃ© et met dans \a stream les
+ * donnÃ©es audio de longueur \a len */
 static void mixCallback(void *udata, Uint8 *stream, int len) {
   if(_plan4fftw) {
     int i, l = MIN(len >> 1, ECHANTILLONS);
@@ -216,7 +216,7 @@ static void initAudio(const char * filename) {
   int mult = 2;
 #endif
   int mixFlags = MIX_INIT_MP3, res;
-  /* préparation des conteneurs de données pour la lib FFTW */
+  /* prÃ©paration des conteneurs de donnÃ©es pour la lib FFTW */
   _in4fftw   = fftw_malloc(ECHANTILLONS *  sizeof *_in4fftw);
   memset(_in4fftw, 0, ECHANTILLONS *  sizeof *_in4fftw);
   assert(_in4fftw);
@@ -228,7 +228,7 @@ static void initAudio(const char * filename) {
   if( (res & mixFlags) != mixFlags ) {
     fprintf(stderr, "Mix_Init: Erreur lors de l'initialisation de la bibliotheque SDL_Mixer\n");
     fprintf(stderr, "Mix_Init: %s\n", Mix_GetError());
-    //exit(3); commenté car ne réagit correctement sur toutes les architectures
+    //exit(3); commentÃ© car ne rÃ©agit correctement sur toutes les architectures
   }
   if(Mix_OpenAudio(44100, AUDIO_S16LSB, 1, mult * ECHANTILLONS) < 0)
     exit(4);  
@@ -241,7 +241,7 @@ static void initAudio(const char * filename) {
     Mix_PlayMusic(_mmusic, 1);
 }
 
-/*!\brief appelée au moment de sortir du programme (atexit), libère les éléments utilisés */
+/*!\brief appelÃ©e au moment de sortir du programme (atexit), libÃ¨re les Ã©lÃ©ments utilisÃ©s */
 static void quit(void) {
   if(_mmusic) {
     if(Mix_PlayingMusic())

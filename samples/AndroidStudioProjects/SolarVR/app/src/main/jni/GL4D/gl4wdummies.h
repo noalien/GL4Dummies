@@ -3,7 +3,7 @@
  * \brief Partie ne concernant que windows de gl4dummies, ici se trouvent
  *  des wrappers vers les fonctions n'existant pas dans opengl32
  *
- * \author Farès BELHADJ amsi@grafeet.fr (ou amsi@ai.univ-paris8.fr)
+ * \author FarÃ¨s BELHADJ amsi@grafeet.fr (ou amsi@ai.univ-paris8.fr)
  * \date March 28, 2008 - February 07, 2014
 */
 

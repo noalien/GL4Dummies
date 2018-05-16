@@ -1,12 +1,12 @@
 /*!\file window.c
  *
  * \brief utilisation de GL4Dummies et Lib Assimp pour chargement de
- * modèles 3D.
+ * modÃ¨les 3D.
  *
- * Ici on charge un modèle d'avion et on le fait tourner sur un cercle
+ * Ici on charge un modÃ¨le d'avion et on le fait tourner sur un cercle
  * en le suivant du regard.
  *
- * \author Farès Belhadj amsi@ai.univ-paris8.fr
+ * \author FarÃ¨s Belhadj amsi@ai.univ-paris8.fr
  * \date May 13 2018
  */
 
@@ -18,9 +18,9 @@
 static int _wW = 800;
 /*!\brief opened window height */
 static int _wH = 600;
-/*!\brief paramètres du cercle suivi par l'avion */
+/*!\brief paramÃ¨tres du cercle suivi par l'avion */
 static GLfloat _radius = 10, _x0 = 10, _z0 = -10, _y0 = 2.5;
-/*!\brief paramètres de l'avion */
+/*!\brief paramÃ¨tres de l'avion */
 static GLfloat _x = 0, _y = 0, _z = 0, _alpha = 0;
 /*!\brief GLSL program Id */
 static GLuint _pId = 0, _pId2 = 0;

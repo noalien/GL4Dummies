@@ -1,13 +1,13 @@
 /*!\file assimp.c
  *
  * \brief utilisation de GL4Dummies et Lib Assimp pour chargement de
- * scènes.
+ * scÃ¨nes.
  *
  * Modification de l'exemple fourni par lib Assimp utilisant GL < 3 et
  * GLUT et upgrade avec utilisation des VAO/VBO et matrices et shaders
  * GL4dummies.
  *
- * \author Vincent Boyer et Farès Belhadj {boyer, amsi}@ai.univ-paris8.fr
+ * \author Vincent Boyer et FarÃ¨s Belhadj {boyer, amsi}@ai.univ-paris8.fr
  * \date February 14 2017
  */
 

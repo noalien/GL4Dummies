@@ -3,7 +3,7 @@
  * \brief Walking on finite plane with skydome textured with a
  * triangle-edge midpoint-displacement algorithm.
  *
- * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
+ * \author FarÃ¨s BELHADJ, amsi@ai.univ-paris8.fr
  * \date February 9 2017
  */
 #include <math.h>

@@ -3,7 +3,7 @@
  * \brief Walking on finite plane with skydome textured with a
  * triangle-edge midpoint-displacement algorithm.
  *
- * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
+ * \author FarÃ¨s BELHADJ, amsi@ai.univ-paris8.fr
  * \date February 9 2017
  */
 #include <math.h>
@@ -12,10 +12,10 @@
 #include <GL4D/gl4duw_SDL2.h>
 #include <SDL_mixer.h>
 static void initAudio(const char * file);
-/*!\brief nombre d'échantillons du signal sonore */
+/*!\brief nombre d'Ã©chantillons du signal sonore */
 #define ECHANTILLONS 1024
 static int _moyenne = 0;
-/*!\brief pointeur vers la musique chargée par SDL_Mixer */
+/*!\brief pointeur vers la musique chargÃ©e par SDL_Mixer */
 static Mix_Music * _mmusic = NULL;
 
 static void quit(void);
@@ -238,10 +238,10 @@ static void quit(void) {
 }
 
 
-/*!\brief Cette fonction est appelée quand l'audio est joué et met 
- * dans \a stream les données audio de longueur \a len.
- * \param udata pour user data, données passées par l'utilisateur, ici NULL.
- * \param stream flux de données audio.
+/*!\brief Cette fonction est appelÃ©e quand l'audio est jouÃ© et met 
+ * dans \a stream les donnÃ©es audio de longueur \a len.
+ * \param udata pour user data, donnÃ©es passÃ©es par l'utilisateur, ici NULL.
+ * \param stream flux de donnÃ©es audio.
  * \param len longueur de \a stream. */
 static void mixCallback(void *udata, Uint8 *stream, int len) {
   int i;
@@ -254,7 +254,7 @@ static void mixCallback(void *udata, Uint8 *stream, int len) {
   return;
 }
 
-/*!\brief Cette fonction initialise les paramètres SDL_Mixer et charge
+/*!\brief Cette fonction initialise les paramÃ¨tres SDL_Mixer et charge
  *  le fichier audio.*/
 static void initAudio(const char * file) {
   int mixFlags = MIX_INIT_OGG | MIX_INIT_MOD, res;

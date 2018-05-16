@@ -1,6 +1,6 @@
 /*!\file window.c
- * \brief géométries lumière diffuse et transformations de base en GL4Dummies
- * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
+ * \brief gÃ©omÃ©tries lumiÃ¨re diffuse et transformations de base en GL4Dummies
+ * \author FarÃ¨s BELHADJ, amsi@ai.univ-paris8.fr
  * \date April 15 2016 */
 #include <stdio.h>
 #include <GL4D/gl4du.h>
@@ -11,14 +11,14 @@ static void init(void);
 static void resize(int w, int h);
 static void draw(void);
 static void quit(void);
-/*!\brief dimensions de la fenêtre */
+/*!\brief dimensions de la fenÃªtre */
 static int _wW = 800, _wH = 600;
 /*!\brief identifiant du programme GLSL */
 static GLuint _pId = 0;
-/*!\brief quelques objets géométriques */
+/*!\brief quelques objets gÃ©omÃ©triques */
 static GLuint _sphere = 0, _cube = 0, _quad = 0, _torus = 0;
-/*!\brief La fonction principale créé la fenêtre d'affichage,
- * initialise GL et les données, affecte les fonctions d'événements et
+/*!\brief La fonction principale crÃ©Ã© la fenÃªtre d'affichage,
+ * initialise GL et les donnÃ©es, affecte les fonctions d'Ã©vÃ©nements et
  * lance la boucle principale d'affichage.*/
 int main(int argc, char ** argv) {
   if(!gl4duwCreateWindow(argc, argv, "GL4Dummies", 0, 0, 
@@ -31,7 +31,7 @@ int main(int argc, char ** argv) {
   gl4duwMainLoop();
   return 0;
 }
-/*!\brief initialise les paramètres OpenGL et les données */
+/*!\brief initialise les paramÃ¨tres OpenGL et les donnÃ©es */
 static void init(void) {
   glEnable(GL_DEPTH_TEST);
   glClearColor(1.0f, 0.7f, 0.7f, 0.0f);
@@ -44,8 +44,8 @@ static void init(void) {
   _quad = gl4dgGenQuadf();
   _torus = gl4dgGenTorusf(300, 30, 0.1f);
 }
-/*!\brief Cette fonction paramétre la vue (viewport) OpenGL en
- * fonction des dimensions de la fenêtre.*/
+/*!\brief Cette fonction paramÃ©tre la vue (viewport) OpenGL en
+ * fonction des dimensions de la fenÃªtre.*/
 static void resize(int w, int h) {
   _wW  = w; _wH = h;
   glViewport(0, 0, _wW, _wH);
@@ -89,13 +89,13 @@ static void draw(void) {
   gl4duSendMatrices();
   glUniform4fv(glGetUniformLocation(_pId, "couleur"), 1, jaune);
   gl4dgDraw(_torus);
-  /* Décommenter pour avoir un rendu sympathique pour pas cher :) */
+  /* DÃ©commenter pour avoir un rendu sympathique pour pas cher :) */
   /*   gl4dfBlur(0, 0, 5, 1, 0, GL_FALSE); */
   /*   gl4dfSobelSetMixMode(GL4DF_SOBEL_MIX_MULT); */
   /*   gl4dfSobel(0, 0, GL_FALSE); */
   a++;
 }
-/*!\brief appelée au moment de sortir du programme (atexit), libère les éléments utilisés */
+/*!\brief appelÃ©e au moment de sortir du programme (atexit), libÃ¨re les Ã©lÃ©ments utilisÃ©s */
 static void quit(void) {
   gl4duClean(GL4DU_ALL);
 }

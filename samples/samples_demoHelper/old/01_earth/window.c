@@ -1,8 +1,8 @@
 /*!\file window.c
  *
- * \brief Terre en GL / GL4Dummies + Texture + Lumière positionnelle +
- * Phong + Spéculaire
- * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
+ * \brief Terre en GL / GL4Dummies + Texture + LumiÃ¨re positionnelle +
+ * Phong + SpÃ©culaire
+ * \author FarÃ¨s BELHADJ, amsi@ai.univ-paris8.fr
  * \date April 15 2016 */
 #include <math.h>
 #include <stdio.h>
@@ -21,27 +21,27 @@ static void         keydown(int keycode);
 static void         draw(void);
 static void         quit(void);
 
-/*!\brief dimensions de la fenêtre */
+/*!\brief dimensions de la fenÃªtre */
 static int _windowWidth = 1200, _windowHeight = 600;
 /*!\brief identifiant du programme GLSL */
 static GLuint _pId = 0;
 /*!\brief arrete l'animation */
 static GLuint _pause = 0;
-/*!\brief flag pour savoir si la touche shift est enfoncée */
+/*!\brief flag pour savoir si la touche shift est enfoncÃ©e */
 static GLuint _shift = GL_FALSE;
-/*!\brief flag pour activer la lumière spéculaire */
+/*!\brief flag pour activer la lumiÃ¨re spÃ©culaire */
 static GLuint _specular = 0;
-/*!\brief position de la lumière relativement à la sphère éclairée */
+/*!\brief position de la lumiÃ¨re relativement Ã  la sphÃ¨re Ã©clairÃ©e */
 static GLfloat _lumPos0[4] = {1500.0, 20.0, 30.0, 1.0};
-/*!\brief tableau des identifiants de texture à charger */
+/*!\brief tableau des identifiants de texture Ã  charger */
 static GLuint _tId[3] = {0};
 /*!\brief pour les deux astres : terre et lune */
 static GLuint _sphere = {0};
-/*!\brief les différents modes de vue */
+/*!\brief les diffÃ©rents modes de vue */
 static GLuint _mode = 0;
 
-/*!\brief La fonction principale créé la fenêtre d'affichage,
- * initialise GL et les données, affecte les fonctions d'événements et
+/*!\brief La fonction principale crÃ©Ã© la fenÃªtre d'affichage,
+ * initialise GL et les donnÃ©es, affecte les fonctions d'Ã©vÃ©nements et
  * lance la boucle principale d'affichage.
  */
 int main(int argc, char ** argv) {
@@ -59,7 +59,7 @@ int main(int argc, char ** argv) {
   return 0;
 }
 
-/*!\brief initialise les paramètres OpenGL */
+/*!\brief initialise les paramÃ¨tres OpenGL */
 static void initGL(void) {
   glEnable(GL_CULL_FACE);
   glEnable(GL_DEPTH_TEST);
@@ -70,7 +70,7 @@ static void initGL(void) {
   resize(_windowWidth, _windowHeight);
 }
 
-/*!\brief initialise les données */
+/*!\brief initialise les donnÃ©es */
 static void initData(void) {
   int i;
   SDL_Surface * t;
@@ -96,8 +96,8 @@ static void initData(void) {
   _sphere = gl4dgGenSpheref(30, 30);
 }
 
-/*!\brief Cette fonction paramétre la vue (viewport) OpenGL en
- * fonction des dimensions de la fenêtre.
+/*!\brief Cette fonction paramÃ©tre la vue (viewport) OpenGL en
+ * fonction des dimensions de la fenÃªtre.
  */
 static void resize(int w, int h) {
   _windowWidth  = w;
@@ -198,7 +198,7 @@ static void draw(void) {
   glUniform1i(glGetUniformLocation(_pId, "tex1"), 1);
   glUniform4fv(glGetUniformLocation(_pId, "lumPos"), 1, lumPos);
   glUniform1i(glGetUniformLocation(_pId, "specular"), _specular);
-  /* envoi de toutes les matrices stockées par GL4D */
+  /* envoi de toutes les matrices stockÃ©es par GL4D */
   gl4duPushMatrix(); {
     gl4duRotatef(a0, 0, 1, 0);
     gl4duSendMatrices();
@@ -222,7 +222,7 @@ static void draw(void) {
     a0 += 360.0 * dt / (_mode == 0 ? 24.0 * 6.0 : 6.0);
 }
 
-/*!\brief appelée au moment de sortir du programme (atexit), libère les éléments utilisés */
+/*!\brief appelÃ©e au moment de sortir du programme (atexit), libÃ¨re les Ã©lÃ©ments utilisÃ©s */
 static void quit(void) {
   gl4duClean(GL4DU_ALL);
 }

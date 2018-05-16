@@ -1,6 +1,6 @@
 /*!\file window.c
- * \brief géométries lumière diffuse, transformations de base et chargement de textures en GL4Dummies
- * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
+ * \brief gÃ©omÃ©tries lumiÃ¨re diffuse, transformations de base et chargement de textures en GL4Dummies
+ * \author FarÃ¨s BELHADJ, amsi@ai.univ-paris8.fr
  * \date May 13 2018 */
 #include <stdio.h>
 #include <GL4D/gl4du.h>
@@ -13,14 +13,14 @@ static void loadTexture(GLuint id, const char * filename);
 static void resize(int w, int h);
 static void draw(void);
 static void quit(void);
-/*!\brief dimensions de la fenêtre */
+/*!\brief dimensions de la fenÃªtre */
 static int _wW = 800, _wH = 600;
 /*!\brief identifiant du programme GLSL */
 static GLuint _pId = 0;
-/*!\brief quelques objets géométriques */
+/*!\brief quelques objets gÃ©omÃ©triques */
 static GLuint _sphere = 0, _cube = 0, _quad = 0, _torus = 0, _tex[5] = {0};
-/*!\brief La fonction principale créé la fenêtre d'affichage,
- * initialise GL et les données, affecte les fonctions d'événements et
+/*!\brief La fonction principale crÃ©Ã© la fenÃªtre d'affichage,
+ * initialise GL et les donnÃ©es, affecte les fonctions d'Ã©vÃ©nements et
  * lance la boucle principale d'affichage.*/
 int main(int argc, char ** argv) {
   if(!gl4duwCreateWindow(argc, argv, "GL4Dummies", 0, 0, 
@@ -33,7 +33,7 @@ int main(int argc, char ** argv) {
   gl4duwMainLoop();
   return 0;
 }
-/*!\brief initialise les paramètres OpenGL et les données */
+/*!\brief initialise les paramÃ¨tres OpenGL et les donnÃ©es */
 static void init(void) {
   glEnable(GL_DEPTH_TEST);
   glClearColor(1.0f, 0.7f, 0.7f, 1.0f);
@@ -45,14 +45,14 @@ static void init(void) {
   _cube = gl4dgGenCubef();
   _quad = gl4dgGenQuadf();
   _torus = gl4dgGenTorusf(300, 30, 0.1f);
-  /* génération de plusieurs identifiants de texture */
+  /* gÃ©nÃ©ration de plusieurs identifiants de texture */
   glGenTextures(sizeof _tex / sizeof *_tex, _tex);
   /* chargement et transfert des images dans des textures OpenGL */
   loadTexture(_tex[0], "images/sphere.jpg");
   loadTexture(_tex[1], "images/cube.jpg");
   loadTexture(_tex[2], "images/quad.jpg");
   loadTexture(_tex[3], "images/torus.jpg");
-  /* une dernière texture vide pour y faire des calculs d'effets */
+  /* une derniÃ¨re texture vide pour y faire des calculs d'effets */
   glBindTexture(GL_TEXTURE_2D, _tex[4]);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -77,8 +77,8 @@ static void loadTexture(GLuint id, const char * filename) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
   }
 }
-/*!\brief Cette fonction paramétre la vue (viewport) OpenGL en
- * fonction des dimensions de la fenêtre.*/
+/*!\brief Cette fonction paramÃ©tre la vue (viewport) OpenGL en
+ * fonction des dimensions de la fenÃªtre.*/
 static void resize(int w, int h) {
   _wW  = w; _wH = h;
   glViewport(0, 0, _wW, _wH);
@@ -123,7 +123,7 @@ static void draw(void) {
   gl4duSendMatrices();
   glBindTexture(GL_TEXTURE_2D, _tex[3]);
   gl4dgDraw(_torus);
-  /* une série de filtres GL4D pour obtenir un effet sur la moitié de l'écran */
+  /* une sÃ©rie de filtres GL4D pour obtenir un effet sur la moitiÃ© de l'Ã©cran */
   glViewport(0, 0, _wW / 2, _wH);
   gl4dfBlur(0, _tex[4], 3, 1, 0, GL_FALSE);
   gl4dfSobelSetResultMode(GL4DF_SOBEL_RESULT_INV_LUMINANCE);
@@ -135,7 +135,7 @@ static void draw(void) {
   gl4dfOp(0, _tex[4], 0, GL_FALSE);
   glViewport(0, 0, _wW, _wH);
 }
-/*!\brief appelée au moment de sortir du programme (atexit), libère les éléments utilisés */
+/*!\brief appelÃ©e au moment de sortir du programme (atexit), libÃ¨re les Ã©lÃ©ments utilisÃ©s */
 static void quit(void) {
   /* suppression de plusieurs identifiants de texture */
   glDeleteTextures(sizeof _tex / sizeof *_tex, _tex);
