@@ -1,7 +1,1 @@
-In order to launch autotools config type : make -f Makefile.autotools
-you should have installed the following packages : automake, autoconf, libtool and make
-
-
-
-Once done, read INSTALL for instructions under Linux/Unix Operating Systems.
-Under Windows Operating System, please use CodeBlocks files in the Windows directory.
+see README.md
