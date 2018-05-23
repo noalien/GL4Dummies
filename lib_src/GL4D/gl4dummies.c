@@ -20,6 +20,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#ifdef __GLES4D__
+/* globales utilisées dans gl4dummies.h dans le cas de GLES3.0 - epsilon */
+_es30_tex_info_t * _tex_info = NULL;
+GLint _tex_info_size = 0;
+#endif
+
 static int kmpSearch(const char * p, const char * t);
 
 #if defined(_WIN32)
@@ -66,14 +72,14 @@ char * gl4dReadTextFile(const char * filename) {
   struct stat buf;
   if(stat(filename, &buf) != 0) {
     fprintf(stderr, "%s:%d:In %s: error %d: %s (%s)\n",
-      __FILE__, __LINE__, __func__, errno, strerror(errno), filename);
+	    __FILE__, __LINE__, __func__, errno, strerror(errno), filename);
     return NULL;
   }
   data = malloc( (buf.st_size + 1) * sizeof * data );
   assert(data);
   if( (f = fopen(filename, "rb")) == NULL ) {
     fprintf(stderr, "%s:%d:In %s: error %d: %s (%s)\n",
-      __FILE__, __LINE__, __func__, errno, strerror(errno), filename);
+	    __FILE__, __LINE__, __func__, errno, strerror(errno), filename);
     free(data);
     return NULL;
   }
@@ -83,7 +89,7 @@ char * gl4dReadTextFile(const char * filename) {
   if( (l = fread(data, sizeof * data, buf.st_size, f)) != buf.st_size) {
 #endif
     fprintf(stderr, "%s:%d:In %s: une erreur s'est produite lors de la lecture du fichier %s\n",
-      __FILE__, __LINE__, __func__, filename);
+	    __FILE__, __LINE__, __func__, filename);
     free(data);
     fclose(f);
     return NULL;
@@ -97,18 +103,18 @@ char * gl4dReadTextFile(const char * filename) {
  * et retourne une copie du code.
  */
 char * gl4dExtractFromDecData(const char * decData, const char * filename) {
-  int i, j;
-  char a[BUFSIZ], * r;
-  snprintf(a, BUFSIZ, "<shader %s>", filename);
-  if((i = kmpSearch(a, decData)) < 0)
-    return NULL;
-  if((j = kmpSearch("</shader>", &decData[i + strlen(a)])) < 0)
-    return NULL;
-  r = malloc((j + 1) * sizeof * r);
-  assert(r);
-  strncpy(r, &decData[i + strlen(a)], j);
-  r[j] = 0;
-  return r;
+	int i, j;
+	char a[BUFSIZ], * r;
+	snprintf(a, BUFSIZ, "<shader %s>", filename);
+	if((i = kmpSearch(a, decData)) < 0)
+		return NULL;
+	if((j = kmpSearch("</shader>", &decData[i + strlen(a)])) < 0)
+		return NULL;
+	r = malloc((j + 1) * sizeof * r);
+	assert(r);
+	strncpy(r, &decData[i + strlen(a)], j);
+	r[j] = 0;
+	return r;
 }
 
 /*!\brief recherche un motif dans un text
@@ -185,9 +191,9 @@ static double getElapsedTime_sub2(void);
 static double (* getET)(void) = getElapsedTime_sub1;
 
 static double getElapsedTime_sub1(void) {
-  gl4dInitTime0();
-  getET = getElapsedTime_sub2;
-  return 0.0;
+	gl4dInitTime0();
+	getET = getElapsedTime_sub2;
+	return 0.0;
 }
 
 static double getElapsedTime_sub2(void) {
@@ -212,7 +218,7 @@ void gl4dInitTime0(void) {
  * \return le temps ecoule en millisecondes.
  */
 double gl4dGetElapsedTime(void) {
-  return getET();
+	return getET();
 }
 
 /*!\brief Une variable de temps. A initialiser avec \ref
@@ -279,15 +285,9 @@ double gl4dGetFps(void) {
 int mv(const char * src, const char * dst) {
   size_t l;
   char buf[BUFSIZ] = {0};
-  FILE * in = fopen(src, "rb");
-  if(in == NULL) {
+  FILE * in = fopen(src, "rb"), * out = fopen(dst, "wb") ;
+  if(in == NULL || out == NULL)
     return 0;
-  }
-  FILE *out = fopen(dst, "wb");
-  if (out == NULL) {
-    fclose(in);
-    return 0;
-  }
   while((l = fread(buf, 1, sizeof buf, in)) > 0)
     fwrite(buf, 1, l, out);
   fclose(out); fclose(in);
@@ -372,7 +372,7 @@ GLuint gl4dCreateShader(GLenum shaderType) {
     return p(shaderType);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour creer le shader\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
     return 0;
   }
 }
@@ -388,7 +388,7 @@ void gl4dShaderSource(GLuint shader, GLint numOfStrings, const char ** strings, 
     p(shader, numOfStrings, strings, lenOfStrings);
   } else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour recuperer le code source du shader\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -403,7 +403,7 @@ void gl4dCompileShader(GLuint shader){
     p(shader);
   else
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour compiler le shader\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
 }
 
 /*!\brief fait appel a glCreateProgram ou glCreateProgramObjectARB
@@ -419,7 +419,7 @@ GLuint gl4dCreateProgram(void) {
     return p();
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour creer un Program\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
     return 0;
   }
 }
@@ -435,7 +435,7 @@ void gl4dAttachShader(GLuint program, GLuint shader) {
     p((GLhandleARB)program, (GLhandleARB)shader);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour attacher le shader\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -450,7 +450,7 @@ void gl4dLinkProgram(GLuint program) {
     p((GLhandleARB)program);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour lier (linker) le Program\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -465,7 +465,7 @@ void gl4dUseProgram(GLuint program) {
     p((GLhandleARB)program);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour exécuter (use) le Program\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -480,7 +480,7 @@ void gl4dGetShaderiv(GLuint object, GLenum type, GLint *param) {
     p((GLhandleARB)object, type, param);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour tester la compilation du Shader\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -495,7 +495,7 @@ void gl4dGetProgramiv(GLuint object, GLenum type, GLint *param) {
     p((GLhandleARB)object, type, param);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour tester le link du Program\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -510,7 +510,7 @@ void gl4dGetShaderInfoLog(GLuint object, GLint maxLen, GLint * len, char * log) 
     p((GLhandleARB)object, maxLen, len, log);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour les logs de compilation du Shader\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -525,7 +525,7 @@ void gl4dGetProgramInfoLog(GLuint object, GLint maxLen, GLint * len, char * log)
     p((GLhandleARB)object, maxLen, len, log);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour les logs de link du Program\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -540,7 +540,7 @@ void gl4dDetachShader(GLuint program, GLuint shader) {
     p((GLhandleARB)program, (GLhandleARB)shader);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour detacher le Shader\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -555,7 +555,7 @@ void gl4dDeleteShader(GLuint object) {
     p((GLhandleARB)object);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour supprimer le Shader\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -570,7 +570,7 @@ void gl4dDeleteProgram(GLuint object) {
     p((GLhandleARB)object);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour supprimer le Program\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -585,7 +585,7 @@ GLboolean gl4dIsProgram(GLuint program) {
     return p((GLhandleARB)program);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour is Program\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
     return GL_FALSE;
   }
 }
@@ -601,7 +601,7 @@ GLboolean gl4dIsShader(GLuint shader) {
     return p((GLhandleARB)shader);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour is Shader\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
     return GL_FALSE;
   }
 }
@@ -617,7 +617,7 @@ void gl4dValidateProgram(GLuint program) {
     p((GLhandleARB)program);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour valider Program\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -632,7 +632,7 @@ GLint gl4dGetUniformLocation(GLuint program, const char * name) {
     return p((GLhandleARB)program, name);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Uniform Location\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
     return -1;
   }
 }
@@ -648,7 +648,7 @@ void gl4dBindFragDataLocation(GLuint program, GLuint colorNumber, const GLchar *
     p(program, colorNumber, name);
   } else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Uniform Location\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -663,7 +663,7 @@ void gl4dBlitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLi
     p(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
   } else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour BlitFramebuffer\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -678,7 +678,7 @@ void gl4dGenFramebuffers(GLsizei n, GLuint * ids) {
     p(n, ids);
   else
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour GenFramebuffers\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
 }
 
 /*!\brief fait appel a glBindFramebuffer ou
@@ -692,7 +692,7 @@ void gl4dBindFramebuffer(GLenum target, GLuint framebuffer) {
     p(target, framebuffer);
   else
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour BindFramebuffer\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
 }
 
 /*!\brief fait appel a glDeleteFramebuffers ou
@@ -706,7 +706,7 @@ void gl4dDeleteFramebuffers(GLsizei n, GLuint * ids) {
     p(n, ids);
   else
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour DeleteFramebuffers\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
 }
 
 /*!\brief fait appel a glFramebufferTexture2D ou
@@ -720,7 +720,7 @@ void gl4dFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget
     p(target, attachment, textarget, texture, level);
   else
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour FramebufferTexture2D\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
 }
 
 /*!\brief fait appel a glDrawBuffers ou
@@ -734,7 +734,7 @@ void gl4dDrawBuffers(GLsizei n, const GLenum * bufs) {
     p(n, bufs);
   else
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour DrawBuffers\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
 }
 
 /*!\brief fait appel a glActiveTexture ou
@@ -748,7 +748,7 @@ void gl4dActiveTexture(GLenum texture) {
     p(texture);
   else
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour ActiveTexture\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
 }
 
 /*!\brief fait appel a glBindBuffer ou
@@ -762,7 +762,7 @@ void gl4dBindBuffer(GLenum target, GLuint buffer) {
     p(target, buffer);
   else
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour BindBuffer\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
 }
 
 /*!\brief fait appel a glBufferData ou
@@ -776,7 +776,7 @@ void gl4dBufferData(GLenum target, GLsizeiptr size, const GLvoid * data, GLenum 
     p(target, size, data, usage);
   else
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour BufferData\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
 }
 
 /*!\brief fait appel a glGenBuffers ou
@@ -790,7 +790,7 @@ void gl4dGenBuffers(GLsizei n, GLuint * buffers) {
     p(n, buffers);
   else
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour GenBuffers\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
 }
 
 /*!\brief fait appel a glDeleteBuffers ou
@@ -804,7 +804,7 @@ void gl4dDeleteBuffers(GLsizei n, const GLuint * buffers) {
     p(n, buffers);
   else
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour DeleteBuffers\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
 }
 
 /*!\brief fait appel a glBlendFuncSeparate ou
@@ -818,7 +818,7 @@ void gl4dBlendFuncSeparate(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum
     p(srcRGB, dstRGB, srcAlpha, dstAlpha);
   else
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour BlendFuncSeparate\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
 }
 
 /*!\brief fait appel a glUniform1i ou glUniform1iARB selon la
@@ -832,7 +832,7 @@ void gl4dUniform1i(GLint location, GLint v0) {
     p(location, v0);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Uniform\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -847,7 +847,7 @@ void gl4dUniform1f(GLint location, GLfloat v0) {
     p(location, v0);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Uniform\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -862,7 +862,7 @@ void gl4dUniform2i(GLint location, GLint v0, GLint v1) {
     p(location, v0, v1);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Uniform\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -877,7 +877,7 @@ void gl4dUniform2f(GLint location, GLfloat v0, GLfloat v1) {
     p(location, v0, v1);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Uniform\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -892,7 +892,7 @@ void gl4dUniform3i(GLint location, GLint v0, GLint v1, GLint v2) {
     p(location, v0, v1, v2);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Uniform\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -907,7 +907,7 @@ void gl4dUniform3f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2) {
     p(location, v0, v1, v2);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Uniform\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -922,7 +922,7 @@ void gl4dUniform4i(GLint location, GLint v0, GLint v1, GLint v2, GLint v3) {
     p(location, v0, v1, v2, v3);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Uniform\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -937,7 +937,7 @@ void gl4dUniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v
     p(location, v0, v1, v2, v3);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Uniform\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -952,7 +952,7 @@ void gl4dUniform1iv(GLint location, GLsizei count, const GLint * values) {
     p(location, count, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Uniform\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -967,7 +967,7 @@ void gl4dUniform1fv(GLint location, GLsizei count, const GLfloat * values) {
     p(location, count, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Uniform\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -982,7 +982,7 @@ void gl4dUniform2iv(GLint location, GLsizei count, const GLint * values) {
     p(location, count, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Uniform\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -997,7 +997,7 @@ void gl4dUniform2fv(GLint location, GLsizei count, const GLfloat * values) {
     p(location, count, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Uniform\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1012,7 +1012,7 @@ void gl4dUniform3iv(GLint location, GLsizei count, const GLint * values) {
     p(location, count, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Uniform\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1027,7 +1027,7 @@ void gl4dUniform3fv(GLint location, GLsizei count, const GLfloat * values) {
     p(location, count, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Uniform\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1042,7 +1042,7 @@ void gl4dUniform4iv(GLint location, GLsizei count, const GLint * values) {
     p(location, count, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Uniform\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1057,7 +1057,7 @@ void gl4dUniform4fv(GLint location, GLsizei count, const GLfloat * values) {
     p(location, count, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Uniform\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1072,7 +1072,7 @@ void gl4dUniformMatrix2fv(GLint location, GLsizei count, GLboolean transpose, co
     p(location, count, transpose, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour UniformMatrix\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1087,7 +1087,7 @@ void gl4dUniformMatrix3fv(GLint location, GLsizei count, GLboolean transpose, co
     p(location, count, transpose, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour UniformMatrix\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1102,7 +1102,7 @@ void gl4dUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, co
     p(location, count, transpose, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour UniformMatrix\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1117,7 +1117,7 @@ GLint gl4dGetAttribLocation(GLuint program, const char * name) {
     return p((GLhandleARB)program, name);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Get Attrib Location\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
     return -1;
   }
 }
@@ -1133,7 +1133,7 @@ void gl4dBindAttribLocation(GLuint program, GLuint index, const char * name) {
     p((GLhandleARB)program, index, name);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Bind Attrib Location\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1148,7 +1148,7 @@ void gl4dVertexAttrib1s(GLuint index, GLshort v0) {
     p(index, v0);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1163,7 +1163,7 @@ void gl4dVertexAttrib1f(GLuint index, GLfloat v0) {
     p(index, v0);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1178,7 +1178,7 @@ void gl4dVertexAttrib1d(GLuint index, GLdouble v0) {
     p(index, v0);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1193,7 +1193,7 @@ void gl4dVertexAttrib2s(GLuint index, GLshort v0, GLshort v1) {
     p(index, v0, v1);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1208,7 +1208,7 @@ void gl4dVertexAttrib2f(GLuint index, GLfloat v0, GLfloat v1) {
     p(index, v0, v1);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1223,7 +1223,7 @@ void gl4dVertexAttrib2d(GLuint index, GLdouble v0, GLdouble v1) {
     p(index, v0, v1);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1238,7 +1238,7 @@ void gl4dVertexAttrib3s(GLuint index, GLshort v0, GLshort v1, GLshort v2) {
     p(index, v0, v1, v2);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1253,7 +1253,7 @@ void gl4dVertexAttrib3f(GLuint index, GLfloat v0, GLfloat v1, GLfloat v2) {
     p(index, v0, v1, v2);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1268,7 +1268,7 @@ void gl4dVertexAttrib3d(GLuint index, GLdouble v0, GLdouble v1, GLdouble v2) {
     p(index, v0, v1, v2);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1283,7 +1283,7 @@ void gl4dVertexAttrib4s(GLuint index, GLshort v0, GLshort v1, GLshort v2, GLshor
     p(index, v0, v1, v2, v3);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1298,7 +1298,7 @@ void gl4dVertexAttrib4f(GLuint index, GLfloat v0, GLfloat v1, GLfloat v2, GLfloa
     p(index, v0, v1, v2, v3);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1313,7 +1313,7 @@ void gl4dVertexAttrib4d(GLuint index, GLdouble v0, GLdouble v1, GLdouble v2, GLd
     p(index, v0, v1, v2, v3);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1328,7 +1328,7 @@ void gl4dVertexAttrib4Nub(GLuint index, GLubyte v0, GLubyte v1, GLubyte v2, GLub
     p(index, v0, v1, v2, v3);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1343,7 +1343,7 @@ void gl4dVertexAttrib1sv(GLuint index, const GLshort * values) {
     p(index, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1358,7 +1358,7 @@ void gl4dVertexAttrib1fv(GLuint index, const GLfloat * values) {
     p(index, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1373,7 +1373,7 @@ void gl4dVertexAttrib1dv(GLuint index, const GLdouble * values) {
     p(index, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1388,7 +1388,7 @@ void gl4dVertexAttrib2sv(GLuint index, const GLshort * values) {
     p(index, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1403,7 +1403,7 @@ void gl4dVertexAttrib2fv(GLuint index, const GLfloat * values) {
     p(index, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1418,7 +1418,7 @@ void gl4dVertexAttrib2dv(GLuint index, const GLdouble * values) {
     p(index, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1433,7 +1433,7 @@ void gl4dVertexAttrib3sv(GLuint index, const GLshort * values) {
     p(index, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1448,7 +1448,7 @@ void gl4dVertexAttrib3fv(GLuint index, const GLfloat * values) {
     p(index, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1463,7 +1463,7 @@ void gl4dVertexAttrib3dv(GLuint index, const GLdouble * values) {
     p(index, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1478,7 +1478,7 @@ void gl4dVertexAttrib4bv(GLuint index, const GLbyte * values) {
     p(index, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1493,7 +1493,7 @@ void gl4dVertexAttrib4sv(GLuint index, const GLshort * values) {
     p(index, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1508,7 +1508,7 @@ void gl4dVertexAttrib4iv(GLuint index, const GLint * values) {
     p(index, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1523,7 +1523,7 @@ void gl4dVertexAttrib4fv(GLuint index, const GLfloat * values) {
     p(index, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1538,7 +1538,7 @@ void gl4dVertexAttrib4dv(GLuint index, const GLdouble * values) {
     p(index, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1553,7 +1553,7 @@ void gl4dVertexAttrib4ubv(GLuint index, const GLubyte * values) {
     p(index, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1568,7 +1568,7 @@ void gl4dVertexAttrib4usv(GLuint index, const GLushort * values) {
     p(index, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1583,7 +1583,7 @@ void gl4dVertexAttrib4uiv(GLuint index, const GLuint * values) {
     p(index, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1598,7 +1598,7 @@ void gl4dVertexAttrib4Nbv(GLuint index, const GLbyte * values) {
     p(index, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1613,7 +1613,7 @@ void gl4dVertexAttrib4Nsv(GLuint index, const GLshort * values) {
     p(index, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1628,7 +1628,7 @@ void gl4dVertexAttrib4Niv(GLuint index, const GLint * values) {
     p(index, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1643,7 +1643,7 @@ void gl4dVertexAttrib4Nubv(GLuint index, const GLubyte * values) {
     p(index, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1658,7 +1658,7 @@ void gl4dVertexAttrib4Nusv(GLuint index, const GLushort * values) {
     p(index, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1673,7 +1673,7 @@ void gl4dVertexAttrib4Nuiv(GLuint index, const GLuint * values) {
     p(index, values);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1688,7 +1688,7 @@ void gl4dVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean no
     p(index, size, type, normalized, stride, pointer);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Vertex Attrib Pointer\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1703,7 +1703,7 @@ void gl4dEnableVertexAttribArray(GLuint index) {
     p(index);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Enable Vertex Attrib Array\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1718,7 +1718,7 @@ void gl4dDisableVertexAttribArray(GLuint index) {
     p(index);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Disable Vertex Attrib Array\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1730,7 +1730,7 @@ void gl4dDeleteVertexArrays(GLsizei n, const GLuint * arrays) {
     p(n, arrays);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Delete Vertex Arrays\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1742,7 +1742,7 @@ void gl4dGenVertexArrays(GLsizei n, GLuint * arrays) {
     p(n, arrays);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Gen Vertex Arrays\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 
@@ -1754,7 +1754,7 @@ void gl4dBindVertexArray(GLuint array) {
     p(array);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Bind Vertex Array\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 /*!\brief fait appel a glGetFramebufferAttachmentParameteriv si disponible
@@ -1765,7 +1765,7 @@ void glGetFramebufferAttachmentParameteriv(GLenum target,  GLenum attachment,  G
     p(target, attachment, pname, params);
   else {
     fprintf(stderr, "%s:%d:In %s: Aucune procedure pour Get Framebuffer Attachment Parameter\n",
-      __FILE__, __LINE__, __func__);
+	    __FILE__, __LINE__, __func__);
   }
 }
 #endif

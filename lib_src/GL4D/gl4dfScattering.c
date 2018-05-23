@@ -9,7 +9,7 @@
  */
 #include <stdlib.h>
 #include <assert.h>
-#include <GL4D/gl4du.h>
+#include "gl4du.h"
 #include "gl4df.h"
 #include "gl4dfCommon.h"
 

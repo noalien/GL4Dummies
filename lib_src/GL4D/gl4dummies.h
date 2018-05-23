@@ -94,14 +94,23 @@
 #endif
 
 #ifdef __ANDROID__
-#define __GL4D_ES2__
+//#define __GL4D_ES__
 #endif
 
 #ifdef __ANDROID__
+#define __GLES4D__
 #include <android/log.h>
-#include <GLES2/gl2.h>
-#include <GLES2/gl2ext.h>
+
+#if __ANDROID_API__ >= 24
+#include <GLES3/gl32.h>
+#elif __ANDROID_API__ >= 21
+#include <GLES3/gl31.h>
+#else
+#include <GLES3/gl3.h>
+#endif
+
 typedef double GLdouble;
+typedef unsigned long Uint32;
 #define GL_DOUBLE GL_FLOAT
 #else
 #include <SDL.h>
@@ -115,13 +124,13 @@ typedef double GLdouble;
 #include "gl4wdummies.h"
 #endif
 
-#ifdef __GL4D_ES2__
-#define GL4D_VAO_INDEX GL_UNSIGNED_SHORT
-typedef GLushort GL4Dvaoindex;
-#else
+//#ifdef __GLES4D__
+//#define GL4D_VAO_INDEX GL_UNSIGNED_SHORT
+//typedef GLushort GL4Dvaoindex;
+//#else
 #define GL4D_VAO_INDEX GL_UNSIGNED_INT
 typedef GLuint GL4Dvaoindex;
-#endif
+//#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -140,6 +149,91 @@ GL4DAPI double    GL4DAPIENTRY gl4dGetFps(void);
 GL4DAPI int       GL4DAPIENTRY mv(const char * src, const char * dst);
 GL4DAPI char *    GL4DAPIENTRY pathOf(const char * path);
 GL4DAPI char *    GL4DAPIENTRY filenameOf(const char * path);
+
+#ifdef __GLES4D__
+
+#  ifndef GL_POLYGON_MODE
+#    define GL_POLYGON_MODE 0x0B40
+#  endif
+#  ifndef GL_FILL
+#    define GL_FILL 0x1B02
+#  endif
+#  ifndef GL_TEXTURE_WIDTH
+#    define GL_TEXTURE_WIDTH                  0x1000
+#  endif
+#  ifndef GL_TEXTURE_HEIGHT
+#    define GL_TEXTURE_HEIGHT                 0x1001
+#  endif
+
+#  define fprintf(file, ...) do {\
+    if(file == stdout)\
+        __android_log_print(ANDROID_LOG_VERBOSE, "GL4D", __VA_ARGS__);\
+    else if(file == stderr)\
+        __android_log_print(ANDROID_LOG_ERROR, "GL4D", __VA_ARGS__);\
+    else\
+        fprintf(file, __VA_ARGS__);\
+} while(0)
+#  include <assert.h>
+#  include <string.h>
+#  include <stdlib.h>
+typedef struct _es30_tex_info_t _es30_tex_info_t;
+struct _es30_tex_info_t {
+    GLint id;
+    GLint width;
+    GLint height;
+};
+extern _es30_tex_info_t * _tex_info;
+extern GLint _tex_info_size;
+static void _free_tex_info(void) {
+    if(_tex_info) {
+        free(_tex_info);
+        _tex_info = NULL;
+    }
+    _tex_info_size = 0;
+}
+inline static void glGetTexLevelParameteriv_ES30(GLenum target, GLint level, GLenum pname, GLint * params) {
+    GLint ctex;
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &ctex);
+    if(_tex_info == NULL || ctex >= _tex_info_size || _tex_info[ctex].id == 0) {
+        fprintf(stderr, "Unknown texture info for current texture\n");
+        return;
+    }
+    if(pname == GL_TEXTURE_WIDTH)
+        *params = _tex_info[ctex].width;
+    else if(pname == GL_TEXTURE_HEIGHT)
+        *params = _tex_info[ctex].height;
+}
+void gl4duAtExit(void (*func)(void));
+inline static void glTexImage2D_ES30(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid * data) {
+    GLint ctex;
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &ctex);
+    if(_tex_info == NULL) {
+        _tex_info_size = ctex + 1;
+        _tex_info = (_es30_tex_info_t *)calloc(_tex_info_size, sizeof *_tex_info);
+        assert(_tex_info);
+        gl4duAtExit(_free_tex_info);
+    } else if(ctex >= _tex_info_size) {
+        _tex_info = (_es30_tex_info_t *)realloc(_tex_info, (ctex + 1) * sizeof *_tex_info);
+        assert(_tex_info);
+        memset(&_tex_info[_tex_info_size], 0, (ctex - _tex_info_size + 1) * sizeof *_tex_info);
+        _tex_info_size = ctex + 1;
+    }
+    _tex_info[ctex].id = ctex;
+    _tex_info[ctex].width = width;
+    _tex_info[ctex].height = height;
+    glTexImage2D(target, level, internalFormat, width, height, border, format, type, data);
+}
+inline static void glPolygonMode(int a, int b) {}
+#  define glGetTexLevelParameteriv glGetTexLevelParameteriv_ES30
+#  define glTexImage2D glTexImage2D_ES30
+#endif
+
+
+#define GL4D_GL_ERROR do {\
+    GLint err = glGetError();\
+    if (err != GL_NO_ERROR)\
+        fprintf(stderr, "GL error at %s/%s()/%d: 0x%08x\n", __FILE__, __func__, __LINE__, err);\
+    } while(0)
 
 
 #ifdef __cplusplus

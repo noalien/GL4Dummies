@@ -19,7 +19,7 @@ extern "C" {
 
   static const char * gl4dfBasicVS = 
     "<imvs>gl4dfBasic.vs</imvs>\n\
-     #version 330\n						\
+     #version 300 es\n						\
      layout (location = 0) in vec3 vsiPosition;\n		\
      layout (location = 1) in vec3 vsiNormal;\n			\
      layout (location = 2) in vec2 vsiTexCoord;\n		\
@@ -44,9 +44,7 @@ extern "C" {
      }";
 
   extern void   fcommMatchTex(GLuint goal, GLuint orig);
-  extern GLuint fcommGetTempTex(GLuint i);
   extern GLuint fcommGetPlane(void);
-  extern GLuint fcommGetFBO(void);
 
 
 #ifdef __cplusplus

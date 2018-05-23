@@ -51,13 +51,16 @@ static void blurfinit(GLuint in, GLuint out, GLuint radius, GLuint nb_iterations
 /* appelée les autres fois (après la première qui lance init) */
 static void blurffunc(GLuint in, GLuint out, GLuint radius, GLuint nb_iterations, GLuint weight, GLboolean flipV) {
   GLuint rout = out, fbo;
-  GLint i, n, vp[4], w, h, cfbo, ctex, cpId, polygonMode[2];
-  GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND), tex = glIsEnabled(GL_TEXTURE_2D);
+  GLint i, n, vp[4], w, h, cfbo, ctex, cpId;
+  GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND);
+#ifndef __GLES4D__
+  GLint polygonMode[2];
+  glGetIntegerv(GL_POLYGON_MODE, polygonMode);
+#endif
   glGetIntegerv(GL_VIEWPORT, vp);
   glGetIntegerv(GL_FRAMEBUFFER_BINDING, &cfbo);
   glGetIntegerv(GL_TEXTURE_BINDING_2D, &ctex);
   glGetIntegerv(GL_CURRENT_PROGRAM, &cpId);
-  glGetIntegerv(GL_POLYGON_MODE, polygonMode);
 
   if(in == 0) { /* Pas d'entrée, donc l'entrée est le dernier draw */
     fcommMatchTex(in = _tempTexId[0], 0);
@@ -76,8 +79,9 @@ static void blurffunc(GLuint in, GLuint out, GLuint radius, GLuint nb_iterations
     setDimensions(w, h);
   fcommMatchTex(_tempTexId[2], rout);
 
+#ifndef __GLES4D__
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  if(!tex) glEnable(GL_TEXTURE_2D);
+#endif
   if(dt) glDisable(GL_DEPTH_TEST);
   if(bl) glDisable(GL_BLEND);
   glViewport(0, 0, _width, _height);
@@ -119,8 +123,9 @@ static void blurffunc(GLuint in, GLuint out, GLuint radius, GLuint nb_iterations
   glBindFramebuffer(GL_FRAMEBUFFER, cfbo);
   glBindTexture(GL_TEXTURE_2D, ctex);
   glUseProgram(cpId);
+#ifndef __GLES4D__
   glPolygonMode(GL_FRONT_AND_BACK, polygonMode[0]);
-  if(!tex) glDisable(GL_TEXTURE_2D);
+#endif
   if(bl) glEnable(GL_BLEND);
   if(dt) glEnable(GL_DEPTH_TEST);
   glDeleteFramebuffers(1, &fbo);
@@ -166,7 +171,7 @@ static void init(void) {
        }\n								\
        vec4 weightedBlur(void) {\n					\
          float w = texture(myWeights, vsoTexCoord.st)[weightMapComponent];\n							\
-         int sub_nweights = 1 + int(float(nweights) * clamp(weightMapScale * w + weightMapTranslate, 0, 1));\n \
+         int sub_nweights = 1 + int(float(nweights) * clamp(weightMapScale * w + weightMapTranslate, 0.0, 1.0));\n \
          vec4 c = texture(myTexture, vsoTexCoord.st) * (w = weight[0]);\n \
          for (int i = 1; i < sub_nweights; i++) {\n			\
            w += 2.0 * weight[i];\n					\
@@ -184,7 +189,7 @@ static void init(void) {
     gl4duAtExit(quit);
   }
   if(_tempTexId[0])
-  setDimensions(vp[2] - vp[0], vp[3] - vp[1]);
+    setDimensions(vp[2] - vp[0], vp[3] - vp[1]);
 }
 
 static void setDimensions(GLuint w, GLuint h) {

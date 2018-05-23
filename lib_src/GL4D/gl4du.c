@@ -17,7 +17,9 @@
  */
 
 #include "gl4du.h"
+#ifndef __GLES4D__
 #include "gl4dh.h"
+#endif
 #include "bin_tree.h"
 #include "linked_list.h"
 #include <sys/stat.h>
@@ -109,6 +111,7 @@ static inline void * matrixData(_GL4DUMatrix * matrix);
  */
 static char _pathOfMe[BUFSIZ] = {0};
 static int  _pathOfMeInit = 0;
+static int  _hasInit = 0;
 
 #if defined(_WIN32)
 #  include <windows.h>
@@ -174,6 +177,12 @@ static void findPathOfMe(const char * argv0) {
 void gl4duInit(int argc, char ** argv) {
   findPathOfMe(argc > 0 ? argv[0] : "");
   gl4dgInit();
+  _hasInit = 1;
+}
+
+/*!\brief indique si la bibliothèque a été initialisée */
+int gl4duHasInit(void) {
+  return _hasInit;
 }
 
 /*!\brief Ajoute \a _pathOfMe au chemin \a filename passé en argument
@@ -485,6 +494,14 @@ void gl4duDeleteProgram(GLuint id) {
 /*!\brief supprime tous les programs et/ou tous les shaders.
  */
 void gl4duClean(GL4DUenum what) {
+  if(what & GL4DU_AT_EXIT) {
+    if(_aelist) {
+      while(!llEmpty(_aelist))
+        ((void (*)(void))llPop(_aelist))();
+      llFree(_aelist, NULL);
+      _aelist = NULL;
+    }
+  }
   if(what & GL4DU_PROGRAM) {
     program_t ** ptr = &programs_list;
     while(*ptr)
@@ -499,16 +516,11 @@ void gl4duClean(GL4DUenum what) {
     btFree(&_gl4duMatrices, freeGL4DUMatrix);
   if(what & GL4DU_GEOMETRY)
     gl4dgClean();
+#ifndef __GLES4D__
   if(what & GL4DU_DEMO_HELPER)
     gl4dhClean();
-  if(what & GL4DU_AT_EXIT) {
-    if(_aelist) {
-      while(!llEmpty(_aelist))
-	((void (*)(void))llPop(_aelist))();
-      llFree(_aelist, NULL);
-      _aelist = NULL;
-    }
-  }
+#endif
+  _hasInit = 0;
 }
 
 /*!\brief ajoute \a func dans la liste des fonctions à appeler lors du

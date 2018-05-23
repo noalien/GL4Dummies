@@ -87,9 +87,12 @@ static void sobelfinit(GLuint in, GLuint out, GLboolean flipV) {
 /* appelée les autres fois (après la première qui lance init) */
 static void sobelffunc(GLuint in, GLuint out, GLboolean flipV) {
   GLuint rout = out, fbo;
-  GLint n, vp[4], w, h, cfbo, ctex, cpId, polygonMode[2];
-  GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND), tex = glIsEnabled(GL_TEXTURE_2D);
+  GLint n, vp[4], w, h, cfbo, ctex, cpId;
+  GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND);
+#ifndef __GLES4D__
+  GLint polygonMode[2];
   glGetIntegerv(GL_POLYGON_MODE, polygonMode);
+#endif
   glGetIntegerv(GL_VIEWPORT, vp);
   glGetIntegerv(GL_FRAMEBUFFER_BINDING, &cfbo);
   glGetIntegerv(GL_TEXTURE_BINDING_2D, &ctex);
@@ -110,8 +113,9 @@ static void sobelffunc(GLuint in, GLuint out, GLboolean flipV) {
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
   }
+#ifndef __GLES4D__
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  if(!tex) glEnable(GL_TEXTURE_2D);
+#endif
   if(dt) glDisable(GL_DEPTH_TEST);
   if(bl) glDisable(GL_BLEND);
   glViewport(0, 0, w, h);
@@ -143,8 +147,9 @@ static void sobelffunc(GLuint in, GLuint out, GLboolean flipV) {
   glViewport(vp[0], vp[1], vp[2], vp[3]);
   glBindFramebuffer(GL_FRAMEBUFFER, (GLuint)cfbo);
   glUseProgram(cpId);
+#ifndef __GLES4D__
   glPolygonMode(GL_FRONT_AND_BACK, polygonMode[0]);
-  if(!tex) glDisable(GL_TEXTURE_2D);
+#endif
   if(bl) glEnable(GL_BLEND);
   if(dt) glEnable(GL_DEPTH_TEST);
   glDeleteFramebuffers(1, &fbo);
@@ -182,10 +187,9 @@ static void init(void) {
        const vec2 G[ossize] = vec2[]( vec2(1.0,  1.0), vec2(0.0,  2.0), vec2(-1.0,  1.0),\n \
                                       vec2(2.0,  0.0), vec2(0.0,  0.0), vec2(-2.0,  0.0),\n \
                                       vec2(1.0, -1.0), vec2(0.0, -2.0), vec2(-1.0, -1.0) );\n \
-       vec2 p = step;\n							\
-       vec2 offset[ossize] = vec2[](vec2(-p.x , -p.y), vec2( 0.0, -p.y), vec2( p.x , -p.y),\n \
-                                    vec2(-p.x, 0.0),        vec2( 0.0, 0.0),     vec2( p.x, 0.0),\n \
-                                    vec2(-p.x,   p.y),  vec2( 0.0, p.y), vec2( p.x ,  p.y) );\n	\
+       vec2 offset[ossize] = vec2[](vec2(-step.x , -step.y), vec2( 0.0, -step.y), vec2( step.x , -step.y),\n \
+                                    vec2(-step.x, 0.0),        vec2( 0.0, 0.0),     vec2( step.x, 0.0),\n \
+                                    vec2(-step.x,   step.y),  vec2( 0.0, step.y), vec2( step.x ,  step.y) );\n	\
        vec3 sobel(sampler2D s, vec2 c) {\n				\
          vec2 r = vec2(0.0, 0.0), g = vec2(0.0, 0.0), b = vec2(0.0, 0.0);\n \
          for(int i = 0; i < ossize; i++) {\n				\
