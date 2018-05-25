@@ -37,9 +37,12 @@ static void scatteringfinit(GLuint in, GLuint out, GLuint radius, GLuint displac
 
 static void scatteringffunc(GLuint in, GLuint out, GLuint radius, GLuint displacementmap, GLuint weightmap, GLboolean flipV) {
   GLuint rout = out, fbo;
-  GLint n, vp[4], w, h, cfbo, ctex, cpId, polygonMode[2];
-  GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND), tex = glIsEnabled(GL_TEXTURE_2D);
+  GLint n, vp[4], w, h, cfbo, ctex, cpId;
+  GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND);
+#ifndef __GLES4D__
+  GLint polygonMode[2];
   glGetIntegerv(GL_POLYGON_MODE, polygonMode);
+#endif
   glGetIntegerv(GL_VIEWPORT, vp);
   glGetIntegerv(GL_FRAMEBUFFER_BINDING, &cfbo);
   glGetIntegerv(GL_TEXTURE_BINDING_2D, &ctex);
@@ -62,8 +65,9 @@ static void scatteringffunc(GLuint in, GLuint out, GLuint radius, GLuint displac
   }
   if(w != _width || h != _height)
     setDimensions(w, h);
+#ifndef __GLES4D__
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  if(!tex) glEnable(GL_TEXTURE_2D);
+#endif
   if(dt) glDisable(GL_DEPTH_TEST);
   if(bl) glDisable(GL_BLEND);
   glViewport(0, 0, w, h);
@@ -109,8 +113,9 @@ static void scatteringffunc(GLuint in, GLuint out, GLuint radius, GLuint displac
   glViewport(vp[0], vp[1], vp[2], vp[3]);
   glBindFramebuffer(GL_FRAMEBUFFER, (GLuint)cfbo);
   glUseProgram(cpId);
+#ifndef __GLES4D__
   glPolygonMode(GL_FRONT_AND_BACK, polygonMode[0]);
-  if(!tex) glDisable(GL_TEXTURE_2D);
+#endif
   if(bl) glEnable(GL_BLEND);
   if(dt) glEnable(GL_DEPTH_TEST);
   glDeleteFramebuffers(1, &fbo);
@@ -157,7 +162,7 @@ static void init(void) {
          if(useWM == 0) {\n\
            fragColor = texture(myTexture, vsoTexCoord.st + decale(vsoTexCoord.st));\n\
          } else {\n\
-           vec4 wm = clamp(2.0 * (vec4(1.0) - texture(wmTexture, vsoTexCoord.st)) - vec4(1.0), 0, 1);\n\
+           vec4 wm = clamp(2.0 * (vec4(1.0) - texture(wmTexture, vsoTexCoord.st)) - vec4(1.0), 0.0, 1.0);\n\
            fragColor = texture(myTexture, vsoTexCoord.st + wm.r * 3.0 * decale(vsoTexCoord.st));\n\
          }\n\
        }";

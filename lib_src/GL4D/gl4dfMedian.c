@@ -33,9 +33,12 @@ static void medianfinit(GLuint in, GLuint out, GLuint nb_iterations, GLboolean f
 /* appelée les autres fois (après la première qui lance init) */
 static void medianffunc(GLuint in, GLuint out, GLuint nb_iterations, GLboolean flipV) {
   GLuint rout = out, fbo, flipflop[2];
-  GLint i, n, vp[4], w, h, cfbo, ctex, cpId, polygonMode[2];
-  GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND), tex = glIsEnabled(GL_TEXTURE_2D);
+  GLint i, n, vp[4], w, h, cfbo, ctex, cpId;
+  GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND);
+#ifndef __GLES4D__
+  GLint polygonMode[2];
   glGetIntegerv(GL_POLYGON_MODE, polygonMode);
+#endif
   glGetIntegerv(GL_VIEWPORT, vp);
   glGetIntegerv(GL_FRAMEBUFFER_BINDING, &cfbo);
   glGetIntegerv(GL_TEXTURE_BINDING_2D, &ctex);
@@ -59,18 +62,19 @@ static void medianffunc(GLuint in, GLuint out, GLuint nb_iterations, GLboolean f
   fcommMatchTex(_tempTexId[2], rout);
   flipflop[!(nb_iterations&1)] = rout;
   flipflop[nb_iterations&1] = _tempTexId[2];
+#ifndef __GLES4D__
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  if(!tex) glEnable(GL_TEXTURE_2D);
+#endif
   if(dt) glDisable(GL_DEPTH_TEST);
   if(bl) glDisable(GL_BLEND);
   glViewport(0, 0, w, h);
   glGenFramebuffers(1, &fbo);
   glBindFramebuffer(GL_FRAMEBUFFER, fbo); {
+    GLfloat step[2] = { 1.0f / (w - 1.0f), 1.0f / (h - 1.0f) };
     glUseProgram(_medianPId);
     glUniform1i(glGetUniformLocation(_medianPId,  "myTex"), 0);
     glUniform1i(glGetUniformLocation(_medianPId,  "inv"), flipV);
-    glUniform1i(glGetUniformLocation(_medianPId,  "width"), w);
-    glUniform1i(glGetUniformLocation(_medianPId,  "height"), h);
+    glUniform2fv(glGetUniformLocation(_medianPId,  "step"), 1, step);
     glActiveTexture(GL_TEXTURE0);
     for(i = 0; i < nb_iterations; ++i) {
       glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, flipflop[i&1],  0);
@@ -89,8 +93,9 @@ static void medianffunc(GLuint in, GLuint out, GLuint nb_iterations, GLboolean f
   glViewport(vp[0], vp[1], vp[2], vp[3]);
   glBindFramebuffer(GL_FRAMEBUFFER, (GLuint)cfbo);
   glUseProgram(cpId);
+#ifndef __GLES4D__
   glPolygonMode(GL_FRONT_AND_BACK, polygonMode[0]);
-  if(!tex) glDisable(GL_TEXTURE_2D);
+#endif
   if(bl) glEnable(GL_BLEND);
   if(dt) glEnable(GL_DEPTH_TEST);
   glDeleteFramebuffers(1, &fbo);
@@ -121,29 +126,24 @@ static void init(void) {
       "in  vec2 vsoTexCoord;\n\
        out vec4 fragColor;\n\
        uniform sampler2D myTex;\n\
-       uniform int width, height;\n\
-       const int ossize = 9;\n\
-       const vec2 G[9] = vec2[]( vec2(1.0,  1.0), vec2(0.0,  2.0), vec2(-1.0,  1.0), \n\
-                                 vec2(2.0,  0.0), vec2(0.0,  0.0), vec2(-2.0,  0.0), \n\
-                                 vec2(1.0, -1.0), vec2(0.0, -2.0), vec2(-1.0, -1.0) );\n\
-       vec2 pas = vec2(1.0 / float(width - 1), 1.0 / float(height - 1));\n\
-       vec2 offset[ossize] = vec2[](vec2(-pas.x , -pas.y), vec2( 0.0, -pas.y), vec2( pas.x , -pas.y), \n\
-                                    vec2(-pas.x, 0.0),        vec2( 0.0, 0.0),     vec2( pas.x, 0.0), \n\
-                                    vec2(-pas.x,   pas.y),  vec2( 0.0, pas.y), vec2( pas.x ,  pas.y) );\n\
+       uniform vec2 step;\n\
+       vec2 offset[9] = vec2[](vec2(-step.x , -step.y), vec2( 0.0, -step.y), vec2( step.x , -step.y), \n\
+                                    vec2(-step.x, 0.0),        vec2( 0.0, 0.0),     vec2( step.x, 0.0), \n\
+                                    vec2(-step.x,   step.y),  vec2( 0.0, step.y), vec2( step.x ,  step.y) );\n\
        vec4 median(void) {\n\
-         vec4 sample[ossize], c;\n\
-         sample[0].rgb = texture(myTex, vsoTexCoord.st + offset[0]).rgb;\n\
-         sample[0].a = dot(sample[0].rgb, sample[0].rgb);\n\
-         for(int i = 1, j; i < ossize; i++) {\n\
+         vec4 echantillon[9], c;\n\
+         echantillon[0].rgb = texture(myTex, vsoTexCoord.st + offset[0]).rgb;\n\
+         echantillon[0].a = dot(echantillon[0].rgb, echantillon[0].rgb);\n\
+         for(int i = 1, j; i < 9; i++) {\n\
            c.rgb = texture(myTex, vsoTexCoord.st + offset[i]).rgb;\n\
            c.a = dot(c.rgb, c.rgb);\n\
            for(j = 0; j < i; j++)\n\
-             if(c.a > sample[j].a) break; // PUTAIN !!!!!!!\n\
+             if(c.a > echantillon[j].a) break; // PUTAIN !!!!!!!\n\
            for(int k = i - 1; k >= j; k--)\n\
-             sample[k + 1] = sample[k];\n\
-           sample[j] = c;\n\
+             echantillon[k + 1] = echantillon[k];\n\
+           echantillon[j] = c;\n\
          }\n\
-         return vec4(sample[ossize >> 1].rgb, 1.0);\n\
+         return vec4(echantillon[4].rgb, 1.0);\n\
        }\n\
        void main(void) {\n\
          fragColor = median();\n\

@@ -18,9 +18,13 @@ extern "C" {
 #endif
 
   static const char * gl4dfBasicVS = 
-    "<imvs>gl4dfBasic.vs</imvs>\n\
-     #version 300 es\n						\
-     layout (location = 0) in vec3 vsiPosition;\n		\
+    "<imvs>gl4dfBasic.vs</imvs>\n"
+#ifdef __GLES4D__
+    "#version 300 es\n"
+#else
+    "#version 330\n"
+#endif
+    "layout (location = 0) in vec3 vsiPosition;\n		\
      layout (location = 1) in vec3 vsiNormal;\n			\
      layout (location = 2) in vec2 vsiTexCoord;\n		\
      uniform int inv;\n						\

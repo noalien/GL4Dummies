@@ -41,10 +41,12 @@ static void opfinit(GLuint in1, GLuint in2, GLuint out, GLboolean flipV) {
 /* appelée les autres fois (après la première qui lance init) */
 static void opffunc(GLuint in1, GLuint in2, GLuint out, GLboolean flipV) {
   GLuint fbo, rout = out;
-  GLint vp[4], w, h, pw, ph, polygonMode[2], cpId, n, cfbo, ctex;
-  GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND), tex = glIsEnabled(GL_TEXTURE_2D);
-
+  GLint vp[4], w, h, cpId, cfbo, ctex;
+  GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND);
+#ifndef __GLES4D__
+  GLint polygonMode[2];
   glGetIntegerv(GL_POLYGON_MODE, polygonMode);
+#endif
   glGetIntegerv(GL_VIEWPORT, vp);
   glGetIntegerv(GL_FRAMEBUFFER_BINDING, &cfbo);
   glGetIntegerv(GL_TEXTURE_BINDING_2D, &ctex);
@@ -66,10 +68,11 @@ static void opffunc(GLuint in1, GLuint in2, GLuint out, GLboolean flipV) {
   glBindTexture(GL_TEXTURE_2D, rout);
   glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
   glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);    
-  if(!tex) glEnable(GL_TEXTURE_2D);
   if(!bl) glEnable(GL_BLEND);
   if(dt) glDisable(GL_DEPTH_TEST);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+#ifndef __GLES4D__
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+#endif
   glViewport(0, 0, w, h);
   glGenFramebuffers(1, &fbo);
   glBindFramebuffer(GL_FRAMEBUFFER, fbo); {
@@ -95,8 +98,9 @@ static void opffunc(GLuint in1, GLuint in2, GLuint out, GLboolean flipV) {
   glUseProgram(cpId);
   glBindFramebuffer(GL_FRAMEBUFFER, cfbo);
   glBindTexture(GL_TEXTURE_2D, ctex);
+#ifndef __GLES4D__
   glPolygonMode(GL_FRONT_AND_BACK, polygonMode[0]);
-  if(!tex) glDisable(GL_TEXTURE_2D);
+#endif
   if(!bl) glDisable(GL_BLEND);
   if(dt) glEnable(GL_DEPTH_TEST);
   glDeleteFramebuffers(1, &fbo);
@@ -118,9 +122,13 @@ static void init(void) {
   glBindTexture(GL_TEXTURE_2D, ctex);
   if(!_opPId) {
     const char * imfs =
-      "<imfs>gl4df_op.fs</imfs>\n\
-       #version 330\n		       \
-       uniform sampler2D tex0, tex1;\n \
+      "<imfs>gl4df_op.fs</imfs>\n"
+#ifdef __GLES4D__
+      "#version 300 es\n"
+#else
+      "#version 330\n"
+#endif
+      "uniform sampler2D tex0, tex1;\n \
        uniform int op;\n	       \
        in  vec2 vsoTexCoord;\n						\
        out vec4 fragColor;\n						\
@@ -141,10 +149,10 @@ static void init(void) {
            fragColor = c0 / c1;\n					\
            break;\n							\
          case 4: /*  */\n						\
-           fragColor = length(c1) > 0 ? c1 : c0;\n			\
+           fragColor = (length(c1) > 0.0) ? c1 : c0;\n			\
            break;\n							\
          default:\n							\
-           fragColor = vec4(1, 0, 0, 1);\n				\
+           fragColor = vec4(1.0, 0.0, 0.0, 1.0);\n				\
            break;\n							\
          }\n								\
        }";
