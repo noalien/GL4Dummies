@@ -72,7 +72,7 @@ static void draw(void) {
   if(t0 < 0.0f)
     t0 = SDL_GetTicks();
   t = (SDL_GetTicks() - t0) / 1000.0f, d = -2.4f /* du retard pour commencer en bas */ + 0.25f /* vitesse */ * t;
-  glClearColor(0, 0, 0, 1);
+  glClearColor(1, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glDisable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
