@@ -33,7 +33,7 @@ static void drawTex(GLuint tId, const GLfloat scale[2], const GLfloat translate[
 static void updateScreenFromGPU(void);
 
 /*!\brief identifiant du programme GLSL */
-static GLuint _pId = 0; 
+static GLuint _pId = 0;
 
 /*!\brief identifiant de la géométrie QUAD GL4Dummies */
 static GLuint _quadId = 0;
@@ -53,13 +53,13 @@ void gl4dpSetColor(Uint32 color) {
 
 /*!\brief initialise (ou réinitialise) l'écran aux dimensions \a w et
  * \a h, le lie à l'identifiant (OpenGL) de texture retourné.
- * 
+ *
  * \param w la largeur de la fenêtre/texture GL.
  * \param h la hauteur de la fenêtre/texture GL.
  * \return l'identifiant (OpenGL) de la texture générée.
  */
 GLuint gl4dpInitScreenWithDimensions(GLuint w, GLuint h) {
-  const char * imvs = 
+  const char * imvs =
     "<imvs>gl4dp_basic_with_transforms.vs</imvs>\
      #version 330\n					\
      layout (location = 0) in vec3 vsiPosition;\n	\
@@ -77,14 +77,14 @@ GLuint gl4dpInitScreenWithDimensions(GLuint w, GLuint h) {
      }\n";
   const char * imfs =
     "<imfs>gl4dp_basic.fs</imfs>\n\
-     #version 330\n				  \
-     uniform sampler2D myTexture;\n		  \
-     in  vec2 vsoTexCoord;\n			  \
+     #version 330\n         \
+     uniform sampler2D myTexture;\n     \
+     in  vec2 vsoTexCoord;\n        \
      out vec4 fragColor;\n						\
      void main(void) {\n						\
        fragColor = texture(myTexture, vec2(vsoTexCoord.x, vsoTexCoord.y));\n \
      }";
-  assert(w * h);
+  assert(w && h);
   addScreen(w, h);
   glBindTexture(GL_TEXTURE_2D, (*_cur_screen)->tId);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); /* ICI */
@@ -102,7 +102,7 @@ GLuint gl4dpInitScreenWithDimensions(GLuint w, GLuint h) {
 /*!\brief initialise (ou réinitialise) l'écran aux dimensions du
  * viewport OpenGL, le lie à l'identifiant (OpenGL) de texture
  * retourné.
- * 
+ *
  * Utilise \ref gl4dpInitScreenWithDimensions.
  *
  * \return l'identifiant (OpenGL) de la texture générée.
@@ -115,13 +115,13 @@ GLuint gl4dpInitScreen(void) {
 }
 
 /*!\brief ajoute un écran à la tête de liste d'écrans gérés.
- * 
+ *
  * \param w la largeur de l'écran à créer.
  * \param h la hauteur de l'écran à créer.
  */
 static void addScreen(GLuint w, GLuint h) {
   screen_node_t * newscr = NULL;
-  assert(w * h);
+  assert(w && h);
   newscr = malloc(sizeof *newscr);
   assert(newscr);
   glGenTextures(1, &(newscr->tId));
@@ -139,7 +139,7 @@ static void addScreen(GLuint w, GLuint h) {
 
 /*!\brief active comme écran courant l'écran dont l'id est passé en
  * argument.
- * 
+ *
  * \param id identifiant de l'écran.
  */
 int gl4dpSetScreen(GLuint id) {
@@ -233,8 +233,8 @@ static void updateScreenFromGPU(void) {
 void gl4dpUpdateScreen(GLint * rect) {
   const GLfloat s[2] = {1.0, 1.0}, t[2] = {0.0, 0.0};
   if(!(*_cur_screen)->isCPUToDate) {
-	updateScreenFromGPU();
-	return;
+  updateScreenFromGPU();
+  return;
   }
   glBindTexture(GL_TEXTURE_2D, (*_cur_screen)->tId);
   if(!(*_cur_screen)->isGPUToDate) {
@@ -281,11 +281,11 @@ void gl4dpLine(int x0, int y0, int x1, int y1) {
     incO = incH - ((pasY * v) << 1);
     for(y = y0, x = x0; y != y1; y += pasY) {
       if(IN_SCREEN(x, y))
-	gl4dpPutPixel(x, y);
+  gl4dpPutPixel(x, y);
       if(del < 0) del += incH;
       else {
-	del += incO;
-	x += pasX;
+  del += incO;
+  x += pasX;
       }
     }
   } else {  /* premier octant */
@@ -293,11 +293,11 @@ void gl4dpLine(int x0, int y0, int x1, int y1) {
     incO = incH - ((pasX * u) << 1);
     for(x = x0, y = y0; x != x1; x += pasX) {
       if(IN_SCREEN(x, y))
-	gl4dpPutPixel(x, y); 
+  gl4dpPutPixel(x, y);
       if(del < 0) del += incH;
       else {
-	del += incO;
-	y += pasY;
+  del += incO;
+  y += pasY;
       }
     }
   }
@@ -424,7 +424,7 @@ void gl4dpCopyFromSDLSurfaceWithTransforms(SDL_Surface * s, const GLfloat scale[
     glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &fboTId);
   } else {
     glGenFramebuffers(1, &fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);    
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
   }
   /* ATTACHER LA TEXTURE ECRAN POUR RENDRE DESSUS */
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, (*_cur_screen)->tId,  0);
@@ -472,10 +472,10 @@ void gl4dpMap(GLuint dstSId, GLuint srcSId, const GLfloat pRect[4], const GLfloa
     0.0f, 0.0f, 1.0f,
     0.0f, 0.0f, 1.0f,
     /* 2 coordonnées de texture par sommet */
-    tRect[0], tRect[1], tRect[2], tRect[1], 
+    tRect[0], tRect[1], tRect[2], tRect[1],
     tRect[0], tRect[3], tRect[2], tRect[3]
   };
-  pt[0] = (pRect[0] + pRect[2]) - 1.0f; 
+  pt[0] = (pRect[0] + pRect[2]) - 1.0f;
   pt[1] = (pRect[1] + pRect[3]) - 1.0f;
   gl4dpSetScreen(srcSId);
   gl4dpUpdateScreen(NULL);
@@ -484,12 +484,12 @@ void gl4dpMap(GLuint dstSId, GLuint srcSId, const GLfloat pRect[4], const GLfloa
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
   glEnableVertexAttribArray(0);
-  glEnableVertexAttribArray(1); 
-  glEnableVertexAttribArray(2); 
+  glEnableVertexAttribArray(1);
+  glEnableVertexAttribArray(2);
   glGenBuffers(1, &buffer);
   glBindBuffer(GL_ARRAY_BUFFER, buffer);
   glBufferData(GL_ARRAY_BUFFER, sizeof data, data, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);  
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const void *)((4 * 3) * sizeof *data));
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (const void *)((8 * 3) * sizeof *data));
 
@@ -499,7 +499,7 @@ void gl4dpMap(GLuint dstSId, GLuint srcSId, const GLfloat pRect[4], const GLfloa
     glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &fboTId);
   } else {
     glGenFramebuffers(1, &fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);    
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
   }
   /* ATTACHER LA TEXTURE ECRAN POUR RENDRE DESSUS */
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, (*_cur_screen)->tId,  0);
@@ -549,5 +549,5 @@ static void drawTex(GLuint tId, const GLfloat scale[2], const GLfloat translate[
   glUniform1i (glGetUniformLocation(_pId, "myTexture"), 0);
   glUniform2fv(glGetUniformLocation(_pId, "ptranslate"), 1, t);
   glUniform1f (glGetUniformLocation(_pId, "rotation"), 0);
-  gl4dgDraw(_quadId); 
+  gl4dgDraw(_quadId);
 }
