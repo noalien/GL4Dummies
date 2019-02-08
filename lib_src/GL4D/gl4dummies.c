@@ -285,9 +285,15 @@ double gl4dGetFps(void) {
 int mv(const char * src, const char * dst) {
   size_t l;
   char buf[BUFSIZ] = {0};
-  FILE * in = fopen(src, "rb"), * out = fopen(dst, "wb") ;
-  if(in == NULL || out == NULL)
+  FILE *in = fopen(src, "rb");
+  if(!in) {
     return 0;
+  }
+  FILE* out = fopen(dst, "wb");
+  if(!out) {
+    fclose(in);
+    return 0;
+  }
   while((l = fread(buf, 1, sizeof buf, in)) > 0)
     fwrite(buf, 1, l, out);
   fclose(out); fclose(in);
