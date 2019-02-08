@@ -17,6 +17,8 @@ install-data-local:
 	$(INSTALL_DATA) bin/share/GL4Dummies/images/repere.bmp $(prefix)/share/GL4Dummies/images/
 	$(INSTALL_DATA) bin/share/GL4Dummies/shaders/*.fs $(prefix)/share/GL4Dummies/shaders/
 	$(INSTALL_DATA) bin/share/GL4Dummies/shaders/*.vs $(prefix)/share/GL4Dummies/shaders/
+	chmod a+rx $(prefix)/include/GL4D
+	chmod a+r $(prefix)/include/GL4D/*
 
 uninstall-local:
 	@$(NORMAL_UNINSTALL)
