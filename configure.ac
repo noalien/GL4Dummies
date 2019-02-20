@@ -1,6 +1,6 @@
 dnl INIT
 AC_CONFIG_MACRO_DIRS([m4])
-AC_INIT([GL4Dummies], [0.1.6])
+AC_INIT([GL4Dummies], [0.1.7])
 AM_INIT_AUTOMAKE([subdir-objects])
 dnl Verifier le type de systeme
 AC_CANONICAL_HOST

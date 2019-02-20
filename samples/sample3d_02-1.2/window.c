@@ -244,7 +244,7 @@ static void draw(void) {
   dt = ((t = SDL_GetTicks()) - t0) / 1000.0;
   t0 = t;
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glDisable(GL_CULL_FACE);
+  glEnable(GL_CULL_FACE);
   glEnable(GL_DEPTH_TEST);
   glDisable(GL_BLEND);
   gl4duBindMatrix("modelViewMatrix");
