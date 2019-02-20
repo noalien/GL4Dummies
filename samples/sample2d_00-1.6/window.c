@@ -138,9 +138,10 @@ static void triangle(point2d_t * p1, point2d_t * p2, point2d_t * p3) {
     fillWithLine(b, c, &ptsD[ret], 0);
     fillWithLine(a, c, ptsG, 1);
   }
-  for(i = 0; i < n - 1; ++i) {
+  for(i = 0; i < n; ++i) {
     /* modif : utilisation des données pour scan */
-    assert(ptsG[i].y == ptsD[i].y);
+    //assert(ptsG[i].y == ptsD[i].y);
+    if(ptsG[i].y != ptsD[i].y) continue;
     if(ptsG[i].y < 0 || ptsG[i].y >= gl4dpGetHeight())
       continue;
     scanline(&ptsG[i], &ptsD[i]);
@@ -178,7 +179,7 @@ static void scanline(point2d_t * p1, point2d_t * p2) {
 
 void dessin(void) {
   point2d_t a, b;
-  static point2d_t c = {100, 50, 0, 0, 1, 0, 0};
+  static point2d_t c = {100, 500, 0, 0, 1, 0, 0};
   static point2d_t d = {400, 250, 1, 0, 0, 0, 0};
   static point2d_t e = {10, 100, 0, 1, 0, 0, 0};
   gl4dpClearScreen();
