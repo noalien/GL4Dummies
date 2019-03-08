@@ -26,7 +26,7 @@ uniform float angle;
 void main(void) {
   /* une matrice de rotation autour de l'axe y telle que définie en
      écriture conventionnelle pour les mathématiciens. En GL, nous
-     utilisant la transposée (miroir par rapport à la diagonale de la
+     utilisons la transposée (miroir par rapport à la diagonale de la
      matrice) de l'écriture conventionnelle. Translatez le point de 1
      en y pour voir quelle est la différence (en math la translation
      est stockée sur les 3 premières lignes de la 4ème colonne).*/

@@ -17,7 +17,7 @@ static void draw(void);
 static void quit(void);
 
 /*!\brief largeur et hauteur de la fenêtre */
-static int _wW = 800, _wH = 600;
+static int _wW = 800, _wH = 800;
 /*!\brief identifiant du (futur) Vertex Array Object */
 static GLuint _vao = 0;
 /*!\brief identifiant du (futur) buffer de data - VBO ou Vertex Buffer Object */
