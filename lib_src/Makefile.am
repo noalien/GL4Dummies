@@ -23,12 +23,12 @@ __top_builddir__bin_libGL4Dummies_la_SOURCES = GL4D/aes.c GL4D/aes.h	\
 	GL4D/gl4dhAnimeManager.h GL4D/gl4dh.h GL4D/gl4dp.c		\
 	GL4D/gl4dp.h GL4D/gl4dq.c GL4D/gl4dfBlur.c			\
 	GL4D/gl4dfBlurWeights.h GL4D/gl4df.h GL4D/gl4dfCommon.h		\
-	GL4D/gl4dfCommon.c GL4D/gl4dfSobel.c GL4D/gl4dfMedian.c		\
-	GL4D/gl4dfScattering.c GL4D/gl4dfFocus.c			\
+	GL4D/gl4dfCommon.c GL4D/gl4dfSobel.c GL4D/gl4dfCanny.c		\
+	GL4D/gl4dfMedian.c GL4D/gl4dfScattering.c GL4D/gl4dfFocus.c	\
 	GL4D/gl4dfConversion.c GL4D/gl4dfMedia.c			\
 	GL4D/gl4dfFractalPainting.c GL4D/gl4dfHatching.c		\
-	GL4D/gl4dfSegmentation.c GL4D/gl4dfOpticalFlow.c GL4D/gl4dfOp.c \
-        GL4D/gl4da.c GL4D/gl4da.h 
+	GL4D/gl4dfSegmentation.c GL4D/gl4dfOpticalFlow.c		\
+	GL4D/gl4dfOp.c GL4D/gl4da.c GL4D/gl4da.h
 
 if USE_VERSION_RC
 __top_builddir__bin_libGL4Dummies_la_LDFLAGS =      \

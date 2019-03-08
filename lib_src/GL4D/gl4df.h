@@ -36,7 +36,14 @@ extern "C" {
     GL4DF_OP_SUB,
     GL4DF_OP_MULT,
     GL4DF_OP_DIV,
-    GL4DF_OP_OVERLAY
+    GL4DF_OP_OVERLAY,
+    GL4DF_CANNY_RESULT_RGB,
+    GL4DF_CANNY_RESULT_INV_RGB,
+    GL4DF_CANNY_RESULT_LUMINANCE,
+    GL4DF_CANNY_RESULT_INV_LUMINANCE, /* par défault */
+    GL4DF_CANNY_MIX_NONE,
+    GL4DF_CANNY_MIX_ADD,
+    GL4DF_CANNY_MIX_MULT,
   };
   typedef enum GL4DFenum GL4DFenum;
   /* Dans gl4dConversion.c */
@@ -295,6 +302,45 @@ extern "C" {
    * GL4DF_OP_DIV (division), GL4DF_OP_OVERLAY (overlay).
    */
   GL4DAPI void GL4DAPIENTRY gl4dfOpSetOp(GL4DFenum op);
+
+  /* Dans gl4dfCanny.c */
+  /*!\brief Filtre 2D Canny (détection des contours) 
+   *
+   *\param in identifiant de texture source. Si 0, le framebuffer écran est pris à la place.
+   *\param out identifiant de texture destination. Si 0, la sortie s'effectuera à l'écran.
+   *\param flipV indique s'il est nécessaire d'effectuer un mirroir vertical du résultat.
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfCanny(GLuint in, GLuint out, GLboolean flipV);
+  /* brief Indique la couleur multiplicative du Canny. Par défaut blanc ({1, 1, 1, 1}) est utilisé. 
+   *
+   * param vec4Color la couleur multiplicative (tableau de 4 flottants).
+   */
+  /* GL4DAPI void GL4DAPIENTRY gl4dfCannySetColor(GLfloat * vec4Color); */
+  /*!\brief Fonction liée au filtre Canny. Méthode de calcul du résultat final du Canny
+   *
+   *\param mode indique les différents modes possibles. Plusieurs
+   * choix sont disponibles:\n
+   * - GL4DF_CANNY_RESULT_RGB : le résultat du Canny est laissé inchangé (chaque composante contien son Canny) ;\n
+   * - GL4DF_CANNY_RESULT_INV_RGB : idem que la précédente avec une inversion (1.0 - s) ;\n
+   * - GL4DF_CANNY_RESULT_LUMINANCE : le résultat est transformé en Luminance sur les 3 composantes ;\n
+   * - GL4DF_CANNY_RESULT_INV_LUMINANCE : mode par défault, le résultat est l'inverse de la Luminance sur les 3 composantes.
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfCannySetResultMode(GL4DFenum mode);
+  /*!\brief Fonction liée au filtre Canny. Méthode de combinaison du résultat final du Canny avec l'image d'origine
+   *
+   *\param mode indique les différents modes possibles. Plusieurs
+   * choix sont disponibles:\n
+   * - GL4DF_CANNY_MIX_NONE : le Canny est seul ;\n
+   * - GL4DF_CANNY_MIX_ADD : le Canny est pondéré et additionné à l'image d'origine (utilise la fonction GLSL mix). Le facteur de pondération est fixé par \ref gl4dfCannySetMixFactor;\n
+   * - GL4DF_CANNY_MIX_MULT : le Canny est multiplié par l'image d'origine.
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfCannySetMixMode(GL4DFenum mode);
+  /*!\brief Fonction liée au filtre Canny. Modification du facteur de mix utilisé par le mode GL4DF_CANNY_MIX_ADD
+   *
+   *\param factor facteur de mélange compris entre 0 et 1
+   *\see gl4dfCannySetMixMode
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfCannySetMixFactor(GLfloat factor);
 
 #ifdef __cplusplus
 }
