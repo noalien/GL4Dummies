@@ -100,11 +100,11 @@ static void init(void) {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       if( (t = IMG_Load(_texture_filenames[i])) != NULL ) {
-#ifdef __APPLE__
-	int mode = t->format->BytesPerPixel == 4 ? GL_BGRA : GL_BGR;
-#else
+	//#ifdef __APPLE__
+	//int mode = t->format->BytesPerPixel == 4 ? GL_BGRA : GL_BGR;
+	//#else
 	int mode = t->format->BytesPerPixel == 4 ? GL_RGBA : GL_RGB;
-#endif       
+	//#endif       
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, t->w, t->h, 0, mode, GL_UNSIGNED_BYTE, t->pixels);
 	SDL_FreeSurface(t);
       } else {

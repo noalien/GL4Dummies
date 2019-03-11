@@ -67,9 +67,9 @@ static void init(void) {
     /* un sommet est composé d'une coordonnée 3D, d'une couleur 3D et
      * d'une coordonnée de texture 2D */
     /* sommet  0 */ -1, -1, 0, 1, 0, 0,  0,  0,
-    /* sommet  1 */  1, -1, 0, 0, 1, 0, 50,  0,
-    /* sommet  2 */  1,  1, 0, 0, 0, 1, 50, 50,
-    /* sommet  3 */ -1,  1, 0, 1, 0, 0,  0, 50
+    /* sommet  1 */  1, -1, 0, 0, 1, 0, 1,  0,
+    /* sommet  2 */  1,  1, 0, 0, 0, 1, 1, 1,
+    /* sommet  3 */ -1,  1, 0, 1, 0, 0,  0, 0.1
   };
   const GLuint B = RGB(255, 255, 255), N = 0;
   GLuint tex[] = { B, N, N, B };
