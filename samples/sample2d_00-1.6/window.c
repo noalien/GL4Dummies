@@ -22,6 +22,8 @@ struct point2d_t {
 #include <GL4D/gl4duw_SDL2.h>
 #include <assert.h>
 static int _w = 400;
+static GLuint ecran0, ecran1;
+
 
 /* modif : ajouts protos + fonction edist */
 static int fillWithLine(point2d_t * a, point2d_t * b, point2d_t * Y, int gauche);
@@ -52,6 +54,8 @@ static int fillWithLine(point2d_t * a, point2d_t * b, point2d_t * Y, int gauche)
       Y[i].r = a->r * cld + b->r * ld;
       Y[i].g = a->g * cld + b->g * ld;
       Y[i].b = a->b * cld + b->b * ld;
+      Y[i].s = a->s * cld + b->s * ld;
+      Y[i].t = a->t * cld + b->t * ld;
       if(del < 0) del += incH;
       else {
         del += incO;
@@ -72,6 +76,8 @@ static int fillWithLine(point2d_t * a, point2d_t * b, point2d_t * Y, int gauche)
 	Y[i].r = a->r * cld + b->r * ld;
 	Y[i].g = a->g * cld + b->g * ld;
 	Y[i].b = a->b * cld + b->b * ld;
+	Y[i].s = a->s * cld + b->s * ld;
+	Y[i].t = a->t * cld + b->t * ld;
 	libre = 0;
       }
       if(del < 0) del += incH;
@@ -153,8 +159,9 @@ static void triangle(point2d_t * p1, point2d_t * p2, point2d_t * p3) {
 static void scanline(point2d_t * p1, point2d_t * p2) {
   int x0, x1, w = gl4dpGetWidth(), x;
   point2d_t * g, * d;
-  float dist, dmax;
+  float dist, dmax, S, T;
   unsigned char R, G, B;
+  Uint32 coul;
   assert(p1->y == p2->y);
   if(p1->x < p2->x) {
     g = p1; d = p2;
@@ -169,19 +176,25 @@ static void scanline(point2d_t * p1, point2d_t * p2) {
   x1 = MIN(d->x, w - 1);
   for(x = x0; x <= x1; ++x) {
     dist = (x - g->x) / dmax;
-    R = (unsigned char)(255.0f * (dist * d->r + (1.0f - dist) * g->r));
+    /*R = (unsigned char)(255.0f * (dist * d->r + (1.0f - dist) * g->r));
     G = (unsigned char)(255.0f * (dist * d->g + (1.0f - dist) * g->g));
     B = (unsigned char)(255.0f * (dist * d->b + (1.0f - dist) * g->b));
-    gl4dpSetColor(RGB(R, G, B));
+    gl4dpSetColor(RGB(R, G, B));*/
+    S = dist * d->s + (1.0f - dist) * g->s;
+    T = dist * d->t + (1.0f - dist) * g->t;
+    gl4dpSetScreen(ecran1);
+    coul = gl4dpGetPixel(S * (gl4dpGetWidth() - 1), (1.0 - T) * (gl4dpGetHeight() - 1));
+    gl4dpSetScreen(ecran0);
+    gl4dpSetColor(coul);
     gl4dpPutPixel(x, g->y);
   }
 }
 
 void dessin(void) {
   point2d_t a, b;
-  static point2d_t c = {100, 500, 0, 0, 1, 0, 0};
+  static point2d_t c = {100, 500, 0, 0, 1, 0.5f, 1.0f};
   static point2d_t d = {400, 250, 1, 0, 0, 0, 0};
-  static point2d_t e = {10, 100, 0, 1, 0, 0, 0};
+  static point2d_t e = {10, 100, 0, 1, 0, 1.0f, 0};
   gl4dpClearScreen();
   /*int y;
   for(y = 0; y < 256; ++y) {
@@ -209,6 +222,7 @@ void dessin(void) {
 /*!\brief créé la fenêtre, un screen 2D effacé en noir et lance une
  *  boucle infinie.*/
 int main(int argc, char ** argv) {
+  SDL_Surface * s;
   /* tentative de création d'une fenêtre pour GL4Dummies */
   if(!gl4duwCreateWindow(argc, argv, /* args du programme */
 			 "GL4Dummies' Hello World", /* titre */
@@ -219,12 +233,17 @@ int main(int argc, char ** argv) {
      * contexte OpenGL (au moins 3.2) */
     return 1;
   }
+  s = SDL_LoadBMP("img.bmp");
+  assert(s);
   /* création d'un screen GL4Dummies (texture dans laquelle nous
    * pouvons dessiner) aux dimensions de la fenêtre */
-  gl4dpInitScreenWithDimensions(_w, 256);
+  ecran0 = gl4dpInitScreenWithDimensions(_w, 256);
+  ecran1 = gl4dpInitScreenWithDimensions(s->w, s->h);
+  gl4dpCopyFromSDLSurface(s);
+  gl4dpSetScreen(ecran0);
   /* effacement du screen en cours en utilisant la couleur par défaut,
    * le noir */
-  gl4dpClearScreen();
+  //gl4dpClearScreen();
 
   gl4duwDisplayFunc(dessin);
   /* boucle infinie pour éviter que le programme ne s'arrête et ferme

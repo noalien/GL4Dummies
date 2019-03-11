@@ -257,12 +257,12 @@ static void mixCallback(void *udata, Uint8 *stream, int len) {
 /*!\brief Cette fonction initialise les paramètres SDL_Mixer et charge
  *  le fichier audio.*/
 static void initAudio(const char * file) {
-  int mixFlags = MIX_INIT_OGG | MIX_INIT_MOD, res;
+  int mixFlags = MIX_INIT_MOD, res;
   res = Mix_Init(mixFlags);
   if( (res & mixFlags) != mixFlags ) {
     fprintf(stderr, "Mix_Init: Erreur lors de l'initialisation de la bibliotheque SDL_Mixer\n");
     fprintf(stderr, "Mix_Init: %s\n", Mix_GetError());
-    exit(-3);
+    //exit(-3);
   }
   if(Mix_OpenAudio(44100, AUDIO_S16LSB, 2, 1024) < 0)
     exit(-4);
