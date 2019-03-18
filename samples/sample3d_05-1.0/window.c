@@ -47,7 +47,7 @@ static GLfloat _picked_mobile_coords[4] = {0};
 static GLfloat * _pixels = NULL;
 /*!\brief position de la lumière, relative aux objets */
 static GLfloat _lumpos[] = { 9, 3, 0, 1 };
-#define SHADOW_MAP_SIDE 1024
+#define SHADOW_MAP_SIDE 512
 
 /*!\brief La fonction principale créé la fenêtre d'affichage,
  * initialise GL et les données, affecte les fonctions d'événements et
