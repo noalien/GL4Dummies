@@ -32,5 +32,5 @@ matrix:
 script:
   - make -f Makefile.autotools
   - ./configure
-  - make -j
+  - make
   - sudo make install
