@@ -34,6 +34,7 @@ int main(int argc, char ** argv) {
 /*!\brief initialise les paramètres OpenGL et les données */
 static void init(void) {
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_CULL_FACE);
   glClearColor(1.0f, 0.7f, 0.7f, 0.0f);
   _pId  = gl4duCreateProgram("<vs>shaders/dep3d.vs", "<fs>shaders/dep3d.fs", NULL);
   gl4duGenMatrix(GL_FLOAT, "modelViewMatrix");
@@ -52,6 +53,7 @@ static void resize(int w, int h) {
   gl4duBindMatrix("projectionMatrix");
   gl4duLoadIdentityf();
   gl4duFrustumf(-0.5, 0.5, -0.5 * _wH / _wW, 0.5 * _wH / _wW, 1.0, 1000.0);
+  //gl4duOrthof(-3.5, 3.5, -3.5 * _wH / _wW, 3.5 * _wH / _wW, 1.0, 1000.0);
   gl4duBindMatrix("modelViewMatrix");
 }
 /*!\brief dessine dans le contexte OpenGL actif. */
@@ -75,6 +77,8 @@ static void draw(void) {
   gl4duTranslatef(0, -1, 0);
   gl4duSendMatrices();
   glUniform4fv(glGetUniformLocation(_pId, "couleur"), 1, rouge);
+  gl4dgDraw(_sphere);
+  gl4duPopMatrix();
   gl4dgDraw(_sphere);
 
   gl4duRotatef(a, 0, 1, 0);

@@ -16,6 +16,7 @@
 #include <GL4D/gl4duw_SDL2.h>
 #include "animations.h"
 #include "audioHelper.h"
+#include <SDL_ttf.h>
 
 /* Prototypes des fonctions statiques contenues dans ce fichier C. */
 static void init(void);
@@ -27,21 +28,15 @@ static void keydown(int keycode);
  * ce tableau se termine toujours par l'élémént {0, NULL, NULL,
  * NULL} */
 static GL4DHanime _animations[] = {
-  //  { 8000, bidon00, NULL, NULL },
-  //  { 4000, bidon00, bidon01, fondu },
-  { 5000, music_simple, NULL, NULL },
-  { 5000, music_simple, mix0105, fondu },
+  { 5000, transformations, NULL, NULL },
+  { 5000, transformations, mix0105, fondu },
   { 5000, mix0105, NULL, NULL },
-  { 5000, mix0105, earth, fondui },
-  { 5000, earth, NULL, NULL },
-  { 5000, earth, music_fft, fondui },
-  { 5000, music_fft, NULL, NULL },
   {    0, NULL, NULL, NULL } /* Toujours laisser à la fin */
 };
 
 /*!\brief dimensions initiales de la fenêtre */
 //static GLfloat _dim[] = {1024, 768};
-static GLfloat _dim[] = {800, 600};
+static GLfloat _dim[] = {1280, 900};
 
 /*!\brief fonction principale : initialise la fenêtre, OpenGL, audio
  * et lance la boucle principale (infinie).
@@ -50,8 +45,12 @@ int main(int argc, char ** argv) {
   if(!gl4duwCreateWindow(argc, argv, "GL4Dummies DemoHelper", 
 			 0, 0, 
 			 _dim[0], _dim[1],
-			 GL4DW_RESIZABLE | GL4DW_SHOWN))
+			 GL4DW_RESIZABLE | /* GL4DW_FULLSCREEN | */GL4DW_SHOWN))
     return 1;
+  if(TTF_Init() == -1) {
+    fprintf(stderr, "TTF_Init: %s\n", TTF_GetError());
+    exit(2);
+  }
   init();
   atexit(quit);
   gl4duwResizeFunc(resize);

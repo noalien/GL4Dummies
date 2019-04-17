@@ -79,7 +79,7 @@ static void init(void) {
   glViewport(0, 0, _windowWidth, _windowHeight);
   gl4duBindMatrix("lightProjectionMatrix");
   gl4duLoadIdentityf();
-  gl4duFrustumf(-3, 3, -3, 3, 1.5, 50.0);
+  gl4duFrustumf(-1, 1, -1, 1, 1.5, 50.0);
   gl4duBindMatrix("cameraProjectionMatrix");
   gl4duLoadIdentityf();
   gl4duFrustumf(-0.5, 0.5, -0.5 * _windowHeight / _windowWidth, 0.5 * _windowHeight / _windowWidth, 1.0, 50.0);
@@ -241,7 +241,9 @@ static inline void scene(GLboolean sm) {
 
 /*!\brief dessine dans le contexte OpenGL actif. */
 static void draw(void) {
+  static float aa = 0;
   GLenum renderings[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+  //_lumpos[0] = 9 + 3.0 * cos(aa); aa += 0.01;
   glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
   /* désactiver le rendu de couleur et ne laisser que le depth, dans _smTex */
   glDrawBuffer(GL_NONE);

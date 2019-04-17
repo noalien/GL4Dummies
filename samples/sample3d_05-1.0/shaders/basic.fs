@@ -36,7 +36,7 @@ void main(void) {
 	diffuse = 1.0;
     }
     if(texture(smTex, projCoords.xy).r  <  projCoords.z)
-      diffuse *= 0.5; 
+      diffuse *= 0.0; 
     fragColor = vec4((couleur.rgb * diffuse), couleur.a);
   }
   fragId = vec4(float(id) / (float(nb_mobiles) + 2.0));
