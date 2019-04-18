@@ -51,7 +51,7 @@ size_t fheapCreate(size_t nmem, size_t size) {
 /*!\brief insert, en copiant le contenu, un élément dans le tas et
  * retourne son id (<>0).
  * \param heap_id identifiant du tas dans lequel se passe l'insertion.
- * \param element pointeur vers la donner à insérer (copier).
+ * \param element pointeur vers la donnée à insérer (copier).
  * \return identifiant de l'élément inséré dans le tas (différent de 0).
  */
 size_t fheapPut(size_t heap_id, void * element) {

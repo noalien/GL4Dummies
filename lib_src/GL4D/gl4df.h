@@ -341,6 +341,13 @@ extern "C" {
    *\see gl4dfCannySetMixMode
    */
   GL4DAPI void GL4DAPIENTRY gl4dfCannySetMixFactor(GLfloat factor);
+  /*!\brief Fonction liée au filtre Canny. Modification des seuils :
+   * bas (\a lowTh) et haut (\a highTh).
+   *
+   *\param lowTh seuil bas du filtre Canny
+   *\param highTh seuil haut du filtre Canny
+   */
+  GL4DAPI void GL4DAPIENTRY gl4dfCannySetThresholds(GLfloat lowTh, GLfloat highTh);
 
 #ifdef __cplusplus
 }

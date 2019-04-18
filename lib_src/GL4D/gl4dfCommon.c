@@ -49,8 +49,8 @@ void fcommMatchTex(GLuint goal, GLuint orig) {
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);    
   } else {
     glGetIntegerv(GL_VIEWPORT, vp);
-    w = vp[2] - vp[0]; 
-    h = vp[3] - vp[1];
+    w = vp[2];// - vp[0]; 
+    h = vp[3];// - vp[1];
   }
   glBindTexture(GL_TEXTURE_2D, goal);
   glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &pw);

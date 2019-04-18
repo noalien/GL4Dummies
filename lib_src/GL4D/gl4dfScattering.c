@@ -55,8 +55,8 @@ static void scatteringffunc(GLuint in, GLuint out, GLuint radius, GLuint displac
     gl4dfConvTex2Tex(out, _tempTexId[0], GL_FALSE);
   } 
   if(out == 0) { /* Pas de sortie, donc sortie aux dimensions du viewport */
-    w = vp[2] - vp[0]; 
-    h = vp[3] - vp[1];
+    w = vp[2];// - vp[0]; 
+    h = vp[3];// - vp[1];
     fcommMatchTex(rout = _tempTexId[1], out);
   } else {
     glBindTexture(GL_TEXTURE_2D, out);
@@ -172,7 +172,7 @@ static void init(void) {
     glGenTextures(1, &_noiseTex);
     gl4duAtExit(quit);
   }
-  setDimensions(vp[2] - vp[0], vp[3] - vp[1]);
+  setDimensions(vp[2]/* - vp[0]*/, vp[3]/* - vp[1]*/);
 }
 
 static void setDimensions(GLuint w, GLuint h) {

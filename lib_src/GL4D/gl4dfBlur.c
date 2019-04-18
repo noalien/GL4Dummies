@@ -67,8 +67,8 @@ static void blurffunc(GLuint in, GLuint out, GLuint radius, GLuint nb_iterations
     gl4dfConvFrame2Tex(&_tempTexId[0]);
   }
   if(out == 0) { /* Pas de sortie, donc sortie aux dimensions du viewport */
-    w = vp[2] - vp[0]; 
-    h = vp[3] - vp[1];
+    w = vp[2];// - vp[0]; 
+    h = vp[3];// - vp[1];
     fcommMatchTex(rout = _tempTexId[1], out);
   } else {
     glBindTexture(GL_TEXTURE_2D, out);
@@ -189,7 +189,7 @@ static void init(void) {
     gl4duAtExit(quit);
   }
   if(_tempTexId[0])
-    setDimensions(vp[2] - vp[0], vp[3] - vp[1]);
+    setDimensions(vp[2]/* - vp[0]*/, vp[3]/* - vp[1]*/);
 }
 
 static void setDimensions(GLuint w, GLuint h) {

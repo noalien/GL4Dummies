@@ -25,8 +25,8 @@ void gl4dfConvFrame2Tex(GLuint * out) {
   glGetIntegerv(GL_FRAMEBUFFER_BINDING, &cfbo);
   glGetIntegerv(GL_VIEWPORT, vp);
   if(*out == 0) {
-    w = vp[2] - vp[0];
-    h = vp[3] - vp[1];
+    w = vp[2];// - vp[0];
+    h = vp[3];// - vp[1];
     glGenTextures(1, out);
     glBindTexture(GL_TEXTURE_2D, *out);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, _filter);
