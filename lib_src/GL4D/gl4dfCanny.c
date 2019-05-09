@@ -5,7 +5,7 @@
  *
  * \author Farès BELHADJ amsi@ai.univ-paris8.fr
  * \date March 08, 2019
- * 
+ *
  */
 #include <math.h>
 #include <stdio.h>
@@ -144,7 +144,7 @@ static void cannyffunc(GLuint in, GLuint out, GLboolean flipV) {
     gl4dgDraw(fcommGetPlane());
     glBindTexture(GL_TEXTURE_2D, 0);
     glDrawBuffers(1, buffers);
-    
+
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _tempTexId[4],  0);
     glUseProgram(_cannyPId[1]);
     glUniform1i(glGetUniformLocation(_cannyPId[1],  "len"), 0);
@@ -257,7 +257,8 @@ static void cannyffunc(GLuint in, GLuint out, GLboolean flipV) {
 }
 
 static void init(void) {
-  GLint i, ctex;
+  GLint ctex;
+  GLuint i;
   glGetIntegerv(GL_TEXTURE_BINDING_2D, &ctex);
   if(!_tempTexId[0])
     glGenTextures((sizeof _tempTexId / sizeof *_tempTexId), _tempTexId);

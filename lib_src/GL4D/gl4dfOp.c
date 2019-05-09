@@ -5,7 +5,7 @@
  *
  * \author Farès BELHADJ amsi@ai.univ-paris8.fr
  * \date March 14, 2018
- * 
+ *
  */
 #include <math.h>
 #include <stdio.h>
@@ -53,7 +53,7 @@ static void opffunc(GLuint in1, GLuint in2, GLuint out, GLboolean flipV) {
   glGetIntegerv(GL_CURRENT_PROGRAM, &cpId);
 
   /* vérifier toutes les dimensions */
-  if( out == 0 /* pas de sortie, donc la sortie est l'écran */ || 
+  if( out == 0 /* pas de sortie, donc la sortie est l'écran */ ||
       (out == in1 || out == in2) /* ou une des entrées est la même que la sortie*/ )
     fcommMatchTex(rout = _tempTexId[2], out);
   if(in1 == 0) { /* Pas d'entrée 1, donc l'entrée est le dernier draw */
@@ -67,7 +67,7 @@ static void opffunc(GLuint in1, GLuint in2, GLuint out, GLboolean flipV) {
 
   glBindTexture(GL_TEXTURE_2D, rout);
   glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
-  glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);    
+  glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
   if(!bl) glEnable(GL_BLEND);
   if(dt) glDisable(GL_DEPTH_TEST);
 #ifndef __GLES4D__
@@ -107,7 +107,8 @@ static void opffunc(GLuint in1, GLuint in2, GLuint out, GLboolean flipV) {
 }
 
 static void init(void) {
-  GLint ctex, i;
+  GLint ctex;
+  GLuint i;
   glGetIntegerv(GL_TEXTURE_BINDING_2D, &ctex);
   if(!_tempTexId[0])
     glGenTextures((sizeof _tempTexId / sizeof *_tempTexId), _tempTexId);

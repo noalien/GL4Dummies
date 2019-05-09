@@ -5,7 +5,7 @@
  *
  * \author Farès BELHADJ amsi@ai.univ-paris8.fr
  * \date April 14, 2016
- * 
+ *
  */
 #include <math.h>
 #include <stdio.h>
@@ -105,7 +105,7 @@ static void sobelffunc(GLuint in, GLuint out, GLboolean flipV) {
     gl4dfConvTex2Tex(out, _tempTexId[0], GL_FALSE);
   }
   if(out == 0) { /* Pas de sortie, donc sortie aux dimensions du viewport */
-    w = vp[2];// - vp[0]; 
+    w = vp[2];// - vp[0];
     h = vp[3];// - vp[1];
     fcommMatchTex(rout = _tempTexId[1], out);
   } else {
@@ -156,7 +156,8 @@ static void sobelffunc(GLuint in, GLuint out, GLboolean flipV) {
 }
 
 static void init(void) {
-  GLint i, ctex;
+  GLint ctex;
+  GLuint i;
   glGetIntegerv(GL_TEXTURE_BINDING_2D, &ctex);
   if(!_tempTexId[0])
     glGenTextures((sizeof _tempTexId / sizeof *_tempTexId), _tempTexId);

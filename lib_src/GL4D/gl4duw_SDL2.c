@@ -56,23 +56,44 @@ static inline void       manageEvents(void);
 static inline void       mainLoopBody(void * window, void ** data);
 
 /*!\brief fonction fictive liée au callback de resize de la fenêtre. */
-static inline void fake_resize(int w, int h) {}
+static inline void fake_resize(int w, int h) {
+  (void)w; /* silenced warning */
+  (void)h; /* silenced warning */
+}
 /*!\brief fonction fictive liée au callback de touche clavier enfoncée. */
-static inline void fake_keydown(int keycode) {}
+static inline void fake_keydown(int keycode) {
+  (void)keycode; /* silenced warning */
+}
 /*!\brief fonction fictive liée au callback de touche clavier relachée. */
-static inline void fake_keyup(int keycode) {}
+static inline void fake_keyup(int keycode) {
+  (void)keycode; /* silenced warning */
+}
 /*!\brief fonction fictive liée au callback d'un bouton de souris enfoncé ou relaché. */
-static inline void fake_mousebutton(int button, int state, int x, int y) {}
+static inline void fake_mousebutton(int button, int state, int x, int y) {
+  (void)button; /* silenced warning */
+  (void)state;  /* silenced warning */
+  (void)x;      /* silenced warning */
+  (void)y;      /* silenced warning */
+}
 /*!\brief fonction fictive liée au callback du mouvement de la souris avec bouton enfoncé. */
-static inline void fake_mousemotion(int x, int y) {}
+static inline void fake_mousemotion(int x, int y) {
+  (void)x; /* silenced warning */
+  (void)y; /* silenced warning */
+}
 /*!\brief fonction fictive liée au callback du mouvement de la souris sans bouton enfoncé. */
-static inline void fake_passivemousemotion(int x, int y) {}
+static inline void fake_passivemousemotion(int x, int y) {
+  (void)x; /* silenced warning */
+  (void)y; /* silenced warning */
+}
 /*!\brief fonction fictive liée au callback de l'état idle de la fenêtre. */
 static inline void fake_idle(void) {}
 /*!\brief fonction fictive liée au callback de display. */
 static inline void fake_display(void) {}
 /*!\brief fonction fictive liée au callback de catchSDL_Event. */
-static inline int  fake_catchSDL_Event(SDL_Event * event) { return 0; }
+static inline int  fake_catchSDL_Event(SDL_Event * event) {
+  (void)event; /* silenced warning */
+  return 0;
+}
 
 void gl4duwSetGLAttributes(int glMajorVersion, int glMinorVersion, int glProfileMask, int glDoubleBuffer, int glDepthSize) {
   _glMajorVersion = glMajorVersion;
@@ -82,17 +103,20 @@ void gl4duwSetGLAttributes(int glMajorVersion, int glMinorVersion, int glProfile
   _glDepthSize    = glDepthSize;
 }
 
-GLboolean gl4duwCreateWindow(int argc, char ** argv, const char * title, int x, int y, 
+GLboolean gl4duwCreateWindow(int argc, char ** argv, const char * title, int x, int y,
 		       int width, int height, Uint32 wflags) {
+  (void)x; /* silenced warning */
+  (void)y; /* silenced warning */
   SDL_Window * win = NULL;
   SDL_GLContext oglc = NULL;
-  window_t wt = { (char *)title, NULL };
+  window_t wt = {(char *)title, NULL, 0,    NULL, NULL, NULL,
+                 NULL,          NULL, NULL, NULL, NULL, NULL};
   pair_t pair;
   static int ft = 1;
   pair = btFind(&_btWindows, &wt, windowCmpFunc);
   if(!pair.compResult) {
-    fprintf(stderr, "%s (%d): %s:\n\tErreur lors de la creation de la fenetre SDL : une fenetre portant le meme nom existe deja\n", 
-	    __FILE__, __LINE__, __func__);    
+    fprintf(stderr, "%s (%d): %s:\n\tErreur lors de la creation de la fenetre SDL : une fenetre portant le meme nom existe deja\n",
+	    __FILE__, __LINE__, __func__);
     return GL_FALSE;
   }
   initGL4DUW(argc, argv);
@@ -101,15 +125,15 @@ GLboolean gl4duwCreateWindow(int argc, char ** argv, const char * title, int x, 
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, _glProfileMask);
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, _glDoubleBuffer);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, _glDepthSize);
-  if( (win = SDL_CreateWindow(title, GL4DW_POS_CENTERED, GL4DW_POS_CENTERED, 
+  if( (win = SDL_CreateWindow(title, GL4DW_POS_CENTERED, GL4DW_POS_CENTERED,
 			      width, height, GL4DW_OPENGL | wflags)) == NULL ) {
-    fprintf(stderr, "%s (%d): %s:\n\tErreur lors de la creation de la fenetre SDL : %s", 
+    fprintf(stderr, "%s (%d): %s:\n\tErreur lors de la creation de la fenetre SDL : %s",
 	    __FILE__, __LINE__, __func__, SDL_GetError());
     return GL_FALSE;
   }
   if( (oglc = SDL_GL_CreateContext(win)) == NULL ) {
     SDL_DestroyWindow(win);
-    fprintf(stderr, "%s (%d): %s:\n\tErreur lors de la creation du contexte OpenGL : %s", 
+    fprintf(stderr, "%s (%d): %s:\n\tErreur lors de la creation du contexte OpenGL : %s",
 	    __FILE__, __LINE__, __func__, SDL_GetError());
     return GL_FALSE;
   }
@@ -128,7 +152,8 @@ SDL_Window * gl4duwGetSDL_Window(void) {
 }
 
 GLboolean gl4duwBindWindow(const char * title) {
-  window_t wt = { (char *)title, NULL };
+  window_t wt = {(char *)title, NULL, 0,    NULL, NULL, NULL,
+                 NULL,          NULL, NULL, NULL, NULL, NULL};
   pair_t pair;
   pair = btFind(&_btWindows, &wt, windowCmpFunc);
   if(pair.compResult)
@@ -195,12 +220,12 @@ void gl4duwDisableManageEvents(void) {
  *
  * \param argc nombre d'arguments passés au programme (premier argument de la fonction main).
  * \param argv liste des arguments passés au programme (second argument de la fonction main).
- * \return 0 en cas d'échec, !=0 sinon. 
+ * \return 0 en cas d'échec, !=0 sinon.
  */
 static inline int initGL4DUW(int argc, char ** argv) {
   if(_hasInit) return 1;
   if(SDL_Init(SDL_INIT_VIDEO) < 0) {
-    fprintf(stderr, "%s (%d): %s:\n\tErreur lors de l'initialisation de SDL :  %s", 
+    fprintf(stderr, "%s (%d): %s:\n\tErreur lors de l'initialisation de SDL :  %s",
 	    __FILE__, __LINE__, __func__, SDL_GetError());
     return 0;
   }
@@ -216,7 +241,7 @@ static inline int initGL4DUW(int argc, char ** argv) {
  * \param name titre de la fenêtre
  * \param win le pointeur vers la structure de fenêtre SDL
  * \param oglc la référence vers le contexte OpenGL lié à la fenêtre
- * \return le pointeur vers la fenêtre de type window_t créée 
+ * \return le pointeur vers la fenêtre de type window_t créée
  */
 static inline window_t * newWindow(const char * name, SDL_Window * win, SDL_GLContext oglc) {
   window_t * w = malloc(sizeof *w);
@@ -318,7 +343,18 @@ static inline void manageEvents(void) {
       break;
     case SDL_WINDOWEVENT: {
       SDL_Window * focusedw = SDL_GetWindowFromID(event.window.windowID);
-      window_t wt = { (char *)SDL_GetWindowTitle(focusedw), NULL };
+      window_t wt = {(char *)SDL_GetWindowTitle(focusedw),
+                     NULL,
+                     0,
+                     NULL,
+                     NULL,
+                     NULL,
+                     NULL,
+                     NULL,
+                     NULL,
+                     NULL,
+                     NULL,
+                     NULL};
       pair_t pair;
       pair = btFind(&_btWindows, &wt, windowCmpFunc);
       _focusedWindow = (window_t *)(*(bin_tree_t **)(pair.ptr))->data;
@@ -341,6 +377,7 @@ static inline void manageEvents(void) {
 
 /*!\brief corps de la boucle principale événement/simulation/affichage */
 static inline void mainLoopBody(void * window, void ** data) {
+  (void)data; /* warning silenced */
   window_t * w = (window_t *)window;
   w->idle();
   w->display();

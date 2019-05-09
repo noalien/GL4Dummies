@@ -16,9 +16,9 @@
  * plus efficace.
 */
 #include <assert.h>
-#include <GL4D/gl4du.h>
-#include <GL4D/gl4df.h>
-#include <GL4D/gl4dfCommon.h>
+#include "gl4du.h"
+#include "gl4df.h"
+#include "gl4dfCommon.h"
 
 static inline int nbLevels(int w, int h);
 static int  mdTexData(unsigned int w, unsigned int h);
@@ -48,14 +48,14 @@ void gl4dfMCMD(GLuint in, GLuint out, GLboolean flipV) {
 
 void gl4dfMCMDDimensions(GLuint width, GLuint height) {
   int d = (int)ceil(log(width) / log(2.0));
-  if(width != (1 << d)) {
+  if(width != (GLuint)(1 << d)) {
     fprintf(stderr,
       "%s:%d: les dimensions du MCMD sont des puissances de 2. Conversion a la puissance de 2 superieure.\n",
       __FILE__, __LINE__);
     width = (1 << d);
   }
   d = (int)ceil(log(height) / log(2.0));
-  if(height != (1 << d)) {
+  if(height != (GLuint)(1 << d)) {
     fprintf(stderr,
       "%s:%d: les dimensions du MCMD sont des puissances de 2. Conversion a la puissance de 2 superieure.\n",
       __FILE__, __LINE__);
@@ -689,13 +689,13 @@ static const char * gl4dfMCMD_mdbuV1FSOld =
      }";
 
 static void init(void) {
-  int i;
+  unsigned int i;
   if(!_mdTexId[0])
     glGenTextures(4, _mdTexId);
   if(!_tempTexId[0])
     glGenTextures((sizeof _tempTexId / sizeof *_tempTexId), _tempTexId);
   _maxLevel = mdTexData(_width, _height);
-  for(i = 0; i < (sizeof _tempTexId / sizeof *_tempTexId); i++) {
+  for(i = 0; i < (sizeof _tempTexId / sizeof *_tempTexId); ++i) {
     glBindTexture(GL_TEXTURE_2D, _tempTexId[i]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -954,7 +954,8 @@ static void (*_subdivision_func[])(GLubyte *, GLubyte *, ll_t **, GLushort, GLus
 
 
 static void subdivision2Tex(GLubyte ** parentData, GLubyte ** levelData, GLushort ** childData, GLuint * childDataSize, GLubyte ** childPos, unsigned int w, unsigned int h) {
-  int i, l, sl, maxsl = 0, n;
+  int sl, maxsl = 0;
+  unsigned int i, l, n;
   ll_t ** llmap = llMapNew(w, h);
   *parentData = malloc(4 * w * 4 * h * sizeof ** parentData); assert(*parentData);
   *levelData = malloc(w * h * sizeof ** levelData); assert(*levelData);
@@ -987,7 +988,8 @@ static void subdivision2Tex(GLubyte ** parentData, GLubyte ** levelData, GLushor
 }
 
 static int mdTexData(unsigned int w, unsigned int h) {
-  int i, l = 0;
+  int l = 0;
+  unsigned int i;
   GLushort * childData;
   GLubyte * childPos, * parentData = NULL, * levelData = NULL;
 
