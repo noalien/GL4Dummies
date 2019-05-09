@@ -42,7 +42,7 @@ m_dep = cc.find_library('m', required: true)
 sdl2_dep = dependency('sdl2')
 gl_dep = dependency('gl')
 
-shlib = shared_library('gl4dummies', srcfiles,
+shlib = shared_library('GL4Dummies', srcfiles,
   install: true,
   c_args: lib_args,
   gnu_symbol_visibility: 'hidden',
@@ -82,8 +82,10 @@ install_headers(header_files, subdir: 'GL4D')
 pkg_mod = import('pkgconfig')
 pkg_mod.generate(
   name: 'GL4Dummies',
-  filebase: 'gl4dummies',
-  description: 'GL4Dummies is an API that aims to help C developers to easily produce Multi-platform OpenGL 3.3+ applications.',
+  filebase: 'GL4Dummies',
+  description: 'C wrapper around OpenGL 3.3+',
   libraries: shlib,
   version: '6.0.0',
-  )
+  requires: ['gl', 'sdl2'],
+  install_dir: '/usr/lib/pkgconfig/'
+)
