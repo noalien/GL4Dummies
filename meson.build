@@ -87,5 +87,5 @@ pkg_mod.generate(
   libraries: shlib,
   version: '6.0.0',
   requires: ['gl', 'sdl2'],
-  install_dir: '/usr/lib/pkgconfig/'
+  # install_dir: '/usr/lib/pkgconfig/'
 )
