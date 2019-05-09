@@ -40,6 +40,25 @@ On macOS machines, pip will already be installed if you have already installed
 Python3, same goes for Windows. For the former, check that the binaries from pip
 are in your Path variable.
 
+First, check which version of pip is the default:
+```sh
+pip --version
+```
+
+If it mentions Python3, you are free to simply use `pip`. Otherwise, verify if
+`pip3` is installed, and if yes use it instead. You can install both Meson and
+Ninja in one go:
+```sh
+pip install meson ninja
+```
+If you experience right issues with the above command, either add the option
+`--user` after `install` to install it locally, or re-run the command with
+`sudo` if you have the rights to do so and if you wish to install these tools
+globally.
+
+Alternatively, you can use your operating system’s package manager if packages
+for these tools exist.
+
 ### With superuser rights
 If you have superuser rights on your machine and you want to install this
 project globally, go to the project's root and run the following:
