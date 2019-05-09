@@ -1,7 +1,7 @@
 project('GL4Dummies', 'c',
         version: '6.0.0',
-        default_options: ['c_std=gnu99', 'warning_level=2', 'optimization=3', 
-                          'buildtype=release', 'strip=true'])
+        default_options: ['c_std=gnu99', 'warning_level=2', 'optimization=3',
+                          'buildtype=release'])
 
 subdir('lib_src')
 
