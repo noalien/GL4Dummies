@@ -19,7 +19,7 @@ matrix:
         - sudo apt-get update -qq
         - sudo apt-get install -y libegl1-mesa-dev libgles2-mesa-dev
         - sudo apt-get install -y libsdl2-dev
-        - sudo apt-get install -y python3
+        - sudo apt-get install -y python3-pip
         - sudo pip3 install meson ninja
 
     # OSX #######################################################
@@ -27,7 +27,8 @@ matrix:
       ruby: 2.3
       osx_image: xcode10.2
       before_install:
-        - brew update && brew install sdl2 pip3
+        - brew update && brew install sdl2 python
+        - python -m pip install --upgrade pip
         - pip3 install meson ninja
 
 script:
