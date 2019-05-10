@@ -32,6 +32,7 @@ srcfiles = [
 ]
 
 header_files = [
+  './gl4dm.inl',
   './fixed_heap.h',
   './gl4duw_SDL2.h',
   './gl4dq.h',
