@@ -5,7 +5,7 @@
  *
  * \author Farès BELHADJ amsi@ai.univ-paris8.fr
  * \date March 08, 2017
- * 
+ *
  */
 
 #include "gl4du.h"
@@ -33,7 +33,8 @@ static void medianfinit(GLuint in, GLuint out, GLuint nb_iterations, GLboolean f
 /* appelée les autres fois (après la première qui lance init) */
 static void medianffunc(GLuint in, GLuint out, GLuint nb_iterations, GLboolean flipV) {
   GLuint rout = out, fbo, flipflop[2];
-  GLint i, n, vp[4], w, h, cfbo, ctex, cpId;
+  GLint vp[4], w, h, cfbo, ctex, cpId;
+  GLuint i;
   GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND);
 #ifndef __GLES4D__
   GLint polygonMode[2];
@@ -51,7 +52,7 @@ static void medianffunc(GLuint in, GLuint out, GLuint nb_iterations, GLboolean f
     gl4dfConvTex2Tex(out, _tempTexId[0], GL_FALSE);
   }
   if(out == 0) { /* Pas de sortie, donc sortie aux dimensions du viewport */
-    w = vp[2];// - vp[0]; 
+    w = vp[2];// - vp[0];
     h = vp[3];// - vp[1];
     fcommMatchTex(rout = _tempTexId[1], out);
   } else {
@@ -102,7 +103,8 @@ static void medianffunc(GLuint in, GLuint out, GLuint nb_iterations, GLboolean f
 }
 
 static void init(void) {
-  GLint i, ctex;
+  GLint ctex;
+  GLuint i;
   glGetIntegerv(GL_TEXTURE_BINDING_2D, &ctex);
   if(!_tempTexId[0])
     glGenTextures((sizeof _tempTexId / sizeof *_tempTexId), _tempTexId);

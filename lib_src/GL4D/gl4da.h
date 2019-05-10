@@ -11,7 +11,7 @@
 #define __GL4DA_H__
 
 //#include "gl4dq.h"
-#include <GL4D/gl4dq.h>
+#include "gl4dq.h"
 
 #ifdef __cplusplus
 extern "C" {
