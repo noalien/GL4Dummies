@@ -134,6 +134,7 @@ GLboolean gl4duwBindWindow(const char * title) {
   if(pair.compResult)
     return GL_FALSE;
   _curWindow = (window_t *)((*(bin_tree_t **)pair.ptr)->data);
+  SDL_GL_MakeCurrent(_curWindow->window, _curWindow->glContext);
   return GL_TRUE;
 }
 
@@ -142,6 +143,7 @@ void gl4duwMainLoop(void) {
     if(_hasManageEvents)
       manageEvents();
     btForAll(_btWindows, mainLoopBody, NULL);
+    SDL_GL_MakeCurrent(_curWindow->window, _curWindow->glContext);
     gl4duPrintFPS(stderr);
     gl4duUpdateShaders();
   }
@@ -342,6 +344,7 @@ static inline void manageEvents(void) {
 /*!\brief corps de la boucle principale événement/simulation/affichage */
 static inline void mainLoopBody(void * window, void ** data) {
   window_t * w = (window_t *)window;
+  SDL_GL_MakeCurrent(w->window, w->glContext);
   w->idle();
   w->display();
   SDL_GL_SwapWindow(w->window);
