@@ -5,7 +5,7 @@
  *
  * \author Farès BELHADJ amsi@ai.univ-paris8.fr
  * \date March 09, 2017
- * 
+ *
  */
 #include <stdlib.h>
 #include <assert.h>
@@ -53,9 +53,9 @@ static void scatteringffunc(GLuint in, GLuint out, GLuint radius, GLuint displac
   } else if(in == out) {
     fcommMatchTex(in = _tempTexId[0], out);
     gl4dfConvTex2Tex(out, _tempTexId[0], GL_FALSE);
-  } 
+  }
   if(out == 0) { /* Pas de sortie, donc sortie aux dimensions du viewport */
-    w = vp[2];// - vp[0]; 
+    w = vp[2];// - vp[0];
     h = vp[3];// - vp[1];
     fcommMatchTex(rout = _tempTexId[1], out);
   } else {
@@ -63,7 +63,7 @@ static void scatteringffunc(GLuint in, GLuint out, GLuint radius, GLuint displac
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
   }
-  if(w != _width || h != _height)
+  if((GLuint)w != _width || (GLuint)h != _height)
     setDimensions(w, h);
 #ifndef __GLES4D__
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -122,7 +122,8 @@ static void scatteringffunc(GLuint in, GLuint out, GLuint radius, GLuint displac
 }
 
 static void init(void) {
-  GLint vp[4], i, ctex;
+  GLint vp[4], ctex;
+  long unsigned int i;
   glGetIntegerv(GL_VIEWPORT, vp);
   glGetIntegerv(GL_TEXTURE_BINDING_2D, &ctex);
   if(!_tempTexId[0])
@@ -176,9 +177,9 @@ static void init(void) {
 }
 
 static void setDimensions(GLuint w, GLuint h) {
-  int i;
-  GLfloat * noise = NULL; 
-  _width  = w; 
+  unsigned int i;
+  GLfloat * noise = NULL;
+  _width  = w;
   _height = h;
   noise = malloc(2 * _width * _height * sizeof *noise);
   assert(noise);

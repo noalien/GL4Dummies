@@ -6,7 +6,7 @@
  *
  * \author Farès BELHADJ amsi@ai.univ-paris8.fr
  * \date May 27, 2016
- * 
+ *
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,8 +23,10 @@ MKFWINIT0(plane, GLuint);
 static void init(void) {
   GLint ctex;
   glGetIntegerv(GL_TEXTURE_BINDING_2D, &ctex);
-  if(gl4dfBasicVS)
-    ; /* éviter des warnings stupides */
+  if(gl4dfBasicVS) {
+    (void)ctex; /* avoid stupid warning */
+  }
+
   if(!_plan) {
     _plan = gl4dgGenQuadf();
     gl4duAtExit(quit);
@@ -46,15 +48,15 @@ void fcommMatchTex(GLuint goal, GLuint orig) {
   if(orig) {
     glBindTexture(GL_TEXTURE_2D, orig);
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
-    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);    
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
   } else {
     glGetIntegerv(GL_VIEWPORT, vp);
-    w = vp[2];// - vp[0]; 
+    w = vp[2];// - vp[0];
     h = vp[3];// - vp[1];
   }
   glBindTexture(GL_TEXTURE_2D, goal);
   glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &pw);
-  glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &ph);    
+  glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &ph);
   if(pw != w || ph != h)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
   glBindTexture(GL_TEXTURE_2D, (GLuint)ctex);

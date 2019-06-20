@@ -16,9 +16,9 @@
  * plus efficace.
 */
 #include <assert.h>
-#include <GL4D/gl4du.h>
-#include <GL4D/gl4df.h>
-#include <GL4D/gl4dfCommon.h>
+#include "gl4du.h"
+#include "gl4df.h"
+#include "gl4dfCommon.h"
 
 static inline int nbLevels(int w, int h);
 static int  mdTexData(unsigned int w, unsigned int h);
@@ -48,14 +48,14 @@ void gl4dfMCMD(GLuint in, GLuint out, GLboolean flipV) {
 
 void gl4dfMCMDDimensions(GLuint width, GLuint height) {
   int d = (int)ceil(log(width) / log(2.0));
-  if(width != (1 << d)) {
+  if(width != (GLuint)(1 << d)) {
     fprintf(stderr,
       "%s:%d: les dimensions du MCMD sont des puissances de 2. Conversion a la puissance de 2 superieure.\n",
       __FILE__, __LINE__);
     width = (1 << d);
   }
   d = (int)ceil(log(height) / log(2.0));
-  if(height != (1 << d)) {
+  if(height != (GLuint)(1 << d)) {
     fprintf(stderr,
       "%s:%d: les dimensions du MCMD sont des puissances de 2. Conversion a la puissance de 2 superieure.\n",
       __FILE__, __LINE__);
@@ -301,401 +301,401 @@ void gl4dMCMDSetUseNoiseTranslateMap(GLuint map_tex_id) {
 
 static const char * gl4dfMCMD_select4mcmdFS =
   "<imfs>gl4dfMCMD_select4mcmd.fs</imfs>\n\
-     #version 330\n							\
-     in vec2 vsoTexCoord;\n						\
-     out vec4 fragColor;\n						\
-     uniform int width, height;\n					\
-     uniform sampler2D etage0;\n					\
-     uniform float rand_threshold;\n					\
-     const int ossize = 9;\n						\
-     const vec2 G[ossize] = vec2[]( vec2(1.0,  1.0), vec2(0.0,  2.0), vec2(-1.0,  1.0), \n \
-                 vec2(2.0,  0.0), vec2(0.0,  0.0), vec2(-2.0,  0.0), \n \
-                 vec2(1.0, -1.0), vec2(0.0, -2.0), vec2(-1.0, -1.0) );\n \
-     vec2 step = vec2(1.0 / float(width - 1), 1.0 / float(height - 1));\n \
-     vec2 offset[ossize] = vec2[](vec2(-step.x , -step.y), vec2( 0.0, -step.y), vec2( step.x , -step.y), \n \
-               vec2(-step.x, 0.0),       vec2( 0.0, 0.0),      vec2( step.x, 0.0), \n \
-               vec2(-step.x,   step.y), vec2( 0.0, step.y),  vec2( step.x ,  step.y));\n \
-     float luminance(vec3 rgb) {\n					\
-       return dot(vec3(0.299, 0.587, 0.114), rgb);\n			\
-     }\n								\
-     highp float rand(vec2 co) {\n					\
-       highp float a = 12.9898;\n					\
-       highp float b = 78.233;\n					\
-       highp float c = 43758.5453;\n					\
-       highp float dt= dot(co.xy ,vec2(a,b));\n				\
-       highp float sn= mod(dt,3.14);\n					\
-       return fract(sin(sn) * c);\n					\
-     }\n								\
-     float sobel(void) {\n						\
-       vec2 g = vec2(0.0, 0.0);\n					\
-       for(int i = 0; i < ossize; i++)\n				\
-         g += luminance(texture(etage0, vsoTexCoord.st + offset[i]).rgb) * G[i];\n \
-       return 1.0 - length(g);\n					\
-     }\n								\
-     float sobelFromMedia(void) {\n					\
-       vec2 g = vec2(0.0, 0.0);\n					\
-       for(int i = 0; i < ossize; i++)\n				\
-         g += pow(texture(etage0, vsoTexCoord.st + offset[i]).a, 2.99) * G[i];\n \
-       return 1.0 - length(g);\n					\
-     }\n								\
-     const vec3 minc = vec3(1.0 / 255.0);\n				\
-     void main() {\n							\
-       if((rand(vsoTexCoord.st) > rand_threshold) || 0.2 * sobel() < 0.15 || sobelFromMedia() < 0.1)\n \
-         fragColor = vec4(max(texture(etage0, vsoTexCoord.st).rgb, minc), 1.0);\n \
-       else\n								\
+     #version 330\n\
+     in vec2 vsoTexCoord;\n\
+     out vec4 fragColor;\n\
+     uniform int width, height;\n\
+     uniform sampler2D etage0;\n\
+     uniform float rand_threshold;\n\
+     const int ossize = 9;\n\
+     const vec2 G[ossize] = vec2[]( vec2(1.0,  1.0), vec2(0.0,  2.0), vec2(-1.0,  1.0), \n\
+                 vec2(2.0,  0.0), vec2(0.0,  0.0), vec2(-2.0,  0.0), \n\
+                 vec2(1.0, -1.0), vec2(0.0, -2.0), vec2(-1.0, -1.0) );\n\
+     vec2 step = vec2(1.0 / float(width - 1), 1.0 / float(height - 1));\n\
+     vec2 offset[ossize] = vec2[](vec2(-step.x , -step.y), vec2( 0.0, -step.y), vec2( step.x , -step.y), \n\
+               vec2(-step.x, 0.0),       vec2( 0.0, 0.0),      vec2( step.x, 0.0), \n\
+               vec2(-step.x,   step.y), vec2( 0.0, step.y),  vec2( step.x ,  step.y));\n\
+     float luminance(vec3 rgb) {\n\
+       return dot(vec3(0.299, 0.587, 0.114), rgb);\n\
+     }\n\
+     highp float rand(vec2 co) {\n\
+       highp float a = 12.9898;\n\
+       highp float b = 78.233;\n\
+       highp float c = 43758.5453;\n\
+       highp float dt= dot(co.xy ,vec2(a,b));\n\
+       highp float sn= mod(dt,3.14);\n\
+       return fract(sin(sn) * c);\n\
+     }\n\
+     float sobel(void) {\n\
+       vec2 g = vec2(0.0, 0.0);\n\
+       for(int i = 0; i < ossize; i++)\n\
+         g += luminance(texture(etage0, vsoTexCoord.st + offset[i]).rgb) * G[i];\n\
+       return 1.0 - length(g);\n\
+     }\n\
+     float sobelFromMedia(void) {\n\
+       vec2 g = vec2(0.0, 0.0);\n\
+       for(int i = 0; i < ossize; i++)\n\
+         g += pow(texture(etage0, vsoTexCoord.st + offset[i]).a, 2.99) * G[i];\n\
+       return 1.0 - length(g);\n\
+     }\n\
+     const vec3 minc = vec3(1.0 / 255.0);\n\
+     void main() {\n\
+       if((rand(vsoTexCoord.st) > rand_threshold) || 0.2 * sobel() < 0.15 || sobelFromMedia() < 0.1)\n\
+         fragColor = vec4(max(texture(etage0, vsoTexCoord.st).rgb, minc), 1.0);\n\
+       else\n\
          fragColor = vec4(0.0, 0.0, 0.0, 1.0);\n			\
      }";
 
 static const char * gl4dfMCMD_mdFS =
   "<imfs>gl4dfMCMD_md.fs</imfs>\n\
-     #version 330\n							\
-     in vec2 vsoTexCoord;\n						\
-     out vec4 fragColor;\n						\
-     uniform int width, height, level, maxLevel;\n			\
-     uniform sampler2D etage0, etage1, etage2;\n			\
-     uniform float seed;\n						\
-     uniform vec4 mcmd_noise_H, mcmd_noise_S, mcmd_noise_T, mcmd_noise_phase_change, mcmd_I;\n \
-     vec2[4] getParents(vec2 st) {\n					\
-       int i, x;\n							\
-       vec2 p[4];\n							\
-       vec4 c;\n							\
-       for(i = 0; i < 4; i++) {\n					\
-         x = i + int((st.s * float(width) - 0.5 /*transforme le nearest en floor*/) * 4.0);\n \
-         c = texture(etage1, vec2(float(x) / (float(width) * 4.0), st.t));\n \
-         p[i].x = (int(c.r * 255.0) << 8) | int(c.g * 255.0);\n		\
-         p[i].y = (int(c.b * 255.0) << 8) | int(c.a * 255.0);\n		\
-       }\n								\
-       return p;\n							\
-     }\n								\
-     highp float rand(vec2 co) {\n					\
-       highp float a = 12.9898;\n					\
-       highp float b = 78.233;\n					\
-       highp float c = 43758.5453;\n					\
-       highp float dt= dot(co.xy ,vec2(a,b));\n				\
-       highp float sn= mod(dt,3.14);\n					\
-       return 2.0 * fract(sin(sn) * c) - 1.0;\n				\
-     }\n								\
-     highp vec4 rand(vec2 co, vec4 s) {\n				\
-       return vec4(rand(co + vec2(s.x)), rand(co + vec2(s.y)), rand(co + vec2(s.z)), rand(co + vec2(s.w)));\n \
-     }\n								\
-     void main() {\n							\
-       const vec4 minc = vec4(1.0 / 255.0);\n				\
-       int myLevel = int(texture(etage2, vsoTexCoord.st).r * 255.0);\n	\
-       if(myLevel == level && texture(etage0, vsoTexCoord.st).r == 0.0) {\n \
-         const float maxdist = sqrt(2.0) / 2.0;\n				\
-         float sumw = 0.0, w;\n						\
-         vec4 I_sign = vec4(mcmd_I.x < 0.0 ? -1.0 : 1.0, mcmd_I.y < 0.0 ? -1.0 : 1.0, mcmd_I.z < 0.0 ? -1.0 : 1.0, mcmd_I.w < 0.0 ? -1.0 : 1.0);\n \
-         vec4 I_abs = abs(mcmd_I), v = vec4(0.0);\n			\
-         vec2[4] parents = getParents(vsoTexCoord.st);\n		\
-         for(int i = 0; i < 4; i++) {\n					\
-           if(parents[i].x != 65535) {\n				\
-             vec2 p = vec2(parents[i].x / width , parents[i].y / height);\n \
-             w = 1.0 - length(p - vsoTexCoord) / maxdist;\n		\
-             v += w * (vec4(1.0) - I_sign * (vec4(1.0) - pow(vec4(w), I_abs))) * texture(etage0, p);\n \
-             sumw += w;\n						\
-           }\n								\
-         }\n								\
-         if(sumw > 0.0)\n						\
-           v /= sumw;\n							\
-         v += pow(vec4(2.0), vec4(-(myLevel + 1) * mcmd_noise_H)) * (mcmd_noise_S * (mcmd_noise_T + rand(vsoTexCoord.st + vec2(seed), mcmd_noise_phase_change)));\n \
-         fragColor = max(v, minc);\n					\
-       } else\n								\
+     #version 330\n\
+     in vec2 vsoTexCoord;\n\
+     out vec4 fragColor;\n\
+     uniform int width, height, level, maxLevel;\n\
+     uniform sampler2D etage0, etage1, etage2;\n\
+     uniform float seed;\n\
+     uniform vec4 mcmd_noise_H, mcmd_noise_S, mcmd_noise_T, mcmd_noise_phase_change, mcmd_I;\n\
+     vec2[4] getParents(vec2 st) {\n\
+       int i, x;\n\
+       vec2 p[4];\n\
+       vec4 c;\n\
+       for(i = 0; i < 4; i++) {\n\
+         x = i + int((st.s * float(width) - 0.5 /*transforme le nearest en floor*/) * 4.0);\n\
+         c = texture(etage1, vec2(float(x) / (float(width) * 4.0), st.t));\n\
+         p[i].x = (int(c.r * 255.0) << 8) | int(c.g * 255.0);\n\
+         p[i].y = (int(c.b * 255.0) << 8) | int(c.a * 255.0);\n\
+       }\n\
+       return p;\n\
+     }\n\
+     highp float rand(vec2 co) {\n\
+       highp float a = 12.9898;\n\
+       highp float b = 78.233;\n\
+       highp float c = 43758.5453;\n\
+       highp float dt= dot(co.xy ,vec2(a,b));\n\
+       highp float sn= mod(dt,3.14);\n\
+       return 2.0 * fract(sin(sn) * c) - 1.0;\n\
+     }\n\
+     highp vec4 rand(vec2 co, vec4 s) {\n\
+       return vec4(rand(co + vec2(s.x)), rand(co + vec2(s.y)), rand(co + vec2(s.z)), rand(co + vec2(s.w)));\n\
+     }\n\
+     void main() {\n\
+       const vec4 minc = vec4(1.0 / 255.0);\n\
+       int myLevel = int(texture(etage2, vsoTexCoord.st).r * 255.0);\n\
+       if(myLevel == level && texture(etage0, vsoTexCoord.st).r == 0.0) {\n\
+         const float maxdist = sqrt(2.0) / 2.0;\n\
+         float sumw = 0.0, w;\n\
+         vec4 I_sign = vec4(mcmd_I.x < 0.0 ? -1.0 : 1.0, mcmd_I.y < 0.0 ? -1.0 : 1.0, mcmd_I.z < 0.0 ? -1.0 : 1.0, mcmd_I.w < 0.0 ? -1.0 : 1.0);\n\
+         vec4 I_abs = abs(mcmd_I), v = vec4(0.0);\n\
+         vec2[4] parents = getParents(vsoTexCoord.st);\n\
+         for(int i = 0; i < 4; i++) {\n\
+           if(parents[i].x != 65535) {\n\
+             vec2 p = vec2(parents[i].x / width , parents[i].y / height);\n\
+             w = 1.0 - length(p - vsoTexCoord) / maxdist;\n\
+             v += w * (vec4(1.0) - I_sign * (vec4(1.0) - pow(vec4(w), I_abs))) * texture(etage0, p);\n\
+             sumw += w;\n\
+           }\n\
+         }\n\
+         if(sumw > 0.0)\n\
+           v /= sumw;\n\
+         v += pow(vec4(2.0), vec4(-(myLevel + 1) * mcmd_noise_H)) * (mcmd_noise_S * (mcmd_noise_T + rand(vsoTexCoord.st + vec2(seed), mcmd_noise_phase_change)));\n\
+         fragColor = max(v, minc);\n\
+       } else\n\
          fragColor = texture(etage0, vsoTexCoord.st);\n			\
      }";
 
 static const char * gl4dfMCMD_mdLocalFS =
   "<imfs>gl4dfMCMD_mdLocal.fs</imfs>\n\
-     #version 330\n							\
-     in vec2 vsoTexCoord;\n						\
-     out vec4 fragColor;\n						\
-     uniform int width, height, level, maxLevel, use_etage3, use_etage4, use_etage5, use_etage6;\n \
-     uniform sampler2D etage0, etage1, etage2, etage3, etage4, etage5, etage6;\n \
-     uniform float seed, local_Hf;\n					\
-     uniform vec4 mcmd_noise_H, mcmd_noise_S, mcmd_noise_T, mcmd_noise_phase_change, mcmd_I;\n \
-     vec2[4] getParents(vec2 st) {\n					\
-       int i, x;\n							\
-       vec2 p[4];\n							\
-       vec4 c;\n							\
-       for(i = 0; i < 4; i++) {\n					\
-         x = i + int((st.s * float(width) - 0.5 /*transforme le nearest en floor*/) * 4.0);\n \
-         c = texture(etage1, vec2(float(x) / (float(width) * 4.0), st.t));\n \
-         p[i].x = (int(c.r * 255.0) << 8) | int(c.g * 255.0);\n		\
-         p[i].y = (int(c.b * 255.0) << 8) | int(c.a * 255.0);\n		\
-       }\n								\
-       return p;\n							\
-     }\n								\
-     highp float rand(vec2 co) {\n					\
-       highp float a = 12.9898;\n					\
-       highp float b = 78.233;\n					\
-       highp float c = 43758.5453;\n					\
-       highp float dt= dot(co.xy ,vec2(a,b));\n				\
-       highp float sn= mod(dt,3.14);\n					\
-       return 2.0 * fract(sin(sn) * c) - 1.0;\n				\
-     }\n								\
-     highp vec4 rand(vec2 co, vec4 s) {\n				\
-       return vec4(rand(co + vec2(s.x)), rand(co + vec2(s.y)), rand(co + vec2(s.z)), rand(co + vec2(s.w)));\n \
-     }\n								\
-     void main() {\n							\
-       const vec4 minc = vec4(1.0 / 255.0);\n				\
-       int myLevel = int(texture(etage2, vsoTexCoord.st).r * 255.0);\n	\
-       if(myLevel == level && texture(etage0, vsoTexCoord.st).r == 0.0) {\n \
-         const float maxdist = sqrt(2.0) / 2.0;\n				\
-         vec4 texH  = mcmd_noise_H + (use_etage3 != 0 ? local_Hf * (texture(etage3, vsoTexCoord.st) - vec4(0.5)) : vec4(0));\n \
-         vec4 texI  = mcmd_I + (use_etage4 != 0 ? 10.0 * (texture(etage4, vsoTexCoord.st) - vec4(0.5)) : vec4(0));\n \
-         vec4 texNS  = max(mcmd_noise_S + (use_etage5 != 0 ? 10.0 * (texture(etage5, vsoTexCoord.st) - vec4(0.5)) : vec4(0)), vec4(0));\n \
-         vec4 texNT  = mcmd_noise_T + (use_etage6 != 0 ? 10.0 * (texture(etage6, vsoTexCoord.st) - vec4(0.5)) : vec4(0));\n \
-         float sumw = 0.0, w;\n						\
-         vec4 I_sign = vec4(texI.x < 0.0 ? -1.0 : 1.0, texI.y < 0.0 ? -1.0 : 1.0, texI.z < 0.0 ? -1.0 : 1.0, texI.w < 0.0 ? -1.0 : 1.0);\n \
-         vec4 I_abs = abs(texI), v = vec4(0.0);\n			\
-         vec2[4] parents = getParents(vsoTexCoord.st);\n		\
-         for(int i = 0; i < 4; i++) {\n					\
-           if(parents[i].x != 65535) {\n				\
-             vec2 p = vec2(parents[i].x / width , parents[i].y / height);\n \
-             w = 1.0 - length(p - vsoTexCoord) / maxdist;\n		\
-             v += w * (vec4(1.0) - I_sign * (vec4(1.0) - pow(vec4(w), I_abs))) * texture(etage0, p);\n \
-             sumw += w;\n						\
-           }\n								\
-         }\n								\
-         if(sumw > 0.0)\n						\
-           v /= sumw;\n							\
-         v += pow(vec4(2.0), vec4(-(myLevel + 1) * texH)) * (texNS * (texNT + rand(vsoTexCoord.st + vec2(seed), mcmd_noise_phase_change)));\n \
-         fragColor = max(v, minc);\n					\
-       } else\n								\
-         fragColor = texture(etage0, vsoTexCoord.st);\n			\
+     #version 330\n\
+     in vec2 vsoTexCoord;\n\
+     out vec4 fragColor;\n\
+     uniform int width, height, level, maxLevel, use_etage3, use_etage4, use_etage5, use_etage6;\n\
+     uniform sampler2D etage0, etage1, etage2, etage3, etage4, etage5, etage6;\n\
+     uniform float seed, local_Hf;\n\
+     uniform vec4 mcmd_noise_H, mcmd_noise_S, mcmd_noise_T, mcmd_noise_phase_change, mcmd_I;\n\
+     vec2[4] getParents(vec2 st) {\n\
+       int i, x;\n\
+       vec2 p[4];\n\
+       vec4 c;\n\
+       for(i = 0; i < 4; i++) {\n\
+         x = i + int((st.s * float(width) - 0.5 /*transforme le nearest en floor*/) * 4.0);\n\
+         c = texture(etage1, vec2(float(x) / (float(width) * 4.0), st.t));\n\
+         p[i].x = (int(c.r * 255.0) << 8) | int(c.g * 255.0);\n\
+         p[i].y = (int(c.b * 255.0) << 8) | int(c.a * 255.0);\n\
+       }\n\
+       return p;\n\
+     }\n\
+     highp float rand(vec2 co) {\n\
+       highp float a = 12.9898;\n\
+       highp float b = 78.233;\n\
+       highp float c = 43758.5453;\n\
+       highp float dt= dot(co.xy ,vec2(a,b));\n\
+       highp float sn= mod(dt,3.14);\n\
+       return 2.0 * fract(sin(sn) * c) - 1.0;\n\
+     }\n\
+     highp vec4 rand(vec2 co, vec4 s) {\n\
+       return vec4(rand(co + vec2(s.x)), rand(co + vec2(s.y)), rand(co + vec2(s.z)), rand(co + vec2(s.w)));\n\
+     }\n\
+     void main() {\n\
+       const vec4 minc = vec4(1.0 / 255.0);\n\
+       int myLevel = int(texture(etage2, vsoTexCoord.st).r * 255.0);\n\
+       if(myLevel == level && texture(etage0, vsoTexCoord.st).r == 0.0) {\n\
+         const float maxdist = sqrt(2.0) / 2.0;\n\
+         vec4 texH  = mcmd_noise_H + (use_etage3 != 0 ? local_Hf * (texture(etage3, vsoTexCoord.st) - vec4(0.5)) : vec4(0));\n\
+         vec4 texI  = mcmd_I + (use_etage4 != 0 ? 10.0 * (texture(etage4, vsoTexCoord.st) - vec4(0.5)) : vec4(0));\n\
+         vec4 texNS  = max(mcmd_noise_S + (use_etage5 != 0 ? 10.0 * (texture(etage5, vsoTexCoord.st) - vec4(0.5)) : vec4(0)), vec4(0));\n\
+         vec4 texNT  = mcmd_noise_T + (use_etage6 != 0 ? 10.0 * (texture(etage6, vsoTexCoord.st) - vec4(0.5)) : vec4(0));\n\
+         float sumw = 0.0, w;\n\
+         vec4 I_sign = vec4(texI.x < 0.0 ? -1.0 : 1.0, texI.y < 0.0 ? -1.0 : 1.0, texI.z < 0.0 ? -1.0 : 1.0, texI.w < 0.0 ? -1.0 : 1.0);\n\
+         vec4 I_abs = abs(texI), v = vec4(0.0);\n\
+         vec2[4] parents = getParents(vsoTexCoord.st);\n\
+         for(int i = 0; i < 4; i++) {\n\
+           if(parents[i].x != 65535) {\n\
+             vec2 p = vec2(parents[i].x / width , parents[i].y / height);\n\
+             w = 1.0 - length(p - vsoTexCoord) / maxdist;\n\
+             v += w * (vec4(1.0) - I_sign * (vec4(1.0) - pow(vec4(w), I_abs))) * texture(etage0, p);\n\
+             sumw += w;\n\
+           }\n\
+         }\n\
+         if(sumw > 0.0)\n\
+           v /= sumw;\n\
+         v += pow(vec4(2.0), vec4(-(myLevel + 1) * texH)) * (texNS * (texNT + rand(vsoTexCoord.st + vec2(seed), mcmd_noise_phase_change)));\n\
+         fragColor = max(v, minc);\n\
+       } else\n\
+         fragColor = texture(etage0, vsoTexCoord.st);\n\
      }";
 
 static const char * gl4dfMCMD_mdbuV0FS =
   "<imfs>gl4dfMCMD_mdbuV0.fs</imfs>\n\
-     #version 330\n							\
-     in vec2 vsoTexCoord;\n						\
-     out vec4 fragColor;\n						\
-     uniform vec4 mcmd_Ir;\n						\
-     uniform int width, mcmd_take_color, buTreeSize, buTreeWidth, buTreeHeight;\n \
-     uniform sampler2D etage0, etage1, etage2, etage3;\n		\
-     float luminance(vec3 rgb) {\n					\
-       return dot(vec3(0.299, 0.587, 0.114), rgb);\n			\
-     }\n								\
-     uint rgba2ui(vec4 rgba) {\n					\
-       return (uint(rgba.r * 255.0) << uint(24)) |\n			\
-         (uint(rgba.g * 255.0) << uint(16)) |\n				\
-         (uint(rgba.b * 255.0) << uint(8) ) |\n				\
-         (uint(rgba.a * 255.0));\n					\
-     }\n								\
-     float rgba2f(vec4 rgba) {\n					\
-       return float(rgba2ui(rgba)) / float(uint(-1));\n			\
-     }\n								\
-     vec2 getChild(uint ipos) {\n					\
-       return vec2(float(ipos % uint(buTreeWidth)) / float(buTreeWidth - 1.0), float(ipos / uint(buTreeWidth)) / float(buTreeHeight - 1.0));\n \
-     }\n								\
-     vec2 readChildCoords(uint pos, float step) {\n			\
-       return vec2(texture(etage2, getChild(pos)).r, texture(etage2, getChild(pos + uint(1))).r) * step;\n \
-     }\n								\
-     void main() {\n							\
-       vec4 coul = texture(etage0, vsoTexCoord.st);\n			\
-       if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
-         fragColor = coul;\n						\
-         return;\n							\
-       }\n								\
-       float step = 65535.0 / float(width - 1.0);\n			\
-       uint i0 = rgba2ui(texture(etage1, vsoTexCoord.st));\n		\
-       if(mcmd_take_color != 0) {\n					\
-         uint i0 = rgba2ui(texture(etage1, vsoTexCoord.st));\n		\
-         for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n \
-           if(ret.x >= 0.0 && ret.x <= 1.0 && ret.y >= 0.0 && ret.y <= 1.0) {\n	\
-             coul = texture(etage0, ret);\n				\
-           if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
-               fragColor = texture(etage3, vsoTexCoord.st);\n		\
-               return;\n						\
-             }\n							\
-           }\n								\
-         }\n								\
-         fragColor = vec4(0.0, 0.0, 0.0, 1.0);\n			\
-       } else {\n							\
-         const float maxdist = sqrt(2.0) / 2.0;\n				\
-         float sumn = 0.0, w;\n						\
-         vec4 Ir_sign = vec4(mcmd_Ir.x < 0.0 ? -1.0 : 1.0, mcmd_Ir.y < 0.0 ? -1.0 : 1.0, mcmd_Ir.z < 0.0 ? -1.0 : 1.0, mcmd_Ir.w < 0.0 ? -1.0 : 1.0);\n	\
-         vec4 sumcoul = vec4(0.0), Ir_abs = abs(mcmd_Ir);\n		\
-         for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n \
-           if(ret.x >= 0.0 && ret.x <= 1.0 && ret.y >= 0.0 && ret.y <= 1.0) {\n	\
-             coul = texture(etage0, ret);\n				\
-             if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
-               w = 1.0 - length(ret - vsoTexCoord) / maxdist;\n		\
+     #version 330\n\
+     in vec2 vsoTexCoord;\n\
+     out vec4 fragColor;\n\
+     uniform vec4 mcmd_Ir;\n\
+     uniform int width, mcmd_take_color, buTreeSize, buTreeWidth, buTreeHeight;\n\
+     uniform sampler2D etage0, etage1, etage2, etage3;\n\
+     float luminance(vec3 rgb) {\n\
+       return dot(vec3(0.299, 0.587, 0.114), rgb);\n\
+     }\n\
+     uint rgba2ui(vec4 rgba) {\n\
+       return (uint(rgba.r * 255.0) << uint(24)) |\n\
+         (uint(rgba.g * 255.0) << uint(16)) |\n\
+         (uint(rgba.b * 255.0) << uint(8) ) |\n\
+         (uint(rgba.a * 255.0));\n\
+     }\n\
+     float rgba2f(vec4 rgba) {\n\
+       return float(rgba2ui(rgba)) / float(uint(-1));\n\
+     }\n\
+     vec2 getChild(uint ipos) {\n\
+       return vec2(float(ipos % uint(buTreeWidth)) / float(buTreeWidth - 1.0), float(ipos / uint(buTreeWidth)) / float(buTreeHeight - 1.0));\n\
+     }\n\
+     vec2 readChildCoords(uint pos, float step) {\n\
+       return vec2(texture(etage2, getChild(pos)).r, texture(etage2, getChild(pos + uint(1))).r) * step;\n\
+     }\n\
+     void main() {\n\
+       vec4 coul = texture(etage0, vsoTexCoord.st);\n\
+       if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n\
+         fragColor = coul;\n\
+         return;\n\
+       }\n\
+       float step = 65535.0 / float(width - 1.0);\n\
+       uint i0 = rgba2ui(texture(etage1, vsoTexCoord.st));\n\
+       if(mcmd_take_color != 0) {\n\
+         uint i0 = rgba2ui(texture(etage1, vsoTexCoord.st));\n\
+         for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n\
+           if(ret.x >= 0.0 && ret.x <= 1.0 && ret.y >= 0.0 && ret.y <= 1.0) {\n\
+             coul = texture(etage0, ret);\n\
+           if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n\
+               fragColor = texture(etage3, vsoTexCoord.st);\n\
+               return;\n\
+             }\n\
+           }\n\
+         }\n\
+         fragColor = vec4(0.0, 0.0, 0.0, 1.0);\n\
+       } else {\n\
+         const float maxdist = sqrt(2.0) / 2.0;\n\
+         float sumn = 0.0, w;\n\
+         vec4 Ir_sign = vec4(mcmd_Ir.x < 0.0 ? -1.0 : 1.0, mcmd_Ir.y < 0.0 ? -1.0 : 1.0, mcmd_Ir.z < 0.0 ? -1.0 : 1.0, mcmd_Ir.w < 0.0 ? -1.0 : 1.0);\n\
+         vec4 sumcoul = vec4(0.0), Ir_abs = abs(mcmd_Ir);\n\
+         for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n\
+           if(ret.x >= 0.0 && ret.x <= 1.0 && ret.y >= 0.0 && ret.y <= 1.0) {\n\
+             coul = texture(etage0, ret);\n\
+             if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n\
+               w = 1.0 - length(ret - vsoTexCoord) / maxdist;\n\
                sumcoul += w * (vec4(1.0) - Ir_sign * (vec4(1.0) - pow(vec4(w), Ir_abs))) * coul; \
-               sumn += w;\n						\
-             }\n							\
-           }\n								\
-         }\n								\
-         if(sumn > 0.0)\n						\
-           fragColor = sumcoul / sumn;\n				\
-         else\n								\
-           fragColor = vec4(0.0, 0.0, 0.0, 1.0);\n			\
-       }\n								\
+               sumn += w;\n\
+             }\n\
+           }\n\
+         }\n\
+         if(sumn > 0.0)\n\
+           fragColor = sumcoul / sumn;\n\
+         else\n\
+           fragColor = vec4(0.0, 0.0, 0.0, 1.0);\n\
+       }\n\
      }";
 
 static const char * gl4dfMCMD_mdbuV1FS/* New */ =
   "<imfs>gl4dfMCMD_mdbuV1.fs</imfs>\n\
-     #version 330\n							\
-     in vec2 vsoTexCoord;\n						\
-     out vec4 fragColor;\n						\
-     uniform vec4 mcmd_Ir;\n						\
-     uniform int width, mcmd_take_color, buTreeSize, buTreeWidth, buTreeHeight, use_etage4;\n \
-     uniform sampler2D etage0, etage1, etage2, etage3, etage4;\n	\
-     float luminance(vec3 rgb) {\n					\
-       return dot(vec3(0.299, 0.587, 0.114), rgb);\n			\
-     }\n								\
-     uint rgba2ui(vec4 rgba) {\n					\
-       return (uint(rgba.r * 255.0) << uint(24)) |\n			\
-         (uint(rgba.g * 255.0) << uint(16)) |\n				\
-         (uint(rgba.b * 255.0) << uint(8) ) |\n				\
-         (uint(rgba.a * 255.0));\n					\
-     }\n								\
-     float rgba2f(vec4 rgba) {\n					\
-       return float(rgba2ui(rgba)) / float(uint(-1));\n			\
-     }\n								\
-     vec2 getChild(uint ipos) {\n					\
-       return vec2(float(ipos % uint(buTreeWidth)) / float(buTreeWidth - 1.0), float(ipos / uint(buTreeWidth)) / float(buTreeHeight - 1.0));\n \
-     }\n								\
-     vec2 readChildCoords(uint pos, float step) {\n			\
-       return vec2(texture(etage2, getChild(pos)).r, texture(etage2, getChild(pos + uint(1))).r) * step;\n \
-     }\n								\
-     void main() {\n							\
-       vec4 coul = texture(etage0, vsoTexCoord.st);\n			\
-       float orig_a = coul.a;\n						\
-       if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
-         fragColor = coul;\n						\
-         return;\n							\
-       }\n								\
-       float step = 65535.0 / float(width - 1.0);\n			\
-       uint i0 = rgba2ui(texture(etage1, vsoTexCoord.st));\n		\
-       if(mcmd_take_color != 0) {\n					\
-         uint i0 = rgba2ui(texture(etage1, vsoTexCoord.st));\n		\
-         for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n \
-           if(ret.x >= 0.0 && ret.x <= 1.0 && ret.y >= 0.0 && ret.y <= 1.0) {\n	\
-             coul = texture(etage0, ret);\n				\
-           if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
-               fragColor = texture(etage3, vsoTexCoord.st);\n		\
-               return;\n						\
-             }\n							\
-           }\n								\
-         }\n								\
-         fragColor = vec4(0.0, 0.0, 0.0, orig_a /* avant 1.0 */);\n	\
-       } else {\n							\
-         int nw = 0;\n							\
-         const float maxdist = sqrt(2.0) / 2.0;\n			\
-         float sumn = 0.0, suma = 0.0, w, d, sc = 0.03125, sf = 0.9;\n	\
-         vec4 texIr = mcmd_Ir + (use_etage4 != 0 ? 10.0 * (texture(etage4, vsoTexCoord.st) - vec4(0.5)) : vec4(0));\n \
-         vec4 Ir_sign = vec4(texIr.x < 0.0 ? -1.0 : 1.0, texIr.y < 0.0 ? -1.0 : 1.0, texIr.z < 0.0 ? -1.0 : 1.0, texIr.w < 0.0 ? -1.0 : 1.0);\n	\
-         vec4 sumcoul = vec4(0.0), Ir_abs = abs(texIr);\n		\
-         for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n \
-           if(ret.x >= 0.0 && ret.x <= 1.0 && ret.y >= 0.0 && ret.y <= 1.0) {\n	\
-             coul = texture(etage0, ret);\n				\
-             if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
-               float ridge_river_fact = 1.0;\n				\
-               if(coul.a < 1.0 && coul.a > 0.0) { \n			\
-                 ridge_river_fact = -1.0;\n				\
-               }\n							\
-               d = (length(ret - vsoTexCoord) / maxdist);\n		\
-               //sf=0.1;sc=0.032; plot (x<sc) ? x : sc+(1-sc)*((x-sc)**sf) / ((1-sc)**sf);\n \
-               if(d > sc) \n						\
-                 //d = sc + (1.0 - sc) * pow(d - sc, sf) / pow(1.0 - sc, sf);\n \
-                 d = min(pow(d, sf) + (d - sc) * pow((d - sc) / (1.0 - sc), 1.0/sf), 10.0); //sc + (1.0 - sc) * pow(d - sc, sf) / pow(1.0 - sc, sf);\n \
-               else\n							\
-                 d = pow(d, sf);\n					\
-               w = 1.0 - d;\n						\
+     #version 330\n\
+     in vec2 vsoTexCoord;\n\
+     out vec4 fragColor;\n\
+     uniform vec4 mcmd_Ir;\n\
+     uniform int width, mcmd_take_color, buTreeSize, buTreeWidth, buTreeHeight, use_etage4;\n\
+     uniform sampler2D etage0, etage1, etage2, etage3, etage4;\n\
+     float luminance(vec3 rgb) {\n\
+       return dot(vec3(0.299, 0.587, 0.114), rgb);\n\
+     }\n\
+     uint rgba2ui(vec4 rgba) {\n\
+       return (uint(rgba.r * 255.0) << uint(24)) |\n\
+         (uint(rgba.g * 255.0) << uint(16)) |\n\
+         (uint(rgba.b * 255.0) << uint(8) ) |\n\
+         (uint(rgba.a * 255.0));\n\
+     }\n\
+     float rgba2f(vec4 rgba) {\n\
+       return float(rgba2ui(rgba)) / float(uint(-1));\n\
+     }\n\
+     vec2 getChild(uint ipos) {\n\
+       return vec2(float(ipos % uint(buTreeWidth)) / float(buTreeWidth - 1.0), float(ipos / uint(buTreeWidth)) / float(buTreeHeight - 1.0));\n\
+     }\n\
+     vec2 readChildCoords(uint pos, float step) {\n\
+       return vec2(texture(etage2, getChild(pos)).r, texture(etage2, getChild(pos + uint(1))).r) * step;\n\
+     }\n\
+     void main() {\n\
+       vec4 coul = texture(etage0, vsoTexCoord.st);\n\
+       float orig_a = coul.a;\n\
+       if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n\
+         fragColor = coul;\n\
+         return;\n\
+       }\n\
+       float step = 65535.0 / float(width - 1.0);\n\
+       uint i0 = rgba2ui(texture(etage1, vsoTexCoord.st));\n\
+       if(mcmd_take_color != 0) {\n\
+         uint i0 = rgba2ui(texture(etage1, vsoTexCoord.st));\n\
+         for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n\
+           if(ret.x >= 0.0 && ret.x <= 1.0 && ret.y >= 0.0 && ret.y <= 1.0) {\n\
+             coul = texture(etage0, ret);\n\
+           if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n\
+               fragColor = texture(etage3, vsoTexCoord.st);\n\
+               return;\n\
+             }\n\
+           }\n\
+         }\n\
+         fragColor = vec4(0.0, 0.0, 0.0, orig_a /* avant 1.0 */);\n\
+       } else {\n\
+         int nw = 0;\n\
+         const float maxdist = sqrt(2.0) / 2.0;\n\
+         float sumn = 0.0, suma = 0.0, w, d, sc = 0.03125, sf = 0.9;\n\
+         vec4 texIr = mcmd_Ir + (use_etage4 != 0 ? 10.0 * (texture(etage4, vsoTexCoord.st) - vec4(0.5)) : vec4(0));\n\
+         vec4 Ir_sign = vec4(texIr.x < 0.0 ? -1.0 : 1.0, texIr.y < 0.0 ? -1.0 : 1.0, texIr.z < 0.0 ? -1.0 : 1.0, texIr.w < 0.0 ? -1.0 : 1.0);\n\
+         vec4 sumcoul = vec4(0.0), Ir_abs = abs(texIr);\n\
+         for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n\
+           if(ret.x >= 0.0 && ret.x <= 1.0 && ret.y >= 0.0 && ret.y <= 1.0) {\n\
+             coul = texture(etage0, ret);\n\
+             if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n\
+               float ridge_river_fact = 1.0;\n\
+               if(coul.a < 1.0 && coul.a > 0.0) { \n\
+                 ridge_river_fact = -1.0;\n\
+               }\n\
+               d = (length(ret - vsoTexCoord) / maxdist);\n\
+               //sf=0.1;sc=0.032; plot (x<sc) ? x : sc+(1-sc)*((x-sc)**sf) / ((1-sc)**sf);\n\
+               if(d > sc) \n\
+                 //d = sc + (1.0 - sc) * pow(d - sc, sf) / pow(1.0 - sc, sf);\n\
+                 d = min(pow(d, sf) + (d - sc) * pow((d - sc) / (1.0 - sc), 1.0/sf), 10.0); //sc + (1.0 - sc) * pow(d - sc, sf) / pow(1.0 - sc, sf);\n\
+               else\n\
+                 d = pow(d, sf);\n\
+               w = 1.0 - d;\n\
                sumcoul += w * (vec4(1.0) - ridge_river_fact * Ir_sign * (vec4(1.0) - pow(vec4(w), Ir_abs))) * coul; \
-               suma += w * ridge_river_fact;\n				\
-               sumn += w; ++nw;\n						\
-             }\n							\
-           }\n								\
-         }\n								\
-         if((nw == 1 && sumn >= 1.0 - sc) || sumn >= 2.0 - 2.0 * sc)\n	\
-           fragColor = vec4(sumcoul.rgb / sumn, suma < 0.0 ? 254.0 / 255.0 : 1.0);\n \
-         else\n								\
-           fragColor = vec4(0.0, 0.0, 0.0, orig_a/* avant 0.0 */);\n	\
-       }\n								\
+               suma += w * ridge_river_fact;\n\
+               sumn += w; ++nw;\n\
+             }\n\
+           }\n\
+         }\n\
+         if((nw == 1 && sumn >= 1.0 - sc) || sumn >= 2.0 - 2.0 * sc)\n\
+           fragColor = vec4(sumcoul.rgb / sumn, suma < 0.0 ? 254.0 / 255.0 : 1.0);\n\
+         else\n\
+           fragColor = vec4(0.0, 0.0, 0.0, orig_a/* avant 0.0 */);\n\
+       }\n\
      }";
 
 static const char * gl4dfMCMD_mdbuV1FSOld =
   "<imfs>gl4dfMCMD_mdbuV1.fs</imfs>\n\
-     #version 330\n							\
-     in vec2 vsoTexCoord;\n						\
-     out vec4 fragColor;\n						\
-     uniform vec4 mcmd_Ir;\n						\
-     uniform int width, mcmd_take_color, buTreeSize, buTreeWidth, buTreeHeight, use_etage4;\n \
-     uniform sampler2D etage0, etage1, etage2, etage3, etage4;\n	\
-     float luminance(vec3 rgb) {\n					\
-       return dot(vec3(0.299, 0.587, 0.114), rgb);\n			\
-     }\n								\
-     uint rgba2ui(vec4 rgba) {\n					\
-       return (uint(rgba.r * 255.0) << uint(24)) |\n			\
-         (uint(rgba.g * 255.0) << uint(16)) |\n				\
-         (uint(rgba.b * 255.0) << uint(8) ) |\n				\
-         (uint(rgba.a * 255.0));\n					\
-     }\n								\
-     float rgba2f(vec4 rgba) {\n					\
-       return float(rgba2ui(rgba)) / float(uint(-1));\n			\
-     }\n								\
-     vec2 getChild(uint ipos) {\n					\
-       return vec2(float(ipos % uint(buTreeWidth)) / float(buTreeWidth - 1.0), float(ipos / uint(buTreeWidth)) / float(buTreeHeight - 1.0));\n \
-     }\n								\
-     vec2 readChildCoords(uint pos, float step) {\n			\
-       return vec2(texture(etage2, getChild(pos)).r, texture(etage2, getChild(pos + uint(1))).r) * step;\n \
-     }\n								\
-     void main() {\n							\
-       vec4 coul = texture(etage0, vsoTexCoord.st);\n			\
-       if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
-         fragColor = coul;\n						\
-         return;\n							\
-       }\n								\
-       float step = 65535.0 / float(width - 1.0);\n			\
-       uint i0 = rgba2ui(texture(etage1, vsoTexCoord.st));\n		\
-       if(mcmd_take_color != 0) {\n					\
-         uint i0 = rgba2ui(texture(etage1, vsoTexCoord.st));\n		\
-         for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n \
-           if(ret.x >= 0.0 && ret.x <= 1.0 && ret.y >= 0.0 && ret.y <= 1.0) {\n	\
-             coul = texture(etage0, ret);\n				\
-           if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
-               fragColor = texture(etage3, vsoTexCoord.st);\n		\
-               return;\n						\
-             }\n							\
-           }\n								\
-         }\n								\
-         fragColor = vec4(0.0, 0.0, 0.0, 1.0);\n			\
-       } else {\n							\
-         const float maxdist = sqrt(2.0) / 2.0;\n			\
-         float sumn = 0.0, w, d, sc = 0.032, sf = 0.01;\n		\
-         vec4 texIr = mcmd_Ir + (use_etage4 != 0 ? 10.0 * (texture(etage4, vsoTexCoord.st) - vec4(0.5)) : vec4(0));\n \
-         vec4 Ir_sign = vec4(texIr.x < 0.0 ? -1.0 : 1.0, texIr.y < 0.0 ? -1.0 : 1.0, texIr.z < 0.0 ? -1.0 : 1.0, texIr.w < 0.0 ? -1.0 : 1.0);\n	\
-         vec4 sumcoul = vec4(0.0), Ir_abs = abs(texIr);\n		\
-         for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n \
-           if(ret.x >= 0.0 && ret.x <= 1.0 && ret.y >= 0.0 && ret.y <= 1.0) {\n	\
-             coul = texture(etage0, ret);\n				\
-             if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n	\
-               d = (length(ret - vsoTexCoord) / maxdist);\n		\
-               //sf=0.1;sc=0.032; plot (x<sc) ? x : sc+(1-sc)*((x-sc)**sf) / ((1-sc)**sf);\n \
-               if(d > sc) \n						\
-                 d = sc + (1.0 - sc) * pow(d - sc, sf) / pow(1.0 - sc, sf);\n \
-               w = 1.0 - d;\n						\
+     #version 330\n\
+     in vec2 vsoTexCoord;\n\
+     out vec4 fragColor;\n\
+     uniform vec4 mcmd_Ir;\n\
+     uniform int width, mcmd_take_color, buTreeSize, buTreeWidth, buTreeHeight, use_etage4;\n\
+     uniform sampler2D etage0, etage1, etage2, etage3, etage4;\n\
+     float luminance(vec3 rgb) {\n\
+       return dot(vec3(0.299, 0.587, 0.114), rgb);\n\
+     }\n\
+     uint rgba2ui(vec4 rgba) {\n\
+       return (uint(rgba.r * 255.0) << uint(24)) |\n\
+         (uint(rgba.g * 255.0) << uint(16)) |\n\
+         (uint(rgba.b * 255.0) << uint(8) ) |\n\
+         (uint(rgba.a * 255.0));\n\
+     }\n\
+     float rgba2f(vec4 rgba) {\n\
+       return float(rgba2ui(rgba)) / float(uint(-1));\n\
+     }\n\
+     vec2 getChild(uint ipos) {\n\
+       return vec2(float(ipos % uint(buTreeWidth)) / float(buTreeWidth - 1.0), float(ipos / uint(buTreeWidth)) / float(buTreeHeight - 1.0));\n\
+     }\n\
+     vec2 readChildCoords(uint pos, float step) {\n\
+       return vec2(texture(etage2, getChild(pos)).r, texture(etage2, getChild(pos + uint(1))).r) * step;\n\
+     }\n\
+     void main() {\n\
+       vec4 coul = texture(etage0, vsoTexCoord.st);\n\
+       if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n\
+         fragColor = coul;\n\
+         return;\n\
+       }\n\
+       float step = 65535.0 / float(width - 1.0);\n\
+       uint i0 = rgba2ui(texture(etage1, vsoTexCoord.st));\n\
+       if(mcmd_take_color != 0) {\n\
+         uint i0 = rgba2ui(texture(etage1, vsoTexCoord.st));\n\
+         for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n\
+           if(ret.x >= 0.0 && ret.x <= 1.0 && ret.y >= 0.0 && ret.y <= 1.0) {\n\
+             coul = texture(etage0, ret);\n\
+           if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n\
+               fragColor = texture(etage3, vsoTexCoord.st);\n\
+               return;\n\
+             }\n\
+           }\n\
+         }\n\
+         fragColor = vec4(0.0, 0.0, 0.0, 1.0);\n\
+       } else {\n\
+         const float maxdist = sqrt(2.0) / 2.0;\n\
+         float sumn = 0.0, w, d, sc = 0.032, sf = 0.01;\n\
+         vec4 texIr = mcmd_Ir + (use_etage4 != 0 ? 10.0 * (texture(etage4, vsoTexCoord.st) - vec4(0.5)) : vec4(0));\n\
+         vec4 Ir_sign = vec4(texIr.x < 0.0 ? -1.0 : 1.0, texIr.y < 0.0 ? -1.0 : 1.0, texIr.z < 0.0 ? -1.0 : 1.0, texIr.w < 0.0 ? -1.0 : 1.0);\n\
+         vec4 sumcoul = vec4(0.0), Ir_abs = abs(texIr);\n\
+         for(vec2 ret; (ret = readChildCoords(i0, step)).x <= 1.0; i0 += uint(2)) {\n\
+           if(ret.x >= 0.0 && ret.x <= 1.0 && ret.y >= 0.0 && ret.y <= 1.0) {\n\
+             coul = texture(etage0, ret);\n\
+             if(!(coul.r == 0.0 && coul.g == 0.0 && coul.b == 0.0)) {\n\
+               d = (length(ret - vsoTexCoord) / maxdist);\n\
+               //sf=0.1;sc=0.032; plot (x<sc) ? x : sc+(1-sc)*((x-sc)**sf) / ((1-sc)**sf);\n\
+               if(d > sc) \n\
+                 d = sc + (1.0 - sc) * pow(d - sc, sf) / pow(1.0 - sc, sf);\n\
+               w = 1.0 - d;\n\
                sumcoul += w * (vec4(1.0) - Ir_sign * (vec4(1.0) - pow(vec4(w), Ir_abs))) * coul; \
-               sumn += w;\n						\
-             }\n							\
-           }\n								\
-         }\n								\
-         if(sumn >= 1.0 - sc)\n						\
-           fragColor = sumcoul / sumn;\n				\
-         else\n								\
-           fragColor = vec4(0.0, 0.0, 0.0, 0.0);\n			\
-       }\n								\
+               sumn += w;\n\
+             }\n\
+           }\n\
+         }\n\
+         if(sumn >= 1.0 - sc)\n\
+           fragColor = sumcoul / sumn;\n\
+         else\n\
+           fragColor = vec4(0.0, 0.0, 0.0, 0.0);\n\
+       }\n\
      }";
 
 static void init(void) {
-  int i;
+  unsigned int i;
   if(!_mdTexId[0])
     glGenTextures(4, _mdTexId);
   if(!_tempTexId[0])
     glGenTextures((sizeof _tempTexId / sizeof *_tempTexId), _tempTexId);
   _maxLevel = mdTexData(_width, _height);
-  for(i = 0; i < (sizeof _tempTexId / sizeof *_tempTexId); i++) {
+  for(i = 0; i < (sizeof _tempTexId / sizeof *_tempTexId); ++i) {
     glBindTexture(GL_TEXTURE_2D, _tempTexId[i]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -954,7 +954,8 @@ static void (*_subdivision_func[])(GLubyte *, GLubyte *, ll_t **, GLushort, GLus
 
 
 static void subdivision2Tex(GLubyte ** parentData, GLubyte ** levelData, GLushort ** childData, GLuint * childDataSize, GLubyte ** childPos, unsigned int w, unsigned int h) {
-  int i, l, sl, maxsl = 0, n;
+  int sl, maxsl = 0;
+  unsigned int i, l, n;
   ll_t ** llmap = llMapNew(w, h);
   *parentData = malloc(4 * w * 4 * h * sizeof ** parentData); assert(*parentData);
   *levelData = malloc(w * h * sizeof ** levelData); assert(*levelData);
@@ -987,7 +988,8 @@ static void subdivision2Tex(GLubyte ** parentData, GLubyte ** levelData, GLushor
 }
 
 static int mdTexData(unsigned int w, unsigned int h) {
-  int i, l = 0;
+  int l = 0;
+  unsigned int i;
   GLushort * childData;
   GLubyte * childPos, * parentData = NULL, * levelData = NULL;
 

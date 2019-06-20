@@ -5,7 +5,7 @@
  *
  * \author Farès BELHADJ amsi@ai.univ-paris8.fr
  * \date April 14, 2016
- * 
+ *
  */
 #include <math.h>
 #include <stdio.h>
@@ -67,7 +67,8 @@ static void blurffunc(GLuint in, GLuint out, GLuint radius, GLuint nb_iterations
     gl4dfConvFrame2Tex(&_tempTexId[0]);
   }
   if(out == 0) { /* Pas de sortie, donc sortie aux dimensions du viewport */
-    w = vp[2];// - vp[0]; 
+
+    w = vp[2];// - vp[0];
     h = vp[3];// - vp[1];
     fcommMatchTex(rout = _tempTexId[1], out);
   } else {
@@ -75,7 +76,7 @@ static void blurffunc(GLuint in, GLuint out, GLuint radius, GLuint nb_iterations
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
   }
-  if(w != _width || h != _height)
+  if((GLuint)w != _width || (GLuint)h != _height)
     setDimensions(w, h);
   fcommMatchTex(_tempTexId[2], rout);
 
@@ -132,7 +133,8 @@ static void blurffunc(GLuint in, GLuint out, GLuint radius, GLuint nb_iterations
 }
 
 static void init(void) {
-  GLint vp[4], ctex, i;
+  GLint vp[4], ctex;
+  GLuint i;
   glGetIntegerv(GL_TEXTURE_BINDING_2D, &ctex);
   if(!_tempTexId[0])
     glGenTextures((sizeof _tempTexId / sizeof *_tempTexId), _tempTexId);
@@ -194,7 +196,7 @@ static void init(void) {
 
 static void setDimensions(GLuint w, GLuint h) {
   int i;
-  _width  = w; 
+  _width  = w;
   _height = h;
   for(i = 0; i < BLUR_MAX_RADIUS; i++) {
     _offsetH[(i << 1) + 0] = i / (GLfloat)_width;
