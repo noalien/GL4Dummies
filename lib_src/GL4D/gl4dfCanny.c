@@ -206,6 +206,8 @@ static void cannyffunc(GLuint in, GLuint out, GLboolean flipV) {
       for(cc = 0, wh = 4 * w * h; cc < 4; ++cc) {
 	GLint d[] = {4, 4 - (w << 2), -(w << 2), -4 - (w << 2), -4, -4 + (w << 2), (w << 2), 4 + (w << 2)},
 	  d2[][2] = {{1, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, 1}};
+	/* GLint d[] = {4, -(w << 2), -4, (w << 2)}, */
+	/*   d2[][2] = {{1, 0}, {0, -1}, {-1, 0}, {0, 1}}; */
 	for(i = cc; i < wh; i += 4) {
 	  if(!_marks[i] && _pixmap[i] >= hTh) {
 	    _marks[i] = 2;
@@ -214,7 +216,7 @@ static void cannyffunc(GLuint in, GLuint out, GLboolean flipV) {
 	  while(!queueEmpty()) {
 	    GLint j, v, q = queueGet(), x, y;
 	    x = (q >> 2); y = x / w; x = x % w;
-	    for(j = 0; j < 8; j += 2) {
+	    for(j = 0; j < 8; ++j) {
 	      GLint nx = x + d2[j][0], ny = y + d2[j][1], nq = q + d[j];
 	      if(nx >= 0 && ny >= 0 && nx < w && ny < h &&
 		 !_marks[nq]) {
@@ -230,8 +232,10 @@ static void cannyffunc(GLuint in, GLuint out, GLboolean flipV) {
 	for(i = cc; i < wh; i += 4) {
 	  if(_marks[i] < 2)
 	    _pixmap[i] = 0;
-	  else
-	    _pixmap[i] = 255;
+	  else {
+	    _pixmap[i] = 255;//_pixmap[i] == 255 ? 100 : 255;//_pixmap[i] : 100;
+	    /* fprintf(stderr, "!"); */
+	  }
 	}
       }
       glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, _pixmap);
@@ -304,6 +308,12 @@ static void init(void) {
          }\n								\
          len = vec4(length(r), length(g), length(b), length(a)) / 4.0;\n \
          dir = atan(vec4(r.y, g.y, b.y, a.y), vec4(r.x, g.x, b.x, a.x)) / _2pi;\n \
+         ivec4 idir = ivec4(dir * 8.0);\n				\
+         if(idir.x < 0) idir.x += 8;\n					\
+         if(idir.y < 0) idir.y += 8;\n					\
+         if(idir.z < 0) idir.z += 8;\n					\
+         if(idir.w < 0) idir.w += 8;\n					\
+         dir = vec4(idir) / 8.0;\nreturn;\n				\
          if(dir.x < 0.0) dir.x++;\n					\
          if(dir.y < 0.0) dir.y++;\n					\
          if(dir.z < 0.0) dir.z++;\n					\
@@ -339,9 +349,10 @@ static void init(void) {
          for(int i = 0; i < 4; ++i) {\n					\
            if(l[i] >= lowTh) {\n					\
              int dn  = int(d[i] * 8);\n					\
-             int odn = (int(d[i] * 8) + 4) % 8;\n			\
-             if(texture(len, vsoTexCoord + offset[dn] )[i] > l[i] || \n \
-                texture(len, vsoTexCoord + offset[odn])[i] >= l[i] ) {\n \
+             int odn = (dn + 4) % 8;\n					\
+             vec4 dnc  = texture(len, vsoTexCoord + offset[ dn]);\n	\
+             vec4 odnc = texture(len, vsoTexCoord + offset[odn]);\n	\
+             if(!(l[i] > dnc[i] && l[i] > odnc[i])) {\n			\
                l[i] = 0.0;\n						\
              }\n							\
            } else\n							\
