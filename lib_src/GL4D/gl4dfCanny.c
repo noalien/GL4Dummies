@@ -15,7 +15,7 @@
 #include "gl4df.h"
 #include "gl4dfCommon.h"
 
-static GLfloat _mixFactor = 0.5f, _lowTh = 0.2f, _highTh = 0.4f;
+static GLfloat _mixFactor = 0.5f, _lowTh = 0.37f, _highTh = 0.75f;
 static GLuint _cannyPId[3] = {0}, _mixMode = 0 /* none */, _tempTexId[5] = {0};
 static GLboolean _isLuminance = GL_FALSE, _isInvert = GL_FALSE;
 
@@ -79,8 +79,8 @@ void gl4dfCannySetMixFactor(GLfloat factor) {
 }
 
 void gl4dfCannySetThresholds(GLfloat lowTh, GLfloat highTh) {
-  _lowTh = lowTh;
-  _highTh = highTh;
+  _lowTh = lowTh / 4.0f; /* ??? */
+  _highTh = highTh / 4.0f; /* ??? */
 }
 
 /* appelée la première fois */
@@ -89,6 +89,57 @@ static void cannyfinit(GLuint in, GLuint out, GLboolean flipV) {
   cannyfptr = cannyffunc;
   cannyfptr(in, out, flipV);
 }
+
+static inline void ccl(GLuint tex) {
+  /* CCL (Connected-Component Labeling) en CPU */
+  GLubyte *_pixmap = NULL, *_marks = NULL;
+  GLint w, h, wh, cc, i, lTh = _lowTh * 255, hTh = _highTh * 255;
+  glBindTexture(GL_TEXTURE_2D, tex);
+  glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
+  glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
+  queueInit(w * h);
+  _pixmap = malloc(4 * w * h * sizeof *_pixmap);
+  assert(_pixmap);
+  _marks = calloc(4 * w * h, sizeof *_marks);
+  assert(_marks);
+  glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, _pixmap);
+  for(cc = 0, wh = 4 * w * h; cc < 4; ++cc) {
+    /* GLint d[] = {4, 4 - (w << 2), -(w << 2), -4 - (w << 2), -4, -4 + (w << 2), (w << 2), 4 + (w << 2)}, */
+    /*   d2[][2] = {{1, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, 1}}; */
+    GLint d[] = {4, -(w << 2), -4, (w << 2)},
+      d2[][2] = {{1, 0}, {0, -1}, {-1, 0}, {0, 1}};
+    for(i = cc; i < wh; i += 4) {
+      if(!_marks[i] && _pixmap[i] >= hTh) {
+	_marks[i] = 2;
+	queuePut(i);
+      }
+      while(!queueEmpty()) {
+	GLint j, v, q = queueGet(), x, y;
+	x = (q >> 2); y = x / w; x = x % w;
+	for(j = 0; j < sizeof d / sizeof *d; ++j) {
+	  GLint nx = x + d2[j][0], ny = y + d2[j][1], nq = q + d[j];
+	  if(nx >= 0 && ny >= 0 && nx < w && ny < h &&
+	     !_marks[nq]) {
+	    if(_pixmap[nq] >= lTh) {
+	      _marks[nq] = 2;
+	      queuePut(nq);
+	    } else
+	      _marks[nq] = 1;
+	  }
+	}
+      }
+    }
+    for(i = cc; i < wh; i += 4) {
+      if(_marks[i] < 2)
+	_pixmap[i] = 0;
+      else
+	_pixmap[i] = 255;//_pixmap[i] == 255 ? _pixmap[i] : 100;
+    }
+  }
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, _pixmap);
+  free(_pixmap);
+  free(_marks);
+}  
 
 /* appelée les autres fois (après la première qui lance init) */
 static void cannyffunc(GLuint in, GLuint out, GLboolean flipV) {
@@ -164,84 +215,26 @@ static void cannyffunc(GLuint in, GLuint out, GLboolean flipV) {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, 0);
 
+    ccl(_tempTexId[4]);
+
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, rout,  0);
     glUseProgram(_cannyPId[2]);
     glUniform1i(glGetUniformLocation(_cannyPId[2],  "len"), 0);
-    glUniform1i(glGetUniformLocation(_cannyPId[2],  "dir"), 1);
-    glUniform1i(glGetUniformLocation(_cannyPId[2],  "orig"), 2);
+    glUniform1i(glGetUniformLocation(_cannyPId[2],  "orig"), 1);
     glUniform1i(glGetUniformLocation(_cannyPId[2],  "inv"), flipV);
-    glUniform2fv(glGetUniformLocation(_cannyPId[2],  "step"), 1, step);
     glUniform1i(glGetUniformLocation(_cannyPId[2],  "invResult"), _isInvert ? 1 : 0);
     glUniform1i(glGetUniformLocation(_cannyPId[2],  "luminance"), _isLuminance ? 1 : 0);
     glUniform1i(glGetUniformLocation(_cannyPId[2],  "mixMode"), _mixMode);
     glUniform1f(glGetUniformLocation(_cannyPId[2],  "mixFactor"), _mixFactor);
-    glUniform1f(glGetUniformLocation(_cannyPId[2],  "lowTh"), _lowTh);
-    glUniform1f(glGetUniformLocation(_cannyPId[2],  "highTh"), _highTh);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, _tempTexId[4]);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, _tempTexId[3]);
-    glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, in);
     gl4dgDraw(fcommGetPlane());
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, 0);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, 0);
-    /* CCL (Connected-Component Labeling) en CPU */
-    {
-      GLubyte *_pixmap = NULL, *_marks = NULL;
-      GLint w, h, wh, cc, i, lTh = _lowTh * 255, hTh = _highTh * 255;
-      glBindTexture(GL_TEXTURE_2D, rout);
-      glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
-      glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
-      queueInit(w * h);
-      _pixmap = malloc(4 * w * h * sizeof *_pixmap);
-      assert(_pixmap);
-      _marks = calloc(4 * w * h, sizeof *_marks);
-      assert(_marks);
-      glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, _pixmap);
-      for(cc = 0, wh = 4 * w * h; cc < 4; ++cc) {
-	GLint d[] = {4, 4 - (w << 2), -(w << 2), -4 - (w << 2), -4, -4 + (w << 2), (w << 2), 4 + (w << 2)},
-	  d2[][2] = {{1, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, 1}};
-	/* GLint d[] = {4, -(w << 2), -4, (w << 2)}, */
-	/*   d2[][2] = {{1, 0}, {0, -1}, {-1, 0}, {0, 1}}; */
-	for(i = cc; i < wh; i += 4) {
-	  if(!_marks[i] && _pixmap[i] >= hTh) {
-	    _marks[i] = 2;
-	    queuePut(i);
-	  }
-	  while(!queueEmpty()) {
-	    GLint j, v, q = queueGet(), x, y;
-	    x = (q >> 2); y = x / w; x = x % w;
-	    for(j = 0; j < 8; ++j) {
-	      GLint nx = x + d2[j][0], ny = y + d2[j][1], nq = q + d[j];
-	      if(nx >= 0 && ny >= 0 && nx < w && ny < h &&
-		 !_marks[nq]) {
-		if(_pixmap[nq] >= lTh) {
-		  _marks[nq] = 2;
-		  queuePut(nq);
-		} else
-		  _marks[nq] = 1;
-	      }
-	    }
-	  }
-	}
-	for(i = cc; i < wh; i += 4) {
-	  if(_marks[i] < 2)
-	    _pixmap[i] = 0;
-	  else {
-	    _pixmap[i] = 255;//_pixmap[i] == 255 ? 100 : 255;//_pixmap[i] : 100;
-	    /* fprintf(stderr, "!"); */
-	  }
-	}
-      }
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, _pixmap);
-      free(_pixmap);
-      free(_marks);
-    }
   }
 
   if(!out) { /* Copier à l'écran en cas de out nul */
@@ -268,11 +261,11 @@ static void init(void) {
     glGenTextures((sizeof _tempTexId / sizeof *_tempTexId), _tempTexId);
   for(i = 0; i < (sizeof _tempTexId / sizeof *_tempTexId); ++i) {
     glBindTexture(GL_TEXTURE_2D, _tempTexId[i]);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
   }
   glBindTexture(GL_TEXTURE_2D, ctex);
   if(!_cannyPId[0]) {
@@ -289,31 +282,25 @@ static void init(void) {
        layout (location = 0) out vec4 fragLen;\n			\
        layout (location = 1) out vec4 fragDir;\n			\
        const int ossize = 9;\n						\
-       const int ossize5 = 25;\n					\
        const float _2pi = 6.283;\n					\
-       const vec2 G[ossize] = vec2[]( vec2(-3.0,  -3.0), vec2(0.0,  -10.0), vec2(3.0,  -3.0),\n \
-                                      vec2(-10.0,  0.0), vec2(0.0,  0.0), vec2(10.0,  0.0),\n \
-                                      vec2(-3.0, 3.0), vec2(0.0, 10.0), vec2(3.0, 3.0) );\n \
+       const vec2 G[ossize] = vec2[]( vec2(-1.0,  -1.0), vec2(0.0,  -2.0), vec2(1.0,  -1.0),\n \
+                                      vec2(-2.0,  0.0), vec2(0.0,  0.0), vec2(2.0,  0.0),\n \
+                                      vec2(-1.0, 1.0), vec2(0.0, 2.0), vec2(1.0, 1.0) );\n \
        vec2 offset[ossize] = vec2[](vec2(-step.x , -step.y), vec2( 0.0, -step.y), vec2( step.x , -step.y),\n \
                                     vec2(-step.x, 0.0),      vec2( 0.0, 0.0),     vec2( step.x, 0.0),\n \
                                     vec2(-step.x,   step.y), vec2( 0.0, step.y),  vec2( step.x ,  step.y) );\n	\
        void canny(in sampler2D s, in vec2 c, out vec4 len, out vec4 dir) {\n \
          vec2 r = vec2(0.0, 0.0), g = vec2(0.0, 0.0), b = vec2(0.0, 0.0), a = vec2(0.0, 0.0);\n \
          for(int i = 0; i < ossize; i++) {\n				\
+           // ATTENTION ICI JE NE PRENDS QUE LE ROUGE - A MODIFIER\n	\
            vec4 t = texture(s, c + offset[i]);\n			\
            r += t.r * G[i];\n						\
            g += t.g * G[i];\n						\
            b += t.b * G[i];\n						\
            a += t.a * G[i];\n						\
          }\n								\
-         len = vec4(length(r), length(g), length(b), length(a)) / 4.0;\n \
-         dir = atan(vec4(r.y, g.y, b.y, a.y), vec4(r.x, g.x, b.x, a.x)) / _2pi;\n \
-         ivec4 idir = ivec4(dir * 8.0);\n				\
-         if(idir.x < 0) idir.x += 8;\n					\
-         if(idir.y < 0) idir.y += 8;\n					\
-         if(idir.z < 0) idir.z += 8;\n					\
-         if(idir.w < 0) idir.w += 8;\n					\
-         dir = vec4(idir) / 8.0;\nreturn;\n				\
+         len = vec4(length(r), length(g), length(b), length(a));\n \
+         dir = atan(vec4(r.y, g.y, b.y, a.y), vec4(r.x, g.x, b.x, a.x)) / _2pi;\n\
          if(dir.x < 0.0) dir.x++;\n					\
          if(dir.y < 0.0) dir.y++;\n					\
          if(dir.z < 0.0) dir.z++;\n					\
@@ -337,22 +324,15 @@ static void init(void) {
        uniform float lowTh, highTh;\n					\
        in  vec2 vsoTexCoord;\n						\
        out vec4 fragColor;\n						\
-       const int ossize = 8;\n						\
-       vec2 offset[ossize] = vec2[](vec2( step.x, 0.0), vec2( step.x ,  step.y),\n\
-                                    vec2( 0.0, step.y), vec2(-step.x,   step.y),\n\
-                                    vec2(-step.x, 0.0), vec2(-step.x , -step.y),\n\
-                                    vec2( 0.0, -step.y), vec2( step.x , -step.y)\n\
-                                   );\n					\
+       const float pi = 3.1415, _2pi = 6.283, pi_2 = 1.57075;\n		\
        void main(void) {\n						\
          vec4 l = texture(len, vsoTexCoord);\n				\
-         vec4 d = texture(dir, vsoTexCoord);\n				\
+         vec4 d = texture(dir, vsoTexCoord) * _2pi;// + vec4(pi_2);\n	\
          for(int i = 0; i < 4; ++i) {\n					\
            if(l[i] >= lowTh) {\n					\
-             int dn  = int(d[i] * 8);\n					\
-             int odn = (dn + 4) % 8;\n					\
-             vec4 dnc  = texture(len, vsoTexCoord + offset[ dn]);\n	\
-             vec4 odnc = texture(len, vsoTexCoord + offset[odn]);\n	\
-             if(!(l[i] > dnc[i] && l[i] > odnc[i])) {\n			\
+             vec4 dnc  = texture(len, vsoTexCoord + 1.4142 * step * vec2(cos(d[i]), sin(d[i])));\n \
+             vec4 odnc  = texture(len, vsoTexCoord + 1.4142 * step * vec2(cos(d[i] + pi), sin(d[i] + pi)));\n \
+             if(l[i] <= dnc[i] || l[i] <= odnc[i] /*|| (l[i] == dnc[i] && l[i] == odnc[i])*/) {\n \
                l[i] = 0.0;\n						\
              }\n							\
            } else\n							\
@@ -367,29 +347,14 @@ static void init(void) {
 #else
       "#version 330\n"
 #endif
-      "uniform sampler2D len, dir, orig;\n  \
-       uniform vec2 step;\n						\
+      "uniform sampler2D len, orig;\n  \
        uniform int invResult, luminance, mixMode;\n			\
-       uniform float mixFactor, lowTh, highTh;\n			\
+       uniform float mixFactor;\n					\
        in  vec2 vsoTexCoord;\n						\
        out vec4 fragColor;\n						\
-       const int ossize = 8;\n						\
-       vec2 offset[ossize] = vec2[](vec2( step.x, 0.0), vec2( step.x ,  step.y),\n\
-                                    vec2( 0.0, step.y), vec2(-step.x,   step.y),\n\
-                                    vec2(-step.x, 0.0), vec2(-step.x , -step.y),\n\
-                                    vec2( 0.0, -step.y), vec2( step.x , -step.y)\n\
-                                   );\n					\
        void main(void) {\n						\
          vec4 l = texture(len, vsoTexCoord);\n				\
-         vec4 d = texture(dir, vsoTexCoord);\n				\
          vec4 c = texture(orig, vsoTexCoord);\n				\
-         for(int i = 0; i < 4; ++i) {\n					\
-           if(l[i] >= lowTh && l[i] < highTh) {\n			\
-             float r = 0.0;\n						\
-             for(int j = 0; j < ossize; ++j) if(texture(len, vsoTexCoord + offset[j])[i] >= lowTh) { r = l[i]; break; }\n \
-             l[i] = r;\n						\
-           }\n								\
-         }\n								\
          if(invResult != 0)\n						\
            l = vec4(1) - l;\n						\
          if(luminance != 0)\n						\
