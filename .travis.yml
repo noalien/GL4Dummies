@@ -4,6 +4,15 @@ compiler: clang
 
 matrix:
   include:
+    # OSX #######################################################
+    - os: osx
+      ruby: 2.3
+      osx_image: xcode10.2
+      before_install:
+        - brew update && ( brew install sdl2 python || brew upgrade sdl2 python )
+        - python -m pip install --upgrade pip
+        - pip3 install meson ninja
+
     # GNU/Linux tests #############################################
     - os: linux
       dist: xenial
@@ -34,15 +43,6 @@ matrix:
         - sudo apt-get install -y python3-pip python3-setuptools
         - sudo pip3 install --upgrade pip
         - sudo pip3 install meson ninja
-
-    # OSX #######################################################
-    - os: osx
-      ruby: 2.3
-      osx_image: xcode10.2
-      before_install:
-        - brew update && ( brew install sdl2 python || brew update sdl2 python )
-        - python -m pip install --upgrade pip
-        - pip3 install meson ninja
 
 script:
   - meson build
