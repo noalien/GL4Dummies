@@ -32,11 +32,20 @@
       (geom)->index_row_count = 2 * (w);				\
       (geom)->index_nb_rows = ((h) - 1);				\
       break;								\
-    default:								\
+    case 2:								\
       index = mkRegularGridStripIndices((w), (h));			\
       (geom)->index_mode = GL_TRIANGLE_STRIP;				\
       (geom)->index_row_count = 2 * (w) * ((h) - 1);			\
       (geom)->index_nb_rows = 1;					\
+      break;								\
+    case 3:								\
+      index = mkRegularGridTriangleAdjacencyIndices((w), (h));		\
+      (geom)->index_mode = GL_TRIANGLES_ADJACENCY;			\
+      (geom)->index_row_count = 12 * ((w) - 1) * ((h) - 1);		\
+      (geom)->index_nb_rows = 1;					\
+      break;								\
+    default: /* TODO, ajouter GL_TRIANGLE_STRIP_ADJACENCY */		\
+      assert(0);							\
       break;								\
     }									\
   } while(0)
@@ -44,7 +53,7 @@
 /*!\brief dessine un element-array selon la topologie de l'objet. */
 #define DRAW_WITH_GEOMETRY_OPTIMIZATION(geom) do {			\
     int i, d;								\
-    for(i = 0, d = 0; i <  (geom)->index_nb_rows; i++) {		\
+    for(i = 0, d = 0; i <  (geom)->index_nb_rows; ++i) {		\
       glDrawElements((geom)->index_mode, (geom)->index_row_count, GL4D_VAO_INDEX, (const GLvoid *)(intptr_t)d); \
       d += (geom)->index_row_count * sizeof(GL4Dvaoindex);		\
     }									\
@@ -139,6 +148,7 @@ static GLfloat       * mkSphereVerticesf(GLuint slices, GLuint stacks);
 static GL4Dvaoindex  * mkRegularGridTriangleIndices(GLuint width, GLuint height);
 static GL4Dvaoindex  * mkRegularGridStripsIndices(GLuint width, GLuint height);
 static GL4Dvaoindex  * mkRegularGridStripIndices(GLuint width, GLuint height);
+static GL4Dvaoindex  * mkRegularGridTriangleAdjacencyIndices(GLuint width, GLuint height);
 static GLfloat       * mkConeVerticesf(GLuint slices, GLboolean base);
 static GLfloat       * mkFanConeVerticesf(GLuint slices, GLboolean base);
 static GLfloat       * mkCylinderVerticesf(GLuint slices, GLboolean base);
@@ -168,7 +178,7 @@ void gl4dgClean(void) {
   }
   if(_garray) {
     int i;
-    for(i = 0; i < _garray_size; i++)
+    for(i = 0; i < _garray_size; ++i)
       if(_garray[i].vao || _garray[i].geom)
 	freeGeom(&_garray[i]);
     free(_garray);
@@ -610,13 +620,13 @@ static GLfloat * mkSphereVerticesf(GLuint slices, GLuint stacks) {
   GLdouble cMPI_Lat = M_PI / stacks;
   data = malloc(5 * (slices + 1) * (stacks + 1) * sizeof *data);
   assert(data);
-  for(i = 0, k = 0; i <= (int)stacks; i++) {
+  for(i = 0, k = 0; i <= (int)stacks; ++i) {
     theta  = -M_PI_2 + i * cMPI_Lat;
     y = sin(theta);
     r = cos(theta);
-    for(j = 0; j <= (int)slices; j++) {
+    for(j = 0; j <= (int)slices; ++j) {
       phi = j * c2MPI_Long;
-      data[k++] = -r * cos(phi);
+      data[k++] = r * cos(phi);
       data[k++] = y;
       data[k++] = r * sin(phi);
       data[k++] = phi / (2.0 * M_PI);
@@ -627,71 +637,98 @@ static GLfloat * mkSphereVerticesf(GLuint slices, GLuint stacks) {
 }
 
 static GL4Dvaoindex * mkRegularGridTriangleIndices(GLuint width, GLuint height) {
-  int y, ny, x, nx, k, yw, nyw, wm1 = width - 1, hm1 = height - 1;
+  int z, nz, x, nx, k, zw, nzw, wm1 = width - 1, hm1 = height - 1;
   GLuint * index;
   assert(height > 1 && width > 1);
   index = malloc(6 * wm1 * hm1 * sizeof *index);
   assert(index);
-  for(y = 0, k = 0; y < hm1; y++) {
-    ny = y + 1;
-    yw = y * width;
-    nyw = ny * width;
-    for(x = 0; x < wm1; x++) {
+  for(z = 0, k = 0; z < hm1; ++z) {
+    nz = z + 1;
+    zw = z * width;
+    nzw = nz * width;
+    for(x = 0; x < wm1; ++x) {
       nx = x + 1;
-      index[k++] = yw  + x;
-      index[k++] = yw  + nx;
-      index[k++] = nyw + x;
 
-      index[k++] = nyw + x;
-      index[k++] = yw + nx;
-      index[k++] = nyw + nx;
+      index[k++] = zw  + x;
+      index[k++] = nzw + x;
+      index[k++] = zw  + nx;
+
+      index[k++] = zw + nx;
+      index[k++] = nzw + x;
+      index[k++] = nzw + nx;
+    }
+  }
+  return index;
+}
+
+static GL4Dvaoindex * mkRegularGridTriangleAdjacencyIndices(GLuint width, GLuint height) {
+  // TODO, finir (rien n'est fait ici, hormis le malloc de la bonne taille)
+  int z, nz, x, nx, k, zw, nzw, wm1 = width - 1, hm1 = height - 1;
+  GLuint * index;
+  assert(height > 1 && width > 1);
+  index = malloc(12 * wm1 * hm1 * sizeof *index);
+  assert(index);
+  for(z = 0, k = 0; z < hm1; ++z) {
+    nz = z + 1;
+    zw = z * width;
+    nzw = nz * width;
+    for(x = 0; x < wm1; ++x) {
+      nx = x + 1;
+
+      index[k++] = zw  + x;
+      index[k++] = nzw + x;
+      index[k++] = zw  + nx;
+
+      index[k++] = zw + nx;
+      index[k++] = nzw + x;
+      index[k++] = nzw + nx;
     }
   }
   return index;
 }
 
 static GL4Dvaoindex * mkRegularGridStripsIndices(GLuint width, GLuint height) {
-  int y, x, k, yw, nyw, hm1 = height - 1;
+  int z, x, k, zw, nzw, hm1 = height - 1;
   GLuint * index;
   assert(height > 1 && width > 1);
   index = malloc(2 * width * hm1 * sizeof *index);
   assert(index);
-  for(y = 0, k = 0; y < hm1; y++) {
-    yw = y * width;
-    nyw = yw + width;
-    for(x = 0; x < (int)width; x++) {
-      index[k++] = nyw + x;
-      index[k++] = yw  + x;
+  for(z = 0, k = 0; z < hm1; ++z) {
+    zw = z * width;
+    nzw = zw + width;
+    for(x = 0; x < (int)width; ++x) {
+      index[k++] = zw  + x;
+      index[k++] = nzw + x;
     }
   }
   return index;
 }
 
 static GL4Dvaoindex * mkRegularGridStripIndices(GLuint width, GLuint height) {
-  int y, x, k, yw, nyw, nnyw, wm1 = width - 1, hm1 = height - 1, hi = hm1 - ((height&1) ? 0 : 1);
+  int z, x, k, zw, nzw, nnzw, wm1 = width - 1, hm1 = height - 1, hi = hm1 - ((height&1) ? 0 : 1);
   GLuint * index;
   assert(height > 1 && width > 1);
   index = malloc(2 * width * hm1 * sizeof *index);
   assert(index);
-  for(y = 0, k = 0; y < hi; y += 2) {
-    yw = y * width;
-    nyw = yw + width;
-    nnyw = nyw + width;
-    for(x = 0; x < (int)width; x++) {
-      index[k++] = nyw + x;
-      index[k++] = yw  + x;
+  for(z = 0, k = 0; z < hi; z += 2) {
+    zw = z * width;
+    nzw = zw + width;
+    nnzw = nzw + width;
+    for(x = 0; x < (int)width; ++x) {
+      index[k++] = zw  + x;
+      index[k++] = nzw + x;
     }
     for(x = wm1; x >= 0; x--) {
-      index[k++] = nyw  + x;
-      index[k++] = nnyw + x;
+      index[k++] = nnzw + x;
+      index[k++] = nzw  + x;
     }
   }
   if(!(height&1)) {
-    yw = y * width;
-    nyw = yw + width;
-    for(x = 0; x < (int)width; x++) {
-      index[k++] = nyw + x;
-      index[k++] = yw + x;
+    zw = z * width;
+    nzw = zw + width;
+    for(x = 0; x < (int)width; ++x) {
+      index[k++] = zw + x;
+      index[k++] = nzw + x;
     }
   }
   return index;
@@ -723,7 +760,7 @@ static inline void fcvbNormals(GLfloat * p, GLfloat y, int i) {
     (d)[(i)++] = 0; (d)[(i)++] = ym; (d)[(i)++] = 0;			\
     (d)[(i)++] = 0; (d)[(i)++] = sens; (d)[(i)++] = 0;			\
     (d)[(i)++] = 0.5; (d)[(i)++] = 0.5;					\
-    for(j = 0; j <= (slices); j++) {					\
+    for(j = 0; j <= (slices); ++j) {					\
       phi = j * c2MPI_Long;						\
       (d)[(i)++] = -cos(sens * phi);					\
       (d)[(i)++] = (ye);						\
@@ -753,7 +790,7 @@ static GLfloat * mkConeVerticesf(GLuint slices, GLboolean base) {
   GLdouble c2MPI_Long = 2.0 * M_PI / slices, s;
   data = malloc((16 * (slices + 1) + (base ? 8 : 0) * (slices + 2)) * sizeof *data);
   assert(data);
-  for(j = 0; j <= (int)slices; j++) {
+  for(j = 0; j <= (int)slices; ++j) {
     data[k++] = 0; data[k++] = 1; data[k++] = 0;
     data[k++] = 0; data[k++] = 1; data[k++] = 0;
     data[k++] = (s = j / (GLdouble)slices); data[k++] = 1;
@@ -787,7 +824,7 @@ static GLfloat * mkCylinderVerticesf(GLuint slices, GLboolean base) {
   GLdouble c2MPI_Long = 2.0 * M_PI / slices, s;
   data = malloc((16 * (slices + 1) + (base ? 16 : 0) * (slices + 2)) * sizeof *data);
   assert(data);
-  for(j = 0; j <= (int)slices; j++) {
+  for(j = 0; j <= (int)slices; ++j) {
     phi = j * c2MPI_Long;
     data[k++] = -cos(phi);
     data[k++] = 1;
@@ -824,19 +861,19 @@ static GLfloat * mkTorusVerticesf(GLuint slices, GLuint stacks, GLfloat radius) 
   GLdouble c2MPI_Lat  = 2.0 * M_PI / stacks;
   data = malloc(8 * (slices + 1) * (stacks + 1) * sizeof *data);
   assert(data);
-  for(i = 0, k = 0; i <= (int)stacks; i++) {
+  for(i = 0, k = 0; i <= (int)stacks; ++i) {
     theta  = i * c2MPI_Lat;
     y = radius * sin(theta);
     r = radius * cos(theta);
-    for(j = 0; j <= (int)slices; j++) {
+    for(j = 0; j <= (int)slices; ++j) {
       phi = j * c2MPI_Long;
-      x = -cos(phi);
+      x = cos(phi);
       z = sin(phi);
       data[k++] = (1 - radius + r) * x;
       data[k++] = y;
       data[k++] = (1 - radius + r) * z;
       data[k + 0] = data[k - 3] - (1 - radius) * x;
-      data[k + 1] = 0;
+      data[k + 1] = data[k - 2] - (1 - radius) * y;
       data[k + 2] = data[k - 1] - (1 - radius) * z;
       MVEC3NORMALIZE(&data[k]); k += 3;
       data[k++] = phi   / (2.0 * M_PI);
@@ -853,22 +890,22 @@ static GLfloat * mkGrid2dVerticesf(GLuint width, GLuint height, GLfloat * height
   data = malloc(8 * width * height * sizeof *data);
   assert(data);
   if(heightmap) {
-    for(i = 0, k = 0; i < (int)height; i++) {
-      z = 1.0 - 2.0 * (tz = i / (height - 1.0));
+    for(i = 0, k = 0; i < (int)height; ++i) {
+      z = -1.0f + 2.0f * (tz = i / (height - 1.0f));
       iw = i * width;
-      for(j = 0; j < (int)width; j++) {
-	x = -1.0 + 2.0 * (tx = j / (width - 1.0));
-	data[k++] = x; data[k++] = 2.0 * heightmap[iw + j] - 1.0; data[k++] = z;
+      for(j = 0; j < (int)width; ++j) {
+	x = -1.0f + 2.0f * (tx = j / (width - 1.0f));
+	data[k++] = x; data[k++] = 2.0f * heightmap[iw + j] - 1.0f; data[k++] = z;
 	k += 3;
 	data[k++] = tx; data[k++] = tz;
       }
     }
     mkGrid2dNormalsf(width, height, data);
   } else {
-    for(i = 0, k = 0; i < (int)height; i++) {
-      z = -1.0 + 2.0 * (tz = i / (height - 1.0));
-      for(j = 0; j < (int)width; j++) {
-	x = -1.0 + 2.0 * (tx = j / (width - 1.0));
+    for(i = 0, k = 0; i < (int)height; ++i) {
+      z = -1.0f + 2.0f * (tz = i / (height - 1.0f));
+      for(j = 0; j < (int)width; ++j) {
+	x = -1.0f + 2.0f * (tx = j / (width - 1.0f));
 	data[k++] = x;  data[k++] = 0; data[k++] = z;
 	data[k++] = 0;  data[k++] = 1; data[k++] = 0;
 	data[k++] = tx; data[k++] = tz;
@@ -881,26 +918,26 @@ static GLfloat * mkGrid2dVerticesf(GLuint width, GLuint height, GLfloat * height
 static void mkGrid2dNormalsf(GLuint width, GLuint height, GLfloat * data) {
   int x, z, zw, i, wm1 = width - 1, hm1 = height - 1;
   GLfloat n[18];
-  for(z = 1; z < hm1; z++) {
+  for(z = 1; z < hm1; ++z) {
     zw = z * width;
-    for(x = 1; x < wm1; x++) {
-      triangleNormalf(&n[0],  &data[8 * (x + zw)], &data[8 * (x + 1 + zw)], &data[8 * (x + 1 + (z + 1) * width)]);
-      triangleNormalf(&n[3],  &data[8 * (x + zw)], &data[8 * (x + 1 + (z + 1) * width)], &data[8 * (x + (z + 1) * width)]);
-      triangleNormalf(&n[6],  &data[8 * (x + zw)], &data[8 * (x + (z + 1) * width)], &data[8 * (x - 1 + zw)]);
-      triangleNormalf(&n[9],  &data[8 * (x + zw)], &data[8 * (x - 1 + zw)], &data[8 * (x - 1 + (z - 1) * width)]);
-      triangleNormalf(&n[12], &data[8 * (x + zw)], &data[8 * (x - 1 + (z - 1) * width)], &data[8 * (x + (z - 1) * width)]);
-      triangleNormalf(&n[15], &data[8 * (x + zw)], &data[8 * (x + (z - 1) * width)], &data[8 * (x + 1 + zw)]);
-      data[8 * (x + zw) + 3] = 0;
-      data[8 * (x + zw) + 4] = 0;
-      data[8 * (x + zw) + 5] = 0;
-      for(i = 0; i < 6; i++) {
+    for(x = 1; x < wm1; ++x) {
+      triangleNormalf(&n[0],  &data[8 * (x + zw)], &data[8 * (x + 1 + zw)], &data[8 * (x + 1 + (z - 1) * width)]);
+      triangleNormalf(&n[3],  &data[8 * (x + zw)], &data[8 * (x + 1 + (z - 1) * width)], &data[8 * (x + (z - 1) * width)]);
+      triangleNormalf(&n[6],  &data[8 * (x + zw)], &data[8 * (x + (z - 1) * width)], &data[8 * (x - 1 + zw)]);
+      triangleNormalf(&n[9],  &data[8 * (x + zw)], &data[8 * (x - 1 + zw)], &data[8 * (x - 1 + (z + 1) * width)]);
+      triangleNormalf(&n[12], &data[8 * (x + zw)], &data[8 * (x - 1 + (z + 1) * width)], &data[8 * (x + (z + 1) * width)]);
+      triangleNormalf(&n[15], &data[8 * (x + zw)], &data[8 * (x + (z + 1) * width)], &data[8 * (x + 1 + zw)]);
+      data[8 * (x + zw) + 3] = 0.0f;
+      data[8 * (x + zw) + 4] = 0.0f;
+      data[8 * (x + zw) + 5] = 0.0f;
+      for(i = 0; i < 6; ++i) {
         data[8 * (x + zw) + 3] += n[3 * i + 0];
         data[8 * (x + zw) + 4] += n[3 * i + 1];
         data[8 * (x + zw) + 5] += n[3 * i + 2];
       }
-      data[8 * (x + zw) + 3] /= 6.0;
-      data[8 * (x + zw) + 4] /= 6.0;
-      data[8 * (x + zw) + 5] /= 6.0;
+      data[8 * (x + zw) + 3] /= 6.0f;
+      data[8 * (x + zw) + 4] /= 6.0f;
+      data[8 * (x + zw) + 5] /= 6.0f;
     }
   }
 }
