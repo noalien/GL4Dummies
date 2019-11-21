@@ -670,7 +670,7 @@ static inline int _mini(int a, int b) {
 }
 
 static GL4Dvaoindex * mkRegularGridTriangleAdjacencyIndices(GLuint width, GLuint height) {
-  int z, pz, nz, nnz, x, pz, nx, nnx, k, zw, pzw, nzw, nnzw, wm1 = width - 1, hm1 = height - 1;
+  int z, pz, nz, nnz, x, px, nx, nnx, k, zw, pzw, nzw, nnzw, wm1 = width - 1, hm1 = height - 1;
   GLuint * index;
   assert(height > 1 && width > 1);
   index = malloc(12 * wm1 * hm1 * sizeof *index);
