@@ -918,6 +918,7 @@ static GLfloat * mkGrid2dVerticesf(GLuint width, GLuint height, GLfloat * height
 static void mkGrid2dNormalsf(GLuint width, GLuint height, GLfloat * data) {
   int x, z, zw, i, wm1 = width - 1, hm1 = height - 1;
   GLfloat n[18];
+  /* pour les sommets ayant 8 voisins */
   for(z = 1; z < hm1; ++z) {
     zw = z * width;
     for(x = 1; x < wm1; ++x) {
@@ -939,6 +940,57 @@ static void mkGrid2dNormalsf(GLuint width, GLuint height, GLfloat * data) {
       data[8 * (x + zw) + 4] /= 6.0f;
       data[8 * (x + zw) + 5] /= 6.0f;
     }
+  }
+  /* pour les 4 coins */
+  /* haut-gauche (x = 0, z = 0) */
+  triangleNormalf(&data[3], &data[0], &data[8 * width], &data[8]);
+  /* bas-droite (x = w - 1, z = h - 1) */
+  triangleNormalf(&data[8 * (wm1 + hm1 * width) + 3],  &data[8 * (wm1 + hm1 * width)], &data[8 * (wm1 + (height - 2) * width)], &data[8 * (width - 2 + hm1 * width)]);
+  /* haut-droite (x = w - 1, z = 0) */
+  triangleNormalf(&n[0], &data[8 * wm1], &data[8 * (wm1 - 1)], &data[8 * (wm1 - 1 + width)]);
+  triangleNormalf(&n[3], &data[8 * wm1], &data[8 * (wm1 - 1 + width)], &data[8 * (wm1 + width)]);
+  for(i = 0; i < 3; ++i)
+    data[8 * wm1 + 3 + i] = (n[i] + n[3 + i]) / 2.0f;
+  /* bas-gauche (x = 0, z = hm1) */
+  zw = hm1 * width;
+  triangleNormalf(&n[0], &data[8 * zw], &data[8 * (1 + zw)], &data[8 * (1 + (hm1 - 1) * width)]);
+  triangleNormalf(&n[3], &data[8 * zw], &data[8 * (1 + (hm1 - 1) * width)], &data[8 * ((hm1 - 1) * width)]);
+  for(i = 0; i < 3; ++i)
+    data[8 * zw + 3 + i] = (n[i] + n[3 + i]) / 2.0f;
+  /* le bord gauche et droit */
+  for(z = 1; z < hm1; ++z) {
+    zw = z * width;
+    /* gauche */
+    x = 0;
+    triangleNormalf(&n[0], &data[8 * (x + zw)], &data[8 * (x + 1 + zw)], &data[8 * (x + 1 + (z - 1) * width)]);
+    triangleNormalf(&n[3], &data[8 * (x + zw)], &data[8 * (x + 1 + (z - 1) * width)], &data[8 * (x + (z - 1) * width)]);
+    triangleNormalf(&n[6], &data[8 * (x + zw)], &data[8 * (x + (z + 1) * width)], &data[8 * (x + 1 + zw)]);
+    for(i = 0; i < 3; ++i)
+      data[8 * (x + zw) + 3 + i] = (n[i] + n[3 + i] + n[6 + i]) / 3.0f;
+    /* droit */
+    x = wm1;
+    triangleNormalf(&n[0], &data[8 * (x + zw)], &data[8 * (x + (z - 1) * width)], &data[8 * (x - 1 + zw)]);
+    triangleNormalf(&n[3], &data[8 * (x + zw)], &data[8 * (x - 1 + zw)], &data[8 * (x - 1 + (z + 1) * width)]);
+    triangleNormalf(&n[6], &data[8 * (x + zw)], &data[8 * (x - 1 + (z + 1) * width)], &data[8 * (x + (z + 1) * width)]);
+    for(i = 0; i < 3; ++i)
+      data[8 * (x + zw) + 3 + i] = (n[i] + n[3 + i] + n[6 + i]) / 3.0f;
+  }
+  /* le bord haut et bas */
+  for(x = 1; x < wm1; ++x) {
+    /* haut */
+    z = 0; zw = 0;
+    triangleNormalf(&n[0], &data[8 * (x + zw)], &data[8 * (x - 1 + zw)], &data[8 * (x - 1 + (z + 1) * width)]);
+    triangleNormalf(&n[3], &data[8 * (x + zw)], &data[8 * (x - 1 + (z + 1) * width)], &data[8 * (x + (z + 1) * width)]);
+    triangleNormalf(&n[6], &data[8 * (x + zw)], &data[8 * (x + (z + 1) * width)], &data[8 * (x + 1 + zw)]);
+    for(i = 0; i < 3; ++i)
+      data[8 * (x + zw) + 3 + i] = (n[i] + n[3 + i] + n[6 + i]) / 3.0f;
+    /* bas */
+    z = hm1; zw = z * width;
+    triangleNormalf(&n[0], &data[8 * (x + zw)], &data[8 * (x + 1 + zw)], &data[8 * (x + 1 + (z - 1) * width)]);
+    triangleNormalf(&n[3], &data[8 * (x + zw)], &data[8 * (x + 1 + (z - 1) * width)], &data[8 * (x + (z - 1) * width)]);
+    triangleNormalf(&n[6], &data[8 * (x + zw)], &data[8 * (x + (z - 1) * width)], &data[8 * (x - 1 + zw)]);
+    for(i = 0; i < 3; ++i)
+      data[8 * (x + zw) + 3 + i] = (n[i] + n[3 + i] + n[6 + i]) / 3.0f;
   }
 }
 
