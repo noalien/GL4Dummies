@@ -44,8 +44,11 @@
       (geom)->index_row_count = 12 * ((w) - 1) * ((h) - 1);		\
       (geom)->index_nb_rows = 1;					\
       break;								\
-    default: /* TODO, ajouter GL_TRIANGLE_STRIP_ADJACENCY */		\
-      assert(0);							\
+    default: /* GL_TRIANGLE_STRIP_ADJACENCY */				\
+      (index) = mkRegularGridStripsAdjacencyIndices((w), (h));		\
+      (geom)->index_mode = GL_TRIANGLE_STRIP_ADJACENCY;			\
+      (geom)->index_row_count = 4 * (w);				\
+      (geom)->index_nb_rows = ((h) - 1);				\
       break;								\
     }									\
   } while(0)
@@ -149,6 +152,7 @@ static GL4Dvaoindex  * mkRegularGridTriangleIndices(GLuint width, GLuint height)
 static GL4Dvaoindex  * mkRegularGridStripsIndices(GLuint width, GLuint height);
 static GL4Dvaoindex  * mkRegularGridStripIndices(GLuint width, GLuint height);
 static GL4Dvaoindex  * mkRegularGridTriangleAdjacencyIndices(GLuint width, GLuint height);
+static GL4Dvaoindex  * mkRegularGridStripsAdjacencyIndices(GLuint width, GLuint height);
 static GLfloat       * mkConeVerticesf(GLuint slices, GLboolean base);
 static GLfloat       * mkFanConeVerticesf(GLuint slices, GLboolean base);
 static GLfloat       * mkCylinderVerticesf(GLuint slices, GLboolean base);
@@ -157,7 +161,9 @@ static GLfloat       * mkTorusVerticesf(GLuint slices, GLuint stacks, GLfloat ra
 static GLfloat       * mkGrid2dVerticesf(GLuint width, GLuint height, GLfloat * heightmap);
 static void            mkGrid2dNormalsf(GLuint width, GLuint height, GLfloat * data);
 static inline void     triangleNormalf(GLfloat * out, GLfloat * p0, GLfloat * p1, GLfloat * p2);
-
+static inline int      _maxi(int a, int b);
+static inline int      _mini(int a, int b);
+  
 void gl4dgInit(void) {
   int i;
   if(_hasInit) return;
@@ -661,48 +667,6 @@ static GL4Dvaoindex * mkRegularGridTriangleIndices(GLuint width, GLuint height) 
   return index;
 }
 
-static inline int _maxi(int a, int b) {
-  return a > b ? a : b;
-}
-
-static inline int _mini(int a, int b) {
-  return a < b ? a : b;
-}
-
-static GL4Dvaoindex * mkRegularGridTriangleAdjacencyIndices(GLuint width, GLuint height) {
-  int z, pz, nz, nnz, x, px, nx, nnx, k, zw, pzw, nzw, nnzw, wm1 = width - 1, hm1 = height - 1;
-  GLuint * index;
-  assert(height > 1 && width > 1);
-  index = malloc(12 * wm1 * hm1 * sizeof *index);
-  assert(index);
-  for(z = 0, k = 0; z < hm1; ++z) {
-    zw = z * width;
-    pzw = (pz = _maxi(z - 1, 0)) * width;
-    nzw = (nz = z + 1) * width;
-    nnzw = (nnz = _mini(nz + 1, hm1)) * width;
-    for(x = 0; x < wm1; ++x) {
-      px = _maxi(x - 1, 0);
-      nx = x + 1;
-      nnx = _mini(nx + 1, wm1);
-
-      index[k++] = zw  + x;
-      index[k++] = nzw + px;
-      index[k++] = nzw + x;
-      index[k++] = nzw + nx;
-      index[k++] = zw  + nx;
-      index[k++] = pzw + nx;
-
-      index[k++] = zw   + nx;
-      index[k++] = zw   + x;
-      index[k++] = nzw  + x;
-      index[k++] = nnzw + x;
-      index[k++] = nzw  + nx;
-      index[k++] = zw   + nnx;
-    }
-  }
-  return index;
-}
-
 static GL4Dvaoindex * mkRegularGridStripsIndices(GLuint width, GLuint height) {
   int z, x, k, zw, nzw, hm1 = height - 1;
   GLuint * index;
@@ -746,6 +710,65 @@ static GL4Dvaoindex * mkRegularGridStripIndices(GLuint width, GLuint height) {
       index[k++] = zw + x;
       index[k++] = nzw + x;
     }
+  }
+  return index;
+}
+
+static GL4Dvaoindex * mkRegularGridTriangleAdjacencyIndices(GLuint width, GLuint height) {
+  int z, zw, pzw, nzw, nnzw, x, px, nx, nnx, k, wm1 = width - 1, hm1 = height - 1;
+  GLuint * index;
+  assert(height > 1 && width > 1);
+  index = malloc(12 * wm1 * hm1 * sizeof *index);
+  assert(index);
+  for(z = 0, k = 0; z < hm1; ++z) {
+    zw = z * width;
+    pzw = _maxi(z - 1, 0) * width;
+    nzw = (z + 1) * width;
+    nnzw = _mini(z + 2, hm1) * width;
+    for(x = 0; x < wm1; ++x) {
+      px = _maxi(x - 1, 0);
+      nx = x + 1;
+      nnx = _mini(nx + 1, wm1);
+
+      index[k++] = zw  + x;    /* (x, z) */
+      index[k++] = nzw + px;   /* (x - 1, z + 1) */
+      index[k++] = nzw + x;    /* (x, z + 1) */
+      index[k++] = nzw + nx;   /* (x + 1, z + 1) */
+      index[k++] = zw  + nx;   /* (x + 1, z) */
+      index[k++] = pzw + nx;   /* (x + 1, z - 1) */
+
+      index[k++] = zw   + nx;  /* (x + 1, ) */
+      index[k++] = zw   + x;   /* (x, z) */
+      index[k++] = nzw  + x;   /* (x, z + 1) */
+      index[k++] = nnzw + x;   /* (x, z + 2) */
+      index[k++] = nzw  + nx;  /* (x + 1, z + 1) */
+      index[k++] = zw   + nnx; /* (x + 2, z) */
+    }
+  }
+  return index;
+}
+
+static GL4Dvaoindex * mkRegularGridStripsAdjacencyIndices(GLuint width, GLuint height) {
+  int z, zw, pzw, nzw, nnzw, x, k, hm1 = height - 1;
+  GLuint * index;
+  assert(height > 1 && width > 1);
+  index = malloc(4 * width * hm1 * sizeof *index);
+  assert(index);
+  for(z = 0, k = 0; z < hm1; ++z) {
+    zw = z * width;
+    pzw = _maxi(z - 1, 0) * width;
+    nzw = zw + width;
+    nnzw = zw + 2 * width;
+    index[k++] = zw;  /* (0, z) */
+    index[k++] = nzw; /* (-1, z + 1) -> (0, z + 1) */
+    index[k++] = nzw; /* (0, z + 1) */
+    for(x = 1; x < (int)width; ++x) {
+      index[k++] = pzw  + x;     /* (x, z - 1) */
+      index[k++] = zw   + x;     /* (x, z) */
+      index[k++] = nnzw + x - 1; /* (x - 1, z + 2) */
+      index[k++] = nzw  + x;     /* (x, z + 1) */
+    }
+    index[k++] = zw + width - 1;  /* (w, z) -> (w - 1, z) */    
   }
   return index;
 }
@@ -1021,3 +1044,12 @@ static inline void triangleNormalf(GLfloat * out, GLfloat * p0, GLfloat * p1, GL
   MVEC3CROSS(out, v0, v1);
   MVEC3NORMALIZE(out);
 }
+
+static inline int _maxi(int a, int b) {
+  return a > b ? a : b;
+}
+
+static inline int _mini(int a, int b) {
+  return a < b ? a : b;
+}
+
