@@ -661,27 +661,43 @@ static GL4Dvaoindex * mkRegularGridTriangleIndices(GLuint width, GLuint height) 
   return index;
 }
 
+static inline int _maxi(int a, int b) {
+  return a > b ? a : b;
+}
+
+static inline int _mini(int a, int b) {
+  return a < b ? a : b;
+}
+
 static GL4Dvaoindex * mkRegularGridTriangleAdjacencyIndices(GLuint width, GLuint height) {
-  // TODO, finir (rien n'est fait ici, hormis le malloc de la bonne taille)
-  int z, nz, x, nx, k, zw, nzw, wm1 = width - 1, hm1 = height - 1;
+  int z, pz, nz, nnz, x, pz, nx, nnx, k, zw, pzw, nzw, nnzw, wm1 = width - 1, hm1 = height - 1;
   GLuint * index;
   assert(height > 1 && width > 1);
   index = malloc(12 * wm1 * hm1 * sizeof *index);
   assert(index);
   for(z = 0, k = 0; z < hm1; ++z) {
-    nz = z + 1;
     zw = z * width;
-    nzw = nz * width;
+    pzw = (pz = _maxi(z - 1, 0)) * width;
+    nzw = (nz = z + 1) * width;
+    nnzw = (nnz = _mini(nz + 1, hm1)) * width;
     for(x = 0; x < wm1; ++x) {
+      px = _maxi(x - 1, 0);
       nx = x + 1;
+      nnx = _mini(nx + 1, wm1);
 
       index[k++] = zw  + x;
-      index[k++] = nzw + x;
-      index[k++] = zw  + nx;
-
-      index[k++] = zw + nx;
+      index[k++] = nzw + px;
       index[k++] = nzw + x;
       index[k++] = nzw + nx;
+      index[k++] = zw  + nx;
+      index[k++] = pzw + nx;
+
+      index[k++] = zw   + nx;
+      index[k++] = zw   + x;
+      index[k++] = nzw  + x;
+      index[k++] = nnzw + x;
+      index[k++] = nzw  + nx;
+      index[k++] = zw   + nnx;
     }
   }
   return index;
