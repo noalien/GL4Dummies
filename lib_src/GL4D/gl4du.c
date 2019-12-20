@@ -332,8 +332,10 @@ void gl4duDeleteShader(GLuint id) {
  * fichiers shaders et renvoie l'identifiant openGL du program créé.
  *
  * Les arguments sont les noms des fichiers shaders précédés d'un tag
- * indiquant le type de shader : \<vs\> pour un vertex shader et \<fs\>
- * pour un fragment shader et \<gs\> pour un geometry shader.
+ * indiquant le type de shader : \<vs\> pour un vertex shader, \<tcs\>
+ * pour un tessellation control shader, \<tes\> pour un tessellation
+ * evaluation shader, \<gs\> pour un geometry shader et \<fs\> pour un
+ * fragment shader.
  *
  * \return l'identifiant openGL du program créé sinon 0. Dans ce
  * dernier cas les shaders créés (compilés) avant l'échec ne sont pas
@@ -398,6 +400,36 @@ GLuint gl4duCreateProgram(const char * firstone, ...) {
       }
       fprintf(stderr, "%s : geometry shader\n", fn);
       if(!(sId = gl4duCreateShaderIM(GL_GEOMETRY_SHADER, fn, &filename[13 + strlen(fn)]))) goto gl4duCreateProgram_ERROR;
+      attachShader(*prg, *findidInShadersList(sId));
+    } else if(!strncmp("<tcs>", filename, 5)) { /* tessellation control shader */
+      fprintf(stderr, "%s : tessellation control shader\n", &filename[5]);
+      if(!(sId = gl4duCreateShader(GL_TESS_CONTROL_SHADER, &filename[5]))) goto gl4duCreateProgram_ERROR;
+      attachShader(*prg, *findidInShadersList(sId));
+    } else if(!strncmp("<imtcs>", filename, 7)) { /* in memory tessellation control shader */
+      fn[0] = 0;
+      snprintf(format, sizeof format, "<imtcs>%%%d[^\t\n<>$!:;,=\"|]</imtcs>", BUFSIZ - 1);
+      if(sscanf(filename, format, fn) != 1 || strncmp("</imtcs>", &filename[7 + strlen(fn)], 8)) {
+	fprintf(stderr, "%s (%d): %s: erreur lors du parsing de %s\n",
+		__FILE__, __LINE__, __func__, filename);
+	continue;
+      }
+      fprintf(stderr, "%s : tessellation control shader\n", fn);
+      if(!(sId = gl4duCreateShaderIM(GL_TESS_CONTROL_SHADER, fn, &filename[15 + strlen(fn)]))) goto gl4duCreateProgram_ERROR;
+      attachShader(*prg, *findidInShadersList(sId));
+    } else if(!strncmp("<tes>", filename, 5)) { /* tessellation evaluation shader */
+      fprintf(stderr, "%s : tessellation evaluation shader\n", &filename[5]);
+      if(!(sId = gl4duCreateShader(GL_TESS_EVALUATION_SHADER, &filename[5]))) goto gl4duCreateProgram_ERROR;
+      attachShader(*prg, *findidInShadersList(sId));
+    } else if(!strncmp("<imtes>", filename, 7)) { /* in memory tessellation evaluation shader */
+      fn[0] = 0;
+      snprintf(format, sizeof format, "<imtes>%%%d[^\t\n<>$!:;,=\"|]</imtes>", BUFSIZ - 1);
+      if(sscanf(filename, format, fn) != 1 || strncmp("</imtes>", &filename[7 + strlen(fn)], 8)) {
+	fprintf(stderr, "%s (%d): %s: erreur lors du parsing de %s\n",
+		__FILE__, __LINE__, __func__, filename);
+	continue;
+      }
+      fprintf(stderr, "%s : tessellation evaluation shader\n", fn);
+      if(!(sId = gl4duCreateShaderIM(GL_TESS_EVALUATION_SHADER, fn, &filename[15 + strlen(fn)]))) goto gl4duCreateProgram_ERROR;
       attachShader(*prg, *findidInShadersList(sId));
     }
 #endif
@@ -465,6 +497,14 @@ GLuint gl4duCreateProgramFED(const char * encData, const char * firstone, ...) {
     else if(!strncmp("<gs>", filename, 4)) { /* geometry shader */
       fprintf(stderr, "%s : geometry shader\n", &filename[4]);
       if(!(sId = gl4duCreateShaderFED(decData, GL_GEOMETRY_SHADER, &filename[4]))) goto gl4duCreateProgram_ERROR;
+      attachShader(*prg, *findidInShadersList(sId));
+    } else if(!strncmp("<tcs>", filename, 5)) { /* tessellation control shader */
+      fprintf(stderr, "%s : tessellation control shader\n", &filename[5]);
+      if(!(sId = gl4duCreateShaderFED(decData, GL_TESS_CONTROL_SHADER, &filename[5]))) goto gl4duCreateProgram_ERROR;
+      attachShader(*prg, *findidInShadersList(sId));
+    } else if(!strncmp("<tes>", filename, 5)) { /* tessellation evaluation shader */
+      fprintf(stderr, "%s : tessellation evaluation shader\n", &filename[5]);
+      if(!(sId = gl4duCreateShaderFED(decData, GL_TESS_EVALUATION_SHADER, &filename[5]))) goto gl4duCreateProgram_ERROR;
       attachShader(*prg, *findidInShadersList(sId));
     }
 #endif

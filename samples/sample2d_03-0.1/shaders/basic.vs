@@ -39,9 +39,13 @@ layout (location = 2) in vec2 vsiTexCoord;
  * dans le code window.c associé. */
 uniform int count;
 
+out vec2 vsoTexCoord;
+
 void main(void) {
   /* gl_Position, nom réservé produisant un sommet GL */
   /* l'entrée vsiPosition est complétée en vecteur 4D (x, y, z, w) où
      w = 1.0 */
-  gl_Position = vec4(abs(sin(count / 100.0)) * vsiPosition, 1.0);
+  //gl_Position = vec4(abs(sin(count / 100.0)) * vsiPosition, 1.0);
+  gl_Position = vec4(vsiPosition, 1.0);
+  vsoTexCoord = vsiTexCoord;
 }

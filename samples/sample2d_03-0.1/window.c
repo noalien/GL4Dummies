@@ -20,6 +20,8 @@ static int _wW = 800, _wH = 600;
 static GLuint _quad = 0;
 /*!\brief identifiant du (futur) GLSL program */
 static GLuint _pId = 0;
+/*!\brief identifiant de texture */
+static GLuint _texId = 0;
 /*!\brief créé la fenêtre d'affichage, initialise GL et les données,
  * affecte les fonctions d'événements et lance la boucle principale
  * d'affichage. */
@@ -44,18 +46,34 @@ static void init(void) {
   glViewport(0, 0, _wW, _wH);
   /* génération de la géométrie du quadrilatère */
   _quad = gl4dgGenQuadf();
+
+  GLuint p[4] = { -1, 0, 0, -1 };
+
+  /* générer un identifiant de texture */
+  glGenTextures(1, &_texId);
+  /* lier l'identifiant de texture comme texture 2D (1D ou 3D
+   * possibles) */
+  glBindTexture(GL_TEXTURE_2D, _texId);
+  /* paramétrer la texture, voir la doc de la fonction glTexParameter
+   * sur
+   * https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexParameter.xhtml */
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);//LINEAR);
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);//LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, p);
+  /* dé-lier la texture 2D */
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 /*!\brief Cette fonction dessine dans le contexte OpenGL actif. */
 static void draw(void) {
-  static int c = 0;
   /* effacement du buffer de couleur */
   glClear(GL_COLOR_BUFFER_BIT);
   /* activation du programme de rendu _pId */
   glUseProgram(_pId);
-  /* envoi de la valeur de la variable c dans la variable uniform
-   * count du côté shader (GPU). Puis c incrémente de 1 pour l'appel
-   * suivant. */
-  glUniform1i(glGetUniformLocation(_pId, "count"), c++);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, _texId);
+  glUniform1i(glGetUniformLocation(_pId, "tex"), 0);
   /* dessin de la géométrie du quadrilatère */
   gl4dgDraw(_quad);
   /* désactiver le programme shader */
@@ -64,6 +82,10 @@ static void draw(void) {
 /*!\brief appelée au moment de sortir du programme (atexit), elle
  *  libère les éléments OpenGL utilisés.*/
 static void quit(void) {
+  if(_texId) {
+    glDeleteTextures(1, &_texId);
+    _texId = 0;
+  }
   /* nettoyage des éléments utilisés par la bibliothèque GL4Dummies */
   gl4duClean(GL4DU_ALL);
 }
