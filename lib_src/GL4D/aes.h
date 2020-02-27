@@ -22,8 +22,9 @@
  *
  *  The AES block cipher was designed by Vincent Rijmen and Joan Daemen.\n
  *
- *  http://csrc.nist.gov/encryption/aes/rijndael/Rijndael.pdf\n
- *  http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf\n
+ *  http://csrc.nist.gov/encryption/aes/rijndael/Rijndael.pdf (broken link)\n
+ *  http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf (broken link)\n
+ *  See also: https://comparite.ch/encryption-types\n
  *
  *  \author Christophe Devine
  */
