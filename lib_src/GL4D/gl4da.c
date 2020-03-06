@@ -31,7 +31,7 @@ void gl4daMapToSphere (gl4daArcball *a, int x, int y, float * pointSphere){
 void gl4daResize (gl4daArcball *a, int w, int h){
   a->center[0]   = 0.5f * w;
   a->center[1]   = 0.5f * h;
-  a->radius   = 0.5f * fmax (w, h);
+  a->radius   = 0.5f * (float)fmax (w, h);
 }
 
 void gl4daInit (gl4daArcball *a, int x, int y){

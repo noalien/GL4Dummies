@@ -11,7 +11,9 @@
 #ifndef _GL4DFCOMMON_H
 #define _GL4DFCOMMON_H
 
-#pragma GCC diagnostic ignored "-Wunused-variable"
+#if !defined(_MSC_VER)
+#   pragma GCC diagnostic ignored "-Wunused-variable"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
