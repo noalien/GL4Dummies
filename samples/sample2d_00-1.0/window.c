@@ -42,7 +42,7 @@ int main(int argc, char ** argv) {
    * le noir */
   gl4dpClearScreen();
   /* décommentez la ligne suivante pour effacer l'écran en bleu foncé. */
-  gl4dpClearScreenWith(RGB(0, 0, 155));
+  //gl4dpClearScreenWith(RGB(0, 0, 155));
   /* mise en place de la fonction à appeler à chaque display */
   gl4duwDisplayFunc(draw);
   /* boucle infinie pour éviter que le programme ne s'arrête et ferme
