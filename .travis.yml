@@ -9,7 +9,7 @@ matrix:
       ruby: 2.3
       osx_image: xcode10.2
       before_install:
-        - brew update && ( brew install sdl2 python || brew upgrade sdl2 python )
+        - brew update && ( brew install sdl2 python || brew upgrade sdl2 python || echo "Trying without update" )
         - python -m pip install --upgrade pip
         - pip3 install meson ninja
 
