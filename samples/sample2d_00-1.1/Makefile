@@ -22,7 +22,7 @@ HEADERS =
 SOURCES = window.c
 OBJ = $(SOURCES:.c=.o)
 DOXYFILE = documentation/Doxyfile
-EXTRAFILES = COPYING $(wildcard shaders/*.?s images/*.png)
+EXTRAFILES = COPYING $(wildcard shaders/*.?s images/*.png) sample2d_00-1_1.sln sample2d_00-1_1.vcxproj
 DISTFILES = $(SOURCES) Makefile $(HEADERS) $(DOXYFILE) $(EXTRAFILES)
 # Traitements automatiques pour ajout de chemins et options (ne pas modifier)
 ifneq (,$(shell ls -d /usr/local/include 2>/dev/null | tail -n 1))
