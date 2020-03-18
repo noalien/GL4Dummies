@@ -184,6 +184,11 @@ GLuint gl4dpGetHeight(void) {
   return (*_cur_screen)->h;
 }
 
+/*!\brief retourne le pointeur vers les pixels de l'écran courant. */
+GLuint * gl4dpGetPixels(void) {
+  return (*_cur_screen)->pixels;
+}
+
 /*!\brief Efface l'écran en mettant 0. */
 void gl4dpClearScreen(void) {
   if(!(*_cur_screen)->isCPUToDate)
