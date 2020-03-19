@@ -84,6 +84,7 @@ extern "C" {
   GL4DAPI GLuint    GL4DAPIENTRY gl4dpGetTextureId(void);
   GL4DAPI GLuint    GL4DAPIENTRY gl4dpGetWidth(void);
   GL4DAPI GLuint    GL4DAPIENTRY gl4dpGetHeight(void);
+  GL4DAPI GLuint *  GL4DAPIENTRY gl4dpGetPixels(void);
   GL4DAPI void      GL4DAPIENTRY gl4dpClearScreen(void);
   GL4DAPI void      GL4DAPIENTRY gl4dpClearScreenWith(Uint32 color);
   GL4DAPI void      GL4DAPIENTRY gl4dpUpdateScreen(GLint * rect);
