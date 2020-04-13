@@ -17,7 +17,7 @@ CPPFLAGS = -I.
 LDFLAGS = -lm
 # définition des fichiers et dossiers
 PROGNAME = sample2d_00
-VERSION = 1.2
+VERSION = 1.2.2
 distdir = $(PROGNAME)-$(VERSION)
 HEADERS = 
 SOURCES = window.c
