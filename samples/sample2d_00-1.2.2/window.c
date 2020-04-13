@@ -28,7 +28,7 @@
 /*!\brief le tableau `a trier */
 static int _a_trier[N];
 /*!\brief nouveau, les deux données qui échangent leurs places */
-static int _to_swap[2];
+static int _to_swap[2] = {-1, -1};
 
 /*!\brief initialise aléatoirement les valeurs du tableau passé en
  * argument avec des valeurs allant de 0 `a n - 1. */
@@ -108,8 +108,7 @@ static void dessin(void) {
   gl4dpClearScreen();
   for(i = 0; i < N; ++i)
     vLine(i, 0, _a_trier[i], RGB(128, 128, 128));
-  /* nouveau, surligner en rouge les deux positions ayant échangé
-   * leurs places */
+  /* nouveau, surligner en rouge les deux positions à échanger */
   if(_to_swap[0] >= 0) {
     vLine(_to_swap[0], 0, _a_trier[_to_swap[0]], RGB(255, 0, 0));
     vLine(_to_swap[1], 0, _a_trier[_to_swap[1]], RGB(255, 0, 0));
