@@ -17,14 +17,10 @@
 /Windows/*.opensdf
 /Windows/*.sdf
 /Windows/*.user
-build/*
 
-x64
-CMakeFiles
 CMakeCache.txt
 cmake_install.cmake
 install_manifest.txt
-INSTALL
 aclocal.m4
 autom4te.cache/
 compile
@@ -38,5 +34,4 @@ install-sh
 libtool
 ltmain.sh
 missing
-bin/
 m4/
