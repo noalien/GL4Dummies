@@ -15,6 +15,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <Keyword>ManagedCProj</Keyword>
     <RootNamespace>GL4Dummies</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -45,17 +46,17 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>.\dependencies\include\SDL2;$(IncludePath)</IncludePath>
-    <LibraryPath>.\dependencies\lib;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)\..\bin\Win32\</OutDir>
-    <IntDir>$(SolutionDir)\..\bin\Win32\</IntDir>
+    <IncludePath>.\dependencies\SDL2\include;$(IncludePath)</IncludePath>
+    <LibraryPath>.\dependencies\SDL2\lib\x86;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)\dependencies\lib\x86\</OutDir>
+    <IntDir>$(SolutionDir)\dependencies\lib\x86\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>.\dependencies\include\SDL2;$(IncludePath)</IncludePath>
-    <LibraryPath>.\dependencies\lib;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)\..\bin\Win32\</OutDir>
-    <IntDir>$(SolutionDir)\..\bin\Win32\</IntDir>
+    <IncludePath>.\dependencies\SDL2\include;$(IncludePath)</IncludePath>
+    <LibraryPath>.\dependencies\SDL2\lib\x86;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)\dependencies\lib\x86\</OutDir>
+    <IntDir>$(SolutionDir)\dependencies\lib\x86\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -75,7 +76,7 @@
       <AdditionalDependencies>opengl32.lib;SDL2main.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <BuildLog>
-      <Path>..\bin\Win32\$(MSBuildProjectName).log</Path>
+      <Path>.\dependencies\lib\x86\$(MSBuildProjectName).log</Path>
     </BuildLog>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -93,7 +94,7 @@
       <AdditionalDependencies>opengl32.lib;SDL2main.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <BuildLog>
-      <Path>..\bin\Win32\$(MSBuildProjectName).log</Path>
+      <Path>.\dependencies\lib\x86\$(MSBuildProjectName).log</Path>
     </BuildLog>
   </ItemDefinitionGroup>
   <ItemGroup>

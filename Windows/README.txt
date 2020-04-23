@@ -7,4 +7,4 @@ Open the Solution GL4Dummies.sln, compile the Solution (F7) then execute (ctrl-F
 
 Under Code::Blocks:
 - Open the project GL4Dummies.cbp then compile the libs (do not execute)
-- Open one of the given samples (gl4dWalkOnPolygons.cbp, gl4dLandscape.cbp, gl4dObjLoader.cbp), compile then execute.
+- Open the demo gl4dDemo.cbp, compile then execute.

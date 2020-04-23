@@ -111,7 +111,51 @@ int main(int argc, char ** argv) {
   gl4duInit(argc, argv);
   if((_win = initWindow(_windowWidth, _windowHeight, &_oglContext))) {
     initGL(_win);
-    _pId = gl4duCreateProgram("<vs>../share/GL4Dummies/shaders/basic.vs", "<fs>../share/GL4Dummies/shaders/basic.fs", NULL);
+    const char* imvs =
+        "<imvs>demoSample.vs</imvs>\n"
+#ifdef __GLES4D__
+        "#version 300 es\n"
+#else
+        "#version 330\n"
+#endif
+        "uniform mat4 modelViewMatrix;\n"
+        "uniform mat4 projectionMatrix;\n"
+        "layout (location = 0) in vec3 vsiPosition;\n"
+        "layout (location = 1) in vec3 vsiNormal;\n"
+        "layout (location = 2) in vec2 vsiTexCoord;\n"
+        "out vec2 vsoTexCoord;\n"
+        "out vec3 vsoNormal;\n"
+        "out vec4 vsoModPosition;\n"
+        "void main(void) {\n"
+        "    vsoNormal = (transpose(inverse(modelViewMatrix)) * vec4(vsiNormal.xyz, 0.0)).xyz;\n"
+        "    vsoModPosition = modelViewMatrix * vec4(vsiPosition.xyz, 1.0);\n"
+        "    gl_Position = projectionMatrix * modelViewMatrix * vec4(vsiPosition.xyz, 1.0);\n"
+        "    vsoTexCoord = vsiTexCoord;\n"
+        "}\n";
+    const char* imfs =
+        "<imfs>demoSample.fs</imfs>\n"
+#ifdef __GLES4D__
+        "#version 300 es\n"
+#else
+        "#version 330\n"
+#endif
+        "uniform sampler2D myTexture;\n"
+        "uniform vec4 lumpos;\n"
+        "uniform int heightMap;\n"
+        "in vec2 vsoTexCoord;\n"
+        "in vec3 vsoNormal;\n"
+        "in vec4 vsoModPosition;\n"
+        "out vec4 fragColor;\n"
+        "void main(void) {\n"
+        "    float il;\n"
+        "    vec3 lum = normalize(vsoModPosition.xyz - lumpos.xyz);\n"
+        "    il = dot(normalize(vsoNormal), -lum);\n"
+        "    if (heightMap == 1)\n"
+        "        fragColor = il * vec4(texture(myTexture, vsoTexCoord).r);\n"
+        "    else\n"
+        "        fragColor = vec4(il);//mix(vec4(texture(myTexture, vsoTexCoord).rgb, 1.0), vec4(il), 0.3);\n"
+        "}\n";
+    _pId = gl4duCreateProgram(imvs, imfs, NULL);
     initData();
     loop(_win);
   } else
