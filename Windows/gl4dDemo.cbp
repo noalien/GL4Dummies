@@ -41,7 +41,7 @@
 			<Add library="mingw32" />
 			<Add library="OpenGL32" />
 		</Linker>
-		<Unit filename="../samples/example02/landscape.c">
+		<Unit filename="../samples/demo/landscape.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>

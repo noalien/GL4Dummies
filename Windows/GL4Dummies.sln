@@ -4,10 +4,7 @@ VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GL4Dummies", "GL4Dummies.vcxproj", "{F0FB8716-C25B-47F9-B741-590DEE8BEAE1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gl4dLandscape", "gl4dLandscape.vcxproj", "{09538AA9-09E1-4F92-A30F-6056BA775523}"
-	ProjectSection(ProjectDependencies) = postProject
-		{F0FB8716-C25B-47F9-B741-590DEE8BEAE1} = {F0FB8716-C25B-47F9-B741-590DEE8BEAE1}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gl4dDemo", "gl4dDemo.vcxproj", "{09538AA9-09E1-4F92-A30F-6056BA775523}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
