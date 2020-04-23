@@ -5,4 +5,5 @@ all:
 	autoconf
 	automake --add-missing
 clean:
-	@rm -rf missing aclocal.m4 autom4te.cache compile config.log configure install-sh config.guess config.sub ltmain.sh config.status INSTALL libtool depcomp *~
+	@rm -rf missing aclocal.m4 autom4te.cache compile config.log configure install-sh config.guess config.sub ltmain.sh
+	@rm -rf config.status INSTALL libtool depcomp m4/libtool.m4 m4/ltoptions.m4 m4/ltsugar.m4 m4/ltversion.m4 m4/lt~obsolete.m4 *~

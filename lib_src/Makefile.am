@@ -46,6 +46,9 @@ endif
 %.o : %.rc
         $(WINDRES) $< $@
 
+#.o.rc:
+#        $(WINDRES) $< $@
+
 EXTRA_DIST = version.rc
 
 pkgconfigdir = $(libdir)/pkgconfig

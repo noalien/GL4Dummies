@@ -1,5 +1,6 @@
-SUBDIRS=lib_src lib_src/documentation samples/demo
+ACLOCAL_AMFLAGS = -I m4
 
+SUBDIRS=lib_src lib_src/documentation samples/demo
 
 EXTRA_DIST = Windows/gl4dDemo.cbp Windows/gl4dDemo.vcxproj Windows/GL4Dummies.cbp Windows/GL4Dummies.sln Windows/GL4Dummies.vcxproj Windows/README.txt Windows/dependencies/SDL2
 

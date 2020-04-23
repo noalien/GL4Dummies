@@ -94,4 +94,4 @@ dnl OTHER SYSTEMS
 ;;
 esac
 
-AC_OUTPUT([Makefile] [lib_src/Makefile] [lib_src/documentation/Makefile] [samples/Makefile] [samples/example01/Makefile] [samples/example02/Makefile] [samples/example03/Makefile] [samples/example04/Makefile])
+AC_OUTPUT([Makefile] [lib_src/Makefile] [lib_src/documentation/Makefile] [samples/demo/Makefile])
