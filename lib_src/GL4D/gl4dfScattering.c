@@ -37,7 +37,7 @@ static void scatteringfinit(GLuint in, GLuint out, GLuint radius, GLuint displac
 
 static void scatteringffunc(GLuint in, GLuint out, GLuint radius, GLuint displacementmap, GLuint weightmap, GLboolean flipV) {
   GLuint rout = out, fbo;
-  GLint n, vp[4], w, h, cfbo, ctex, cpId;
+  GLint vp[4], w, h, cfbo, ctex, cpId;
   GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND);
 #ifndef __GLES4D__
   GLint polygonMode[2];

@@ -897,7 +897,7 @@ extern void vaetvient(unsigned char * data, int len, int vaouvient) {
 #include <sys/stat.h>
 
 extern char * aes_from_tar(const char * file) {
-  int l = 0;
+  size_t l = 0;
   char * data = NULL;
   FILE * f;
   struct stat buf;
@@ -920,7 +920,7 @@ extern char * aes_from_tar(const char * file) {
     return NULL;
   }
   fclose(f);
-  vaetvient((unsigned char *)data, l, 1);
+  vaetvient((unsigned char *)data, (int)l, 1);
   return data;
 }
 

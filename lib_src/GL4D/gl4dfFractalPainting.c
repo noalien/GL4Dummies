@@ -785,7 +785,7 @@ static inline ll_t ** llMapNew(GLushort mapWidth, GLushort mapHeight) {
 
 static inline void llMapFree(ll_t ** llmap, GLushort mapWidth, GLushort mapHeight) {
   GLuint i;
-  for(i = 0; i < mapWidth * mapHeight; i++)
+  for(i = 0; i < (GLuint)mapWidth * mapHeight; i++)
     llFree(&(llmap[i]));
   free(llmap);
 }

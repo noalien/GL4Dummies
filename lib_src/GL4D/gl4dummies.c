@@ -84,9 +84,9 @@ char * gl4dReadTextFile(const char * filename) {
     return NULL;
   }
 #ifdef _WIN32
-  if( (l = fread(data, sizeof * data, buf.st_size, f)) == 0) {
+  if( (l = (int)fread(data, sizeof * data, buf.st_size, f)) == 0) {
 #else
-  if( (l = fread(data, sizeof * data, buf.st_size, f)) != buf.st_size) {
+  if( (l = (int)fread(data, sizeof * data, buf.st_size, f)) != buf.st_size) {
 #endif
     fprintf(stderr, "%s:%d:In %s: une erreur s'est produite lors de la lecture du fichier %s\n",
 	    __FILE__, __LINE__, __func__, filename);
@@ -136,13 +136,13 @@ static int kmpSearch(const char * p, const char * t) {
       back = NULL;
     }
     if(!p) return -1;
-    lm = strlen(m = p);
+    lm = (int)strlen(m = p);
     back = malloc(lm * sizeof * back);
     assert(back);
     for(back[i = 0] = j = -1; i < lm - 1; i++, j++, back[i] = (m[i] == m[j]) ? back[j] : j)
       while( j >= 0 && m[i] != m[j] ) j = back[j];
   }
-  lt = strlen(t);
+  lt = (int)strlen(t);
   for(i = j = 0; j < lm && i < lt; i++, j++)
     while( j >= 0 && t[i] != m[j] ) { j = back[j]; }
   if(j == lm) return i - lm;
@@ -352,7 +352,7 @@ char * filenameOf(const char * path) {
       spos = ptr - path;
     ++ptr;
   }
-  tmp = malloc((l = strlen(&path[++spos]) + 1) * sizeof *tmp);
+  tmp = malloc((l = (int)strlen(&path[++spos]) + 1) * sizeof *tmp);
   assert(tmp);
   strncpy(tmp, &path[spos], l - 1); tmp[l - 1] = 0;
   return tmp;

@@ -87,7 +87,7 @@ static void sobelfinit(GLuint in, GLuint out, GLboolean flipV) {
 /* appelée les autres fois (après la première qui lance init) */
 static void sobelffunc(GLuint in, GLuint out, GLboolean flipV) {
   GLuint rout = out, fbo;
-  GLint n, vp[4], w, h, cfbo, ctex, cpId;
+  GLint vp[4], w, h, cfbo, ctex, cpId;
   GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND);
 #ifndef __GLES4D__
   GLint polygonMode[2];

@@ -114,7 +114,7 @@ static inline void ccl(GLuint tex) {
 	queuePut(i);
       }
       while(!queueEmpty()) {
-	GLint j, v, q = queueGet(), x, y;
+	GLint j, q = queueGet(), x, y;
 	x = (q >> 2); y = x / w; x = x % w;
 	for(j = 0; j < sizeof d / sizeof *d; ++j) {
 	  GLint nx = x + d2[j][0], ny = y + d2[j][1], nq = q + d[j];
@@ -144,7 +144,7 @@ static inline void ccl(GLuint tex) {
 /* appelée les autres fois (après la première qui lance init) */
 static void cannyffunc(GLuint in, GLuint out, GLboolean flipV) {
   GLuint rout = out, fbo;
-  GLint n, vp[4], w, h, cfbo, ctex, cpId;
+  GLint vp[4], w, h, cfbo, ctex, cpId;
   GLboolean dt = glIsEnabled(GL_DEPTH_TEST), bl = glIsEnabled(GL_BLEND);
 #ifndef __GLES4D__
   GLint polygonMode[2];

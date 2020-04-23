@@ -5,9 +5,17 @@
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -23,7 +31,20 @@
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -36,7 +57,13 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -47,12 +74,29 @@
     <OutDir>$(SolutionDir)\bin\x86\</OutDir>
     <IntDir>$(SolutionDir)\bin\x86\</IntDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>..\lib_src;.\dependencies\SDL2\include;$(IncludePath)</IncludePath>
+    <LibraryPath>.\dependencies\lib\x64;.\dependencies\SDL2\lib\x64;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)\bin\x64\</OutDir>
+    <IntDir>$(SolutionDir)\bin\x64\</IntDir>
+    <ExecutablePath>$(VC_ExecutablePath_x64);$(CommonExecutablePath);</ExecutablePath>
+    <ReferencePath>$(VC_ReferencesPath_x64);</ReferencePath>
+    <LibraryWPath>$(WindowsSDK_MetadataPath);</LibraryWPath>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>..\lib_src;.\dependencies\SDL2\include;$(IncludePath)</IncludePath>
-    <LibraryPath>.\dependencies\SDL2\lib\x86;.\dependencies\SDL2\lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath>.\dependencies\lib\x86;.\dependencies\SDL2\lib\x86;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\bin\x86\</OutDir>
     <IntDir>$(SolutionDir)\bin\x86\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>..\lib_src;.\dependencies\SDL2\include;$(IncludePath)</IncludePath>
+    <LibraryPath>.\dependencies\lib\x64;.\dependencies\SDL2\lib\x64;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)\bin\x64\</OutDir>
+    <IntDir>$(SolutionDir)\bin\x64\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -70,6 +114,29 @@
     <BuildLog>
       <Path>bin\x86\$(MSBuildProjectName).log</Path>
     </BuildLog>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>GL4Dummies.lib;OpenGL32.lib;SDL2main.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <BuildLog>
+      <Path>bin\x64\$(MSBuildProjectName).log</Path>
+    </BuildLog>
+    <PostBuildEvent>
+      <Command>copy "$(SolutionDir)\dependencies\lib\x64\GL4Dummies.dll" "$(TargetDir)"
+copy "$(SolutionDir)\dependencies\SDL2\lib\x64\SDL2.dll" "$(TargetDir)"
+</Command>
+      <Message>je ne sais pas pourquoi je suis obligé de faire ça que dans le cas x64. Dans le cas x86 (Win32) ça marche sans.</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -92,8 +159,41 @@
       <Path>\bin\x86\$(MSBuildProjectName).log</Path>
     </BuildLog>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>GL4Dummies.lib;OpenGL32.lib;SDL2main.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <BuildLog>
+      <Path>\bin\x64\$(MSBuildProjectName).log</Path>
+    </BuildLog>
+    <PostBuildEvent>
+      <Command>copy "$(SolutionDir)\dependencies\lib\x64\GL4Dummies.dll" "$(TargetDir)"
+copy "$(SolutionDir)\dependencies\SDL2\lib\x64\SDL2.dll" "$(TargetDir)"
+</Command>
+      <Message>je ne sais pas pourquoi je suis obligé de faire ça que dans le cas x64. Dans le cas x86 (Win32) ça marche sans.</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\samples\example02\landscape.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="GL4Dummies.vcxproj">
+      <Project>{f0fb8716-c25b-47f9-b741-590dee8beae1}</Project>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
