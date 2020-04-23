@@ -11,12 +11,11 @@
 #include <assert.h>
 #include <time.h>
 
-#include <GL4D/gl4du.h>
-
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <objdetect.hpp>
+#include <GL4D/gl4du.h>
+
 
 using namespace cv;
 using namespace std;
