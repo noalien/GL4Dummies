@@ -1,2 +1,0 @@
-clean-local:
-	rm -f *~
