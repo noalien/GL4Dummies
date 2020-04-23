@@ -2,18 +2,18 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="gl4dLandscape" />
+		<Option title="gl4dDemo" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="default">
-				<Option output="../bin/Win32/gl4dLandscape" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/x64/gl4dDemo" prefix_auto="1" extension_auto="1" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
 					<Add directory="../lib_src" />
-					<Add directory="dependencies/include/SDL2" />
+					<Add directory="dependencies/SDL2/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -23,8 +23,8 @@
 					<Add library="SDL2" />
 					<Add library="mingw32" />
 					<Add library="OpenGL32" />
-					<Add directory="../bin/Win32" />
-					<Add directory="dependencies/lib" />
+					<Add directory="dependencies/lib/x64" />
+					<Add directory="dependencies/SDL2/lib/x64" />
 				</Linker>
 			</Target>
 		</Build>
@@ -45,9 +45,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>
-			<code_completion />
-			<envvars />
-			<debugger />
 			<lib_finder disable_auto="1" />
 		</Extensions>
 	</Project>
