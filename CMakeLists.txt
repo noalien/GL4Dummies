@@ -69,49 +69,14 @@ install(TARGETS GL4Dummies
   RUNTIME DESTINATION bin)
 install(FILES ${gl4dummies_header_files} ${gl4dummies_inline_files} DESTINATION include/GL4D)
 
-# Example01
-file(GLOB_RECURSE example01_source_files 
-  samples/example01/*.h samples/example01/*.c)
-add_executable(gl4dWalkOnPolygons ${example01_source_files})
-target_link_libraries(gl4dWalkOnPolygons GL4Dummies)
-
-# Example02
-file(GLOB_RECURSE example02_source_files 
-  samples/example02/*.h samples/example02/*.c)
-add_executable(gl4dLandscape ${example02_source_files})
-target_link_libraries(gl4dLandscape GL4Dummies)
-
-# Example03
-file(GLOB_RECURSE example03_source_files 
-  samples/example03/*.h samples/example03/*.c
-  samples/example03/glm/*.h samples/example03/glm/*.c)
-add_executable(gl4dObjLoader ${example03_source_files})
-target_link_libraries(gl4dObjLoader GL4Dummies)
-
-# Example04
-file(GLOB_RECURSE example04_source_files 
-  samples/example04/*.h samples/example04/*.c)
-add_executable(gl4dContainer ${example04_source_files})
-target_link_libraries(gl4dContainer GL4Dummies)
-
-# Example05
-#file(GLOB_RECURSE example05_source_files 
-#  samples/example05/*.h samples/example05/*.c)
-#add_executable(example5 ${example05_source_files})
-#target_link_libraries(example5 GL4Dummies)
-
-# Landscape Multitexturing
-file(GLOB_RECURSE landscape_multitex_source_files 
-  samples/landscape_multitex/*.h samples/landscape_mutlitex/*.c)
-add_executable(landscape_multitex ${landscape_multitex_source_files})
-target_link_libraries(landscape_multitex GL4Dummies)
+# Demo
+file(GLOB_RECURSE demo_source_files 
+  samples/demo/*.h samples/demo/*.c)
+add_executable(gl4dDemo ${demo_source_files})
+target_link_libraries(gl4dDemo GL4Dummies)
 
 if(UNIX OR APPLE OR MINGW)
-  set_target_properties(gl4dContainer PROPERTIES COMPILE_FLAGS "-std=c99")
+  set_target_properties(gl4dDemo PROPERTIES COMPILE_FLAGS "-std=c99")
 elseif(WIN32)
-  set_target_properties(gl4dWalkOnPolygons PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
-  set_target_properties(gl4dLandscape PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
-  set_target_properties(gl4dObjLoader PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
-  set_target_properties(gl4dContainer PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE")
-  #set_target_properties(example5 PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
+  set_target_properties(gl4dDemo PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
 endif()
