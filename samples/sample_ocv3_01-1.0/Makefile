@@ -34,7 +34,7 @@ else
 endif
 
 #définition des fichiers et dossiers
-PROGNAME = sample_ocv3
+PROGNAME = sample_ocv3_01
 PACKAGE=$(PROGNAME)
 VERSION = 1.0
 distdir = $(PACKAGE)-$(VERSION)
@@ -42,7 +42,7 @@ HEADERS =
 SOURCES = window.cpp
 OBJ = $(SOURCES:.cpp=.o)
 DOXYFILE = documentation/Doxyfile
-EXTRAFILES = COPYING shaders/basic.vs shaders/basic.fs
+EXTRAFILES = COPYING shaders/basic.vs shaders/basic.fs README_VisualStudio.txt sample_ocv3_01-1_0.sln sample_ocv3_01-1_0.vcxproj
 DISTFILES = $(SOURCES) Makefile $(HEADERS) $(DOXYFILE) $(EXTRAFILES)
 
 all: $(PROGNAME)
