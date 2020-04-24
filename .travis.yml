@@ -9,7 +9,7 @@ matrix:
       ruby: 2.3
       osx_image: xcode10.2
       before_install:
-        - brew update && ( brew install sdl2 || brew upgrade sdl2 || echo "Trying without update" )
+        - brew update && ( brew install sdl2 autoconf automake libtool || brew upgrade sdl2 autoconf automake libtool || echo "Trying without update" )
 
     # GNU/Linux tests #############################################
     - os: linux
