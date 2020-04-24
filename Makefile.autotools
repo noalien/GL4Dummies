@@ -1,5 +1,5 @@
 all:
-	libtoolize
+	libtoolize || glibtoolize
 	autoreconf -i -Im4
 	aclocal
 	autoconf
