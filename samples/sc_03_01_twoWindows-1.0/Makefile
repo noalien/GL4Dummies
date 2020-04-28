@@ -1,12 +1,13 @@
 #  Makefile 
 #  Auteur : Farès BELHADJ
-#  Email  : amsi@ai.univ-paris8.fr
-#  Date   : 04/02/2018
+#  Email  : amsi@up8.edu
+#  Date   : 28/04/2020
 # définition des commandes utilisées
 CC = gcc
 ECHO = echo
 RM = rm -f
 TAR = tar
+ZIP = zip
 MKDIR = mkdir
 CHMOD = chmod
 CP = rsync -R
@@ -15,14 +16,17 @@ CFLAGS = -Wall -O3
 CPPFLAGS = -I.
 LDFLAGS = -lm
 # définition des fichiers et dossiers
-PROGNAME = adv_a_two_windows
+PACKNAME = sc_03_01
+PROGNAME = twoWindows
 VERSION = 1.0
-distdir = $(PROGNAME)-$(VERSION)
+distdir = $(PACKNAME)_$(PROGNAME)-$(VERSION)
 HEADERS = 
 SOURCES = window.c
+MSVCSRC = $(patsubst %,<ClCompile Include=\"%\\\" \\/>,$(SOURCES))
 OBJ = $(SOURCES:.c=.o)
 DOXYFILE = documentation/Doxyfile
-EXTRAFILES = COPYING $(wildcard shaders/*.?s images/*.png)
+VSCFILES = gl4dSample.vcxproj gl4dSample.sln
+EXTRAFILES = COPYING $(wildcard shaders/*.?s images/*.png) $(VSCFILES)
 DISTFILES = $(SOURCES) Makefile $(HEADERS) $(DOXYFILE) $(EXTRAFILES)
 # Traitements automatiques pour ajout de chemins et options (ne pas modifier)
 ifneq (,$(shell ls -d /usr/local/include 2>/dev/null | tail -n 1))
@@ -55,6 +59,10 @@ dist: distdir
 	$(CHMOD) -R a+r $(distdir)
 	$(TAR) zcvf $(distdir).tgz $(distdir)
 	$(RM) -r $(distdir)
+zip: distdir
+	$(CHMOD) -R a+r $(distdir)
+	$(ZIP) -r $(distdir).zip $(distdir)
+	$(RM) -r $(distdir)
 distdir: $(DISTFILES)
 	$(RM) -r $(distdir)
 	$(MKDIR) $(distdir)
@@ -65,6 +73,11 @@ doc: $(DOXYFILE)
 	  sed -e "s/PROJECT_NUMBER *=.*/PROJECT_NUMBER = $(VERSION)/" >> $<.new
 	mv -f $<.new $<
 	cd documentation && doxygen && cd ..
+msvc: $(VSCFILES)
+	@echo "Now these files ($?) already exist. If you wish to regenerate them, you should first delete them manually."  
+$(VSCFILES):
+	@echo "Generating $@ ..."
+	@cat ../../Windows/templates/$@ | sed -e "s/INSERT_TARGET_NAME/$(PROGNAME)/" | sed -e "s/INSERT_SOURCE_FILES/$(MSVCSRC)/" > $@
 clean:
-	@$(RM) -r $(PROGNAME) $(OBJ) *~ $(distdir).tgz gmon.out core.*\
-	  documentation/*~ shaders/*~ documentation/html
+	@$(RM) -r $(PROGNAME) $(OBJ) *~ $(distdir).tgz $(distdir).zip gmon.out	\
+	  core.* documentation/*~ shaders/*~ documentation/html
