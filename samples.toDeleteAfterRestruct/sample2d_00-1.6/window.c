@@ -233,7 +233,7 @@ int main(int argc, char ** argv) {
      * contexte OpenGL (au moins 3.2) */
     return 1;
   }
-  s = SDL_LoadBMP("img.bmp");
+  s = SDL_LoadBMP("images/img.bmp");
   assert(s);
   /* création d'un screen GL4Dummies (texture dans laquelle nous
    * pouvons dessiner) aux dimensions de la fenêtre */
