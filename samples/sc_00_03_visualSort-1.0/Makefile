@@ -77,7 +77,7 @@ msvc: $(VSCFILES)
 	@echo "Now these files ($?) already exist. If you wish to regenerate them, you should first delete them manually."  
 $(VSCFILES):
 	@echo "Generating $@ ..."
-	@cat ../../Windows/templates/$@ | sed -e "s/INSERT_PROJECT_NAME/$(PROGNAME)/g" | sed -e "s/INSERT_TARGET_NAME/$(PROGNAME)/" | sed -e "s/INSERT_SOURCE_FILES/$(MSVCSRC)/" > $@
+	@cat ../../Windows/templates/gl4dSample$(suffix $@) | sed -e "s/INSERT_PROJECT_NAME/$(PROGNAME)/g" | sed -e "s/INSERT_TARGET_NAME/$(PROGNAME)/" | sed -e "s/INSERT_SOURCE_FILES/$(MSVCSRC)/" > $@
 clean:
 	@$(RM) -r $(PROGNAME) $(OBJ) *~ $(distdir).tgz $(distdir).zip gmon.out	\
 	  core.* documentation/*~ shaders/*~ documentation/html
