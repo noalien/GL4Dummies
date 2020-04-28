@@ -9,7 +9,6 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <GL4D/gl4du.h>
-#include <SDL_image.h>
 
 typedef struct mobile_t mobile_t;
 struct mobile_t {
