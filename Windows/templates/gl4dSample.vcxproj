@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{09538AA9-09E1-4F92-A30F-6056BA775523}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>gl4dSample</RootNamespace>
+    <RootNamespace>INSERT_PROJECT_NAME</RootNamespace>
     <TargetName>INSERT_TARGET_NAME</TargetName>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
