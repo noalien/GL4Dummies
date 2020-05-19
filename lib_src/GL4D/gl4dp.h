@@ -87,6 +87,7 @@ extern "C" {
   GL4DAPI GLuint *  GL4DAPIENTRY gl4dpGetPixels(void);
   GL4DAPI void      GL4DAPIENTRY gl4dpClearScreen(void);
   GL4DAPI void      GL4DAPIENTRY gl4dpClearScreenWith(Uint32 color);
+  GL4DAPI void      GL4DAPIENTRY gl4dpScreenHasChanged(void);
   GL4DAPI void      GL4DAPIENTRY gl4dpUpdateScreen(GLint * rect);
   GL4DAPI void      GL4DAPIENTRY gl4dpRect(GLint * rect);
   GL4DAPI void      GL4DAPIENTRY gl4dpLine(int x0, int y0, int x1, int y1);

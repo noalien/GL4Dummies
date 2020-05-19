@@ -230,6 +230,15 @@ static void updateScreenFromGPU(void) {
   drawTex((*_cur_screen)->tId, s, t);
 }
 
+/*!\brief indique que le screen a été modifié côté mémoire centrale
+ * (CPU), qu'il sera donc nécessaire de mettre à jour la mémoire
+ * graphique (GPU) lors de l'appel à la fonction \ref
+ * gl4dpUpdateScreen.
+ */
+void gl4dpScreenHasChanged(void) {
+  (*_cur_screen)->isGPUToDate = 0;
+}
+
 /*!\brief met à jour l'écran en envoyant la sous texture de dimensions
  * \a rect à GL. Si rect vaut NULL, met à jour toute la texture.
  *
