@@ -37,7 +37,7 @@ dnl 5. If any interfaces have been added since the last public
 dnl release, then increment age.
 dnl 6. If any interfaces have been removed or changed since the last
 dnl public release, then set age to 0.  
-m4_define(LT_CURRENT, 6)
+m4_define(LT_CURRENT, 7)
 m4_define(LT_REVISION, 0) 
 m4_define(LT_AGE, 0)
 
