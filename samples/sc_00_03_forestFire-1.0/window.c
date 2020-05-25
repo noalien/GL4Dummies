@@ -66,13 +66,16 @@ static void quitte(void) {
   gl4duClean(GL4DU_ALL);
 }
 
+/*!\brief simulation d'une étape de changement d'état pour l'ensemble
+ * des cellules. */
 static void cellularAutomatonStep(void) {
   GLuint i, w = gl4dpGetWidth(), h = gl4dpGetHeight(), wh = w * h, * map = gl4dpGetPixels();
-  /* à l'étape actuelle (t), il est nécessaire de se renseigner sur
-   * les états de la carte de l'étape précédente (t - 1) soit avant
+  /* à l'étape actuelle, notée (t + 1) car elle représente les états à
+   * venir de l'automate, il est nécessaire de se renseigner sur les
+   * états de la carte de l'étape précédente notée (t), soit avant
    * modification. On fait donc une sauvegarde de la carte avant
    * modification, et on utilise cette sauvegarde pour réaliser les
-   * tests provoquant un changement d'état. */
+   * tests provoquant un changement d'états. */
   /* (1) on alloue la mémoire nécessaire à cette sauvegarde. La
    * fonction malloc alloue dynamiquement une zone mémoire de la
    * taille souhaitée en octets et retourne son adresse. Ici on veut
