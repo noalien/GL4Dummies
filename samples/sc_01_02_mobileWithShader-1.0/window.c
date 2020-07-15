@@ -117,6 +117,7 @@ static void draw(void) {
   glBindTexture(GL_TEXTURE_1D, 0);
   glUseProgram(0);
   toto += 0.01;
+
 }
 
 /*!\brief called at exit and delete and clean used data. */

@@ -285,33 +285,35 @@ void gl4dpRect(GLint * rect) {
  * _cur_color en utilisant l'algorithme de Bresenham'65.
  */
 void gl4dpLine(int x0, int y0, int x1, int y1) {
-  int u = x1 - x0, v = y1 - y0;
+  int u = x1 - x0, v = y1 - y0, fin;
   int pasX = (u < 0) ? -1 : 1, pasY = (v < 0) ? -1 : 1;
   int x, y, del, incH, incO;
   if(!(*_cur_screen)->isCPUToDate)
     updateScreenFromGPU();
   if(abs(u) < abs(v)) { /* deuxieme octant */
+    fin = y1 + pasY;
     del = (incH = ((pasX * u) << 1)) - pasY * v;
     incO = incH - ((pasY * v) << 1);
-    for(y = y0, x = x0; y != y1; y += pasY) {
+    for(y = y0, x = x0; y != fin; y += pasY) {
       if(IN_SCREEN(x, y))
-  gl4dpPutPixel(x, y);
+	gl4dpPutPixel(x, y);
       if(del < 0) del += incH;
       else {
-  del += incO;
-  x += pasX;
+	del += incO;
+	x += pasX;
       }
     }
   } else {  /* premier octant */
+    fin = x1 + pasX;
     del = (incH = ((pasY * v) << 1)) - pasX * u;
     incO = incH - ((pasX * u) << 1);
-    for(x = x0, y = y0; x != x1; x += pasX) {
+    for(x = x0, y = y0; x != fin; x += pasX) {
       if(IN_SCREEN(x, y))
-  gl4dpPutPixel(x, y);
+	gl4dpPutPixel(x, y);
       if(del < 0) del += incH;
       else {
-  del += incO;
-  y += pasY;
+	del += incO;
+	y += pasY;
       }
     }
   }
