@@ -347,7 +347,7 @@ char * filenameOf(const char * path) {
   char *tmp = strrchr(path, '/');
   assert(tmp);
   tmp++;
-  return tmp;
+  return strdup(tmp);
 }
 
 
