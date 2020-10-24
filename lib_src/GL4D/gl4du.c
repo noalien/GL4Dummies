@@ -125,6 +125,7 @@ static int  _hasInit = 0;
 #  include <libproc.h>
 #else /* autres unices */
 #  include <unistd.h>
+#  include <string.h>
 #endif
 
 static void findPathOfMe(const char * argv0) {
