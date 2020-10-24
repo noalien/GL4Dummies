@@ -162,7 +162,7 @@ static void findPathOfMe(const char * argv0) {
     fprintf(stderr, "%s (%s:%d) - finding exec path failed with readlink\n",
 	    __func__, __FILE__, __LINE__);
 #endif
-  strncpy(_pathOfMe, pathOf(strlen(buf) > 0 ? buf : argv0), sizeof _pathOfMe);
+  strncpy(_pathOfMe, pathOf(strlen(buf) > 0 ? buf : argv0), sizeof _pathOfMe - 1);
   _pathOfMeInit = 1;
 }
 
