@@ -19,14 +19,15 @@ list_t list_new(size_t data_size) {
   list_t list;
 
   list.begin = malloc(sizeof *list.begin);
+  assert(list.begin);
+
   list.size = 0;
   list.data_size = data_size;
-
   list.begin->data = malloc(data_size);
+  assert(list.begin->data);
+
   list.begin->next = NULL;
 
-  assert(list.begin);
-  assert(list.begin->data);
 
   return list;
 }
@@ -72,11 +73,13 @@ void list_insert(list_t *list, void *el, size_t index) {
   for (i = 0; i < index; i++) {
     if (current->next == NULL) {
       current->next = malloc(sizeof *current->next);
+      assert(current->next);
+
       current->next->data = malloc(list->data_size);
+      assert(current->next->data);
+
       current->next->next = NULL;
 
-      assert(current->next);
-      assert(current->next->data);
     }
 
     prev = current;
@@ -84,10 +87,11 @@ void list_insert(list_t *list, void *el, size_t index) {
   }
 
   new_ptr = malloc(sizeof *new_ptr);
-  new_ptr->data = malloc(list->data_size);
-
   assert(new_ptr);
+
+  new_ptr->data = malloc(list->data_size);
   assert(new_ptr->data);
+
 
   memcpy(new_ptr->data, el, list->data_size);
 
@@ -181,3 +185,4 @@ void *list_get (list_t list, size_t index) {
 
   return current->data;
 }
+
