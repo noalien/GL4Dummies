@@ -9,8 +9,6 @@
  * \todo COMPLÉTER LE CLIPPING POUR GÉRER ICI LES TRIANGLES
  * PARTIELLEMENT HORS-CHAMP ET ÉVITER DES TESTS GOURMANDS DANS \ref
  * primitives.c
- *
- * \todo IMPLÉMENTER LE SCALE, UNE CAMÉRA LIBRE (LE LOOKAT)
  */
 #include "moteur.h"
 #include <assert.h>
