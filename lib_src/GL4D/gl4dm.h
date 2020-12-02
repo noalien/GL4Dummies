@@ -95,11 +95,11 @@
 
 /*!\brief divise les composantes x, y et z du vecteur \a v par sa
  * composante w et remet w à 1. */
-#define MVEC4WEIGHT(v) do {\
-    v[0] /= v[3];          \
-    v[1] /= v[3];          \
-    v[2] /= v[3];          \
-    v[3]  = 1.0;           \
+#define MVEC4WEIGHT(v) do {			\
+    (v)[0] /= (v)[3];				\
+    (v)[1] /= (v)[3];				\
+    (v)[2] /= (v)[3];				\
+    (v)[3]  = 1.0;				\
   } while(0)
 
 /*!\brief Transposée de la matrice 4x4 \a m. */
