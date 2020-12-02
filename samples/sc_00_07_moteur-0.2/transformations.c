@@ -102,7 +102,7 @@ void stransform(surface_t * s, float * mvMat, float * projMat, float * viewport)
 	 pour supprimer les effets des translations */
       vec4 n = {s->t[i].normal.x, s->t[i].normal.y, s->t[i].normal.z, 1.0f}, res;
       MMAT4XVEC4((float *)&res, timvMat, (float *)&n);
-      MVEC4WEIGHT((float *)&res);
+      MVEC4WEIGHT(((float *)&res));
       MVEC3NORMALIZE((float *)&res);
       /* si le produit scalaire du resultat avec le point de vue est
 	 négatif ou nul, alors le triangle montre sa backface, et
