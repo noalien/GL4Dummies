@@ -88,33 +88,30 @@ vertex_t vtransform(surface_t * s, vertex_t v, float * mvMat, float * timvMat, f
 void stransform(surface_t * s, float * mvMat, float * projMat, float * viewport) {
   int i, j;
   float timvMat[16];
-  /* calcul de la transposée de l'inverse de la matrice model-view */
+  triangle_t vcull;
+  /* calcul de la transposée de l'inverse de la matrice model-view
+     pour la transformation des normales et le calcul du lambertien
+     utilisé par le shading Gouraud dans vtransform. */
   memcpy(timvMat, mvMat, sizeof timvMat);
   MMAT4INVERSE(timvMat);
   MMAT4TRANSPOSE(timvMat);
   for(i = 0; i < s->n; ++i) {
     s->t[i].state = PS_NONE;
+    for(j = 0; j < 3; ++j) {
+      s->t[i].v[j] = vtransform(s, s->t[i].v[j], mvMat, timvMat, projMat, viewport);
+      if(s->options & SO_CULL_BACKFACES) {
+	vcull.v[j].position.x = s->t[i].v[j].x;
+	vcull.v[j].position.y = s->t[i].v[j].y;
+	vcull.v[j].position.z = 0.0f;
+      }
+    }
     if(s->options & SO_CULL_BACKFACES) {
-      float scalaire;
-      /* le vecteur vers le point de vue */
-      const float pv[3] = { 0.0f, 0.0f, 1.0f };
-      /* la normale qui sera transformée par timvMat, le 0 en w est
-	 pour supprimer les effets des translations */
-      vec4 n = {s->t[i].normal.x, s->t[i].normal.y, s->t[i].normal.z, 1.0f}, res;
-      MMAT4XVEC4((float *)&res, timvMat, (float *)&n);
-      MVEC4WEIGHT(((float *)&res));
-      MVEC3NORMALIZE((float *)&res);
-      /* si le produit scalaire du resultat avec le point de vue est
-	 négatif ou nul, alors le triangle montre sa backface, et
-	 selon l'option de la surface il est nécessaire de le CULL. */
-      scalaire = MVEC3DOT((float *)&res, pv);
-      if(scalaire <= 0.0001f) {
+      tnormal(&vcull);
+      if(vcull.normal.z <= 0.0f) {
 	s->t[i].state |= PS_CULL;
 	continue;
       }
     }
-    for(j = 0; j < 3; ++j)
-      s->t[i].v[j] = vtransform(s, s->t[i].v[j], mvMat, timvMat, projMat, viewport);
     clip2UnitCube(&(s->t[i]));
   }
 }
