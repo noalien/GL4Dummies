@@ -1,0 +1,3 @@
+il faut installer la libTIFF pour pouvoir compiler exécuter cet exemple
+
+sous windows / MSVSC, il faut en plus paramétrer le vcxproj
