@@ -391,6 +391,10 @@ inline void interpolate(vertex_t * r, vertex_t * a, vertex_t * b, float fa, floa
    */
   if(_perpective_correction) {
     float z = 1.0f / (fa / a->zmod + fb / b->zmod);
+    if(e == 8) { /* attention il faut que cet indice colle avec la position de la proriété z à partir de l'adresse texCoord */
+      pr[e] = fa * pa[e] + fb * pb[e];
+      e = 7;
+    }
     fa = z * fa / a->zmod; fb = z * fb / b->zmod;
   }
   for(i = s; i <= e; ++i)
