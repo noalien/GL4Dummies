@@ -26,6 +26,7 @@ common names for the package you will need for the SDL:
 ## GNU Autotools
 In order to launch autotools config, type `make -f Makefile.autotools`. The
 following packages are required:
+- `pkg-config` (`pkgconfig` under macOS) 
 - `automake`
 - `autoconf`
 - `libtool`
@@ -84,5 +85,5 @@ You can also refer to the manual ([PDF](http://gl4d.api8.fr/FR/gl4d.pdf) /
 [HTML](http://gl4d.api8.fr/FR/gl4d.html)) for more in-depth instructions (in
 French).
 
-Under the Windows Operating System, please use Visual Studion
+Under the Windows Operating System, please use Visual Studio
 (Community 2019) or CodeBlocks files in the Windows directory.
