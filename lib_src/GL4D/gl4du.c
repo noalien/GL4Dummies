@@ -17,6 +17,7 @@
  */
 
 #include "gl4du.h"
+#include <string.h>
 #ifndef __GLES4D__
 #include "gl4dh.h"
 #endif
@@ -125,18 +126,17 @@ static int  _hasInit = 0;
 #  include <libproc.h>
 #else /* autres unices */
 #  include <unistd.h>
-#  include <string.h>
 #endif
 
 static void findPathOfMe(const char * argv0) {
   char buf[BUFSIZ] = {0};
 #if defined(_WIN32)
   /* tous les compilateurs sous windows ? */
-  GetModuleFileNameA(NULL, buf, sizeof buf);
+  GetModuleFileNameA(NULL, buf, sizeof buf - 1);
 #elif defined(__FreeBSD__)
   struct kinfo_proc *proc = kinfo_getproc(getpid());
   if(proc) {
-    strncpy(buf, proc->ki_comm, sizeof buf);
+    strncpy(buf, proc->ki_comm, sizeof buf - 1);
     free(proc);
   } else {
     fprintf(stderr, "%s (%s:%d) - error while kinfo_getproc(getpid()), trying with readlink\n",
