@@ -160,10 +160,15 @@ static void findPathOfMe(const char * argv0) {
     /* essayer _NSGetExecutablePath() (man 3 dyld) ??? */
   }
 #else /* autres unices */
-  if(readlink("/proc/self/exe", buf, sizeof buf) <= 0 &&       /*  (Linux)  */
-     readlink("/proc/curproc/file", buf, sizeof buf) <= 0 &&    /* (BSD ?) */
-     readlink("/proc/curproc/exe", buf, sizeof buf) <= 0 &&    /* (NetBSD) */
-     readlink("/proc/self/path/a.out", buf, sizeof buf) <= 0  /* (Solaris) sinon strncpy(buf, getexecname(), sizeof buf) ?? */)
+  if((len = readlink("/proc/self/exe", buf, sizeof buf - 1)) > 0) /*  (Linux)  */
+	buf[len] = '\0';
+  else if((len = readlink("/proc/curproc/file", buf, sizeof buf - 1)) > 0)    /* (BSD ?) */
+	buf[len] = '\0';
+  else if((len = readlink("/proc/curproc/exe", buf, sizeof buf - 1)) > 0)    /* (NetBSD) */
+	buf[len] = '\0';
+  else if((len = readlink("/proc/self/path/a.out", buf, sizeof buf - 1)) > 0)  /* (Solaris) sinon strncpy(buf, getexecname(), sizeof buf) ?? */
+	buf[len] = '\0';
+  else
     fprintf(stderr, "%s (%s:%d) - finding exec path failed with readlink, error: %s\n",
 	    __func__, __FILE__, __LINE__, strerror(errno));
 #endif
