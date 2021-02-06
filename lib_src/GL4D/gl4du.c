@@ -164,8 +164,8 @@ static void findPathOfMe(const char * argv0) {
      readlink("/proc/curproc/file", buf, sizeof buf) <= 0 &&    /* (BSD ?) */
      readlink("/proc/curproc/exe", buf, sizeof buf) <= 0 &&    /* (NetBSD) */
      readlink("/proc/self/path/a.out", buf, sizeof buf) <= 0  /* (Solaris) sinon strncpy(buf, getexecname(), sizeof buf) ?? */)
-    fprintf(stderr, "%s (%s:%d) - finding exec path failed with readlink\n",
-	    __func__, __FILE__, __LINE__);
+    fprintf(stderr, "%s (%s:%d) - finding exec path failed with readlink, error: %s\n",
+	    __func__, __FILE__, __LINE__, strerror(errno));
 #endif
   strncpy(_pathOfMe, pathOf(strlen(buf) > 0 ? buf : argv0), sizeof _pathOfMe - 1);
   _pathOfMeInit = 1;
