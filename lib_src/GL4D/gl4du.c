@@ -130,6 +130,7 @@ static int  _hasInit = 0;
 
 static void findPathOfMe(const char * argv0) {
   char buf[BUFSIZ] = {0};
+  ssize_t len = 0;
 #if defined(_WIN32)
   /* tous les compilateurs sous windows ? */
   if(GetModuleFileNameA(NULL, buf, sizeof buf - 1) == 0)
@@ -143,11 +144,13 @@ static void findPathOfMe(const char * argv0) {
   } else {
     fprintf(stderr, "%s (%s:%d) - error while kinfo_getproc(getpid()), trying with readlink\n",
 	    __func__, __FILE__, __LINE__);
-    if(readlink("/proc/curproc/file", buf, sizeof buf) <= 0) { /* only if it has procfs which it does not by default */
+    if((len = readlink("/proc/curproc/file", buf, sizeof buf - 1)) < 0) { /* only if it has procfs which it does not by default */
       fprintf(stderr, "%s (%s:%d) - finding exec path failed with readlink, error: %s\n",
 	      __func__, __FILE__, __LINE__, strerror(errno));
       /* sinon essayer sysctl CTL_KERN KERN_PROC KERN_PROC_PATHNAME -1 ??? */
-    }
+	} else {
+		buf[len] = '\0';
+	}
   }
 #elif defined(__MACOSX__)
   pid_t pid = getpid();
