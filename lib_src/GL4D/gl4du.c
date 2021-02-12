@@ -154,11 +154,17 @@ static void findPathOfMe(const char * argv0) {
   }
 #elif defined(__MACOSX__)
   pid_t pid = getpid();
+  char symlinkpath[BUFSIZ];
+  uint32_t size = BUFSIZ;
   if(proc_pidpath(pid, buf, sizeof buf) <= 0) {
     fprintf(stderr, "%s (%s:%d) - proc_pidpath(%d ...) error: %s\n",
 	    __func__, __FILE__, __LINE__, pid, strerror(errno));
-    /* essayer _NSGetExecutablePath() (man 3 dyld) ??? */
   }
+  if (_NSGetExecutablePath(symlinkpath, &size) == 0)
+	realpath(symlinkpath, buf);
+  else
+    fprintf(stderr, "%s (%s:%d) - _NSGetExecutablePath() returns a path that exceeds the buffer size, size needed: %d\n",
+			__func__, __FILE__, __LINE__, size);
 #else /* autres unices */
   if((len = readlink("/proc/self/exe", buf, sizeof buf - 1)) > 0) /*  (Linux)  */
 	buf[len] = '\0';
