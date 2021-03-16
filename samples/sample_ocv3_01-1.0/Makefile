@@ -1,7 +1,7 @@
 #  Makefile 
 #  Auteur : Farès BELHADJ
-#  Email  : amsi@ai.univ-paris8.fr
-#  Date   : 03/02/2014
+#  Email  : amsi@up8.edu
+#  Date   : 15/03/2021
 
 SHELL = /bin/sh
 # définition des commandes utilisées
@@ -18,19 +18,18 @@ SDL_CFLAGS = $(shell sdl2-config --cflags)
 SDL_LDFLAGS = $(shell sdl2-config --libs)
 CPPFLAGS = -I. $(SDL_CFLAGS)
 CFLAGS = -Wall -O3
-LDFLAGS = -lm -lGL4Dummies $(SDL_LDFLAGS) -lopencv_highgui -lopencv_imgproc -lopencv_core -lopencv_objdetect -lopencv_videoio
+LDFLAGS = -lm -lGL4Dummies $(SDL_LDFLAGS) -lopencv_highgui -lopencv_videoio -lopencv_core
+# éventuellement en plus -lopencv_imgproc -lopencv_objdetect -lopencv_imgcodecs
 
 UNAME := $(shell uname)
 ifeq ($(UNAME),Darwin)
-	MACOSX_DEPLOYMENT_TARGET = 10.9
-        CFLAGS += -I/usr/X11R6/include -I/opt/local/include/ -I/opt/local/include/opencv2	\
-        -I/usr/local/include/opencv2					\
-        -I/usr/local/include/opencv2/objdetect				\
+	MACOSX_DEPLOYMENT_TARGET = 11.0
+        CFLAGS += -I/usr/X11R6/include -I/opt/local/include/ -I/opt/local/include/opencv2
         -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
-        LDFLAGS += -framework OpenGL -L/opt/local/lib -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET) -L/usr/lib -lc++ -lopencv_videoio -lopencv_imgcodecs
+        LDFLAGS += -framework OpenGL -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET) -lc++ 
 else
         CFLAGS += -I/usr/include/opencv2 -I/usr/include/opencv2/objdetect
-        LDFLAGS += -L/usr/lib -L/usr/X11R6/lib -lGL -lGLU -lstdc++
+        LDFLAGS += -lGL -lstdc++
 endif
 
 #définition des fichiers et dossiers
