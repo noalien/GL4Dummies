@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/noalien/GL4Dummies.svg?branch=master)](https://travis-ci.org/noalien/GL4Dummies)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/763511e61710449e841821bafbd346e6)](https://www.codacy.com/app/Phundrak/GL4Dummies?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=noalien/GL4Dummies&amp;utm_campaign=Badge_Grade)
 [![CodeFactor](https://www.codefactor.io/repository/github/noalien/gl4dummies/badge)](https://www.codefactor.io/repository/github/noalien/gl4dummies)
-[![Documentation](http://phundrak.fr/img/docs-doxygen-blue.svg)](http://gl4d.api8.fr/doxygen/html/files.html)
+[![Documentation](http://phundrak.fr/img/docs-doxygen-blue.svg)](https://api8.fr/GL4D/doxygen/html/files.html)
 
 # GL4Dummies
 GL4Dummies is a C wrapper around OpenGL that aims to help C developers to easily
@@ -26,6 +26,7 @@ common names for the package you will need for the SDL:
 ## GNU Autotools
 In order to launch autotools config, type `make -f Makefile.autotools`. The
 following packages are required:
+- `pkg-config` (`pkgconfig` under macOS) 
 - `automake`
 - `autoconf`
 - `libtool`
@@ -80,9 +81,8 @@ set -gx LD_LIBRARY_PATH $HOME/local/lib $LD_LIBRARY_PATH
 ```
 
 ## Online instructions
-You can also refer to the manual ([PDF](http://gl4d.api8.fr/FR/gl4d.pdf) /
-[HTML](http://gl4d.api8.fr/FR/gl4d.html)) for more in-depth instructions (in
+You can also refer to the manual ([PDF](http://gl4d.api8.fr/FR/gl4d.pdf)) for more in-depth instructions (in
 French).
 
-Under the Windows Operating System, please use Visual Studion
+Under the Windows Operating System, please use Visual Studio
 (Community 2019) or CodeBlocks files in the Windows directory.

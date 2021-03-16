@@ -1297,7 +1297,7 @@ void gl4duMultMatrixf(const GLfloat * matrix) {
 void gl4duMultMatrixd(const GLdouble * matrix) {
   GLdouble * mat, cpy[16];
   assert(_gl4dCurMatrix);
-  assert(_gl4dCurMatrix->type == GL_FLOAT);
+  assert(_gl4dCurMatrix->type == GL_DOUBLE);
   mat = (GLdouble *)&(((GLubyte *)_gl4dCurMatrix->data)[_gl4dCurMatrix->top * _gl4dCurMatrix->size]);
   memcpy(cpy, mat, _gl4dCurMatrix->size);
   MMAT4XMAT4(mat, cpy, matrix);
