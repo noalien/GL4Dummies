@@ -183,6 +183,22 @@ void animation_base(int state) {
   }
 }
 
+void animation_bases3D(int state) {
+  switch(state) {
+  case GL4DH_INIT:
+    bases3D_init();
+    return;
+  case GL4DH_FREE:
+    bases3D_sortie();
+    return;
+  case GL4DH_UPDATE_WITH_AUDIO:
+    return;
+  default: /* GL4DH_DRAW */
+    bases3D_draw();
+    return;
+  }
+}
+
 void animationsInit(void) {
   if(!_quadId)
     _quadId = gl4dgGenQuadf();

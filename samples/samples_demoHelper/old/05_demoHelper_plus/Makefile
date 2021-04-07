@@ -35,10 +35,10 @@ PACKAGE=$(PROGNAME)
 VERSION = 1.42
 distdir = $(PACKAGE)-$(VERSION)
 HEADERS = audioHelper.h animations.h 
-SOURCES = audioHelper.c animations.c window.c base.c
+SOURCES = audioHelper.c animations.c window.c base.c bases3D.c
 OBJ = $(SOURCES:.c=.o)
 DOXYFILE = documentation/Doxyfile
-EXTRAFILES = COPYING shaders/basic.vs shaders/mix.fs shaders/basic.fs shaders/base.vs shaders/base.fs takeonme.mod
+EXTRAFILES = COPYING shaders/basic.vs shaders/mix.fs shaders/basic.fs shaders/base.vs shaders/base.fs shaders/bases3D.fs shaders/bases3D.vs takeonme.mod
 DISTFILES = $(SOURCES) Makefile $(HEADERS) $(DOXYFILE) $(EXTRAFILES)
 
 all: $(PROGNAME)

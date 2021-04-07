@@ -146,7 +146,7 @@ void fondui(void (* a0)(int), void (* a1)(int), Uint32 t, Uint32 et, int state) 
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
       glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, vp[2], vp[3], 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     }
-    loadTexture(tex[2], "images/fondui.jpg");
+    loadTexture(tex[2], "images/fondui2.jpg");
     pId = gl4duCreateProgram("<vs>shaders/basic.vs", "<fs>shaders/mixi.fs", NULL);
     return;
   case GL4DH_FREE:

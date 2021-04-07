@@ -27,18 +27,18 @@ static void keydown(int keycode);
  * ce tableau se termine toujours par l'élémént {0, NULL, NULL,
  * NULL} */
 static GL4DHanime _animations[] = {
-  { 1000, exemple_d_animation_06, NULL, NULL },
-  { 2800, exemple_d_animation_06, exemple_d_animation_01, exemple_de_transition_01 },
-  { 1000, exemple_d_animation_01, NULL, NULL },
-  { 1800, exemple_d_animation_01, exemple_d_animation_02, exemple_de_transition_01 },
-  { 1800, exemple_d_animation_02, NULL, NULL },
-  { 1000, exemple_d_animation_02, exemple_d_animation_05, exemple_de_transition_01 },
-  { 2200, exemple_d_animation_05, NULL, NULL },
-  { 3000, exemple_d_animation_00, NULL, NULL },
-  { 2800, exemple_d_animation_00, exemple_d_animation_03, exemple_de_transition_01 },
-  {12000, exemple_d_animation_03, NULL, NULL },
-  { 2800, exemple_d_animation_03, exemple_d_animation_04, exemple_de_transition_01 },
-  {12000, exemple_d_animation_04, NULL, NULL },
+  { 7000, exemple_d_animation_06, NULL, NULL },
+  { 6800, exemple_d_animation_06, exemple_d_animation_03, exemple_de_transition_01 },
+  { 3000, exemple_d_animation_03, NULL, NULL },
+  /* { 1800, exemple_d_animation_01, exemple_d_animation_02, exemple_de_transition_01 }, */
+  /* { 1800, exemple_d_animation_02, NULL, NULL }, */
+  /* { 1000, exemple_d_animation_02, exemple_d_animation_05, exemple_de_transition_01 }, */
+  /* { 2200, exemple_d_animation_05, NULL, NULL }, */
+  /* { 3000, exemple_d_animation_00, NULL, NULL }, */
+  /* { 2800, exemple_d_animation_00, exemple_d_animation_03, exemple_de_transition_01 }, */
+  /* {12000, exemple_d_animation_03, NULL, NULL }, */
+  /* { 2800, exemple_d_animation_03, exemple_d_animation_04, exemple_de_transition_01 }, */
+  /* {12000, exemple_d_animation_04, NULL, NULL }, */
   {    0, NULL, NULL, NULL } /* Toujours laisser à la fin */
 };
 

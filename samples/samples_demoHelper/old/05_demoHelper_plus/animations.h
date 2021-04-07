@@ -24,11 +24,17 @@ extern "C" {
   extern void animation_vide(int state);
   extern void animation_damier(int state);
   extern void animation_base(int state);
+  extern void animation_bases3D(int state);
   extern void animationsInit(void);
   /* Dans base.c */
   extern void base_init(void);
   extern void base_draw(void);
+  /* Dans bases3D.c */
+  extern void bases3D_init(void);
+  extern void bases3D_draw(void);
+  extern void bases3D_sortie(void);
 
+  
 
 #ifdef __cplusplus
 }

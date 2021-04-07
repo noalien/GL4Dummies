@@ -409,11 +409,12 @@ void exemple_d_animation_06(int state) {
   default: /* GL4DH_DRAW */
     /* JOUER L'ANIMATION */
     gl4dpSetScreen(s1);
-    gl4dpUpdateScreen(NULL);
-    r1[0] += 0.01;
-    r1[2] += 0.01;
-    r -= 0.02;
+    //gl4dpClearScreenWith(0xFFFFFFFF);
     gl4dpMap(s1, s2, r1, r2, r);
+    gl4dpUpdateScreen(NULL);
+    r1[0] += 0.001;
+    r1[2] += 0.001;
+    r -= 0.002;
     return;
   }
 }
