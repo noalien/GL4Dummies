@@ -276,8 +276,39 @@
 #define GL4DW_FULLSCREEN_DESKTOP SDL_WINDOW_FULLSCREEN_DESKTOP
 /*!\brief window not created by SDL */
 #define GL4DW_FOREIGN SDL_WINDOW_FOREIGN
-/*!\brief window should be created in high-DPI mode if supported */
-#define GL4DW_ALLOW_HIGHDPI SDL_WINDOW_ALLOW_HIGHDPI
+/* window flags on later versions */
+#ifdef SDL_WINDOW_ALLOW_HIGHDPI
+  /*!\brief window should be created in high-DPI mode if supported (On macOS NSHighResolutionCapable must be set true in the application's Info.plist for this to have any effect, >= SDL 2.0.1) */
+  #define GL4DW_ALLOW_HIGHDPI SDL_WINDOW_ALLOW_HIGHDPI
+#endif
+#ifdef SDL_WINDOW_MOUSE_CAPTURE
+  /*!\brief window has mouse captured (unrelated to INPUT_GRABBED, >= SDL 2.0.4) */
+  #define GL4DW_MOUSE_CAPTURE SDL_WINDOW_MOUSE_CAPTURE
+#endif
+#ifdef SDL_WINDOW_ALWAYS_ON_TOP
+  /*!\brief window should always be above others (X11 only, >= SDL 2.0.5) */
+  #define GL4DW_ALWAYS_ON_TOP SDL_WINDOW_ALWAYS_ON_TOP
+#endif
+#ifdef SDL_WINDOW_SKIP_TASKBAR
+  /*!\brief window should not be added to the taskbar (X11 only, >= SDL 2.0.5) */
+  #define GL4DW_SKIP_TASKBAR SDL_WINDOW_SKIP_TASKBAR
+#endif
+#ifdef SDL_WINDOW_UTILITY
+  /*!\brief window should be treated as a utility window (X11 only, >= SDL 2.0.5) */
+  #define GL4DW_UTILITY SDL_WINDOW_UTILITY
+#endif
+#ifdef SDL_WINDOW_TOOLTIP
+  /*!\brief window should be treated as a tooltip (X11 only, >= SDL 2.0.5) */
+  #define GL4DW_TOOLTIP SDL_WINDOW_TOOLTIP
+#endif
+#ifdef SDL_WINDOW_POPUP_MENU
+  /*!\brief window should be treated as a popup menu (X11 only, >= SDL 2.0.5) */
+  #define GL4DW_POPUP_MENU SDL_WINDOW_POPUP_MENU
+#endif
+#ifdef SDL_WINDOW_VULKAN
+  /*!\brief window usable with a Vulkan instance (may be X11 only, >= SDL 2.0.6) */
+  #define GL4DW_VULKAN SDL_WINDOW_VULKAN
+#endif
 /* window coordinates */
 /*!\brief Used to indicate that you don't care what the window position is.*/
 #define GL4DW_POS_UNDEFINED SDL_WINDOWPOS_UNDEFINED
