@@ -126,6 +126,7 @@ static void triangle_edge(GLfloat *im, int x, int y, int w, int h, int width, GL
  */
 GLfloat * gl4dmTriangleEdge(GLuint width, GLuint height, GLfloat H) {
   GLfloat * hm = calloc(width * height, sizeof *hm);
+  assert(hm);
   hm[0] = GL4DM_EPSILON + gl4dmURand();
   hm[width - 1] = GL4DM_EPSILON + gl4dmURand();
   hm[(height - 1) * width + width - 1] = GL4DM_EPSILON + gl4dmURand();

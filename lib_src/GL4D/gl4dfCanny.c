@@ -116,7 +116,7 @@ static inline void ccl(GLuint tex) {
       while(!queueEmpty()) {
 	GLint j, q = queueGet(), x, y;
 	x = (q >> 2); y = x / w; x = x % w;
-	for(j = 0; j < sizeof d / sizeof *d; ++j) {
+	for(j = 0; j < (GLint)(sizeof d / sizeof *d); ++j) {
 	  GLint nx = x + d2[j][0], ny = y + d2[j][1], nq = q + d[j];
 	  if(nx >= 0 && ny >= 0 && nx < w && ny < h &&
 	     !_marks[nq]) {

@@ -912,7 +912,7 @@ extern char * aes_from_tar(const char * file) {
     free(data);
     return NULL;
   }
-  if( (l = fread(data, sizeof * data, buf.st_size, f)) != buf.st_size) {
+  if( (l = fread(data, sizeof * data, buf.st_size, f)) != (size_t)buf.st_size) {
     fprintf(stderr, "%s:%d:In %s: une erreur s'est produite lors de la lecture du fichier %s\n",
 	    __FILE__, __LINE__, __func__, file);
     free(data);

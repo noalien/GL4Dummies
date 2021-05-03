@@ -16,6 +16,7 @@
 #include "gl4dummies.h"
 
 #include <math.h>
+#include <assert.h>
 
 /* MACROS DIVERS */
 
