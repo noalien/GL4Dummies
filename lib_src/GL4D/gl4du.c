@@ -17,6 +17,7 @@
  */
 
 #include "gl4du.h"
+#include <string.h>
 #ifndef __GLES4D__
 #include "gl4dh.h"
 #endif
@@ -129,39 +130,55 @@ static int  _hasInit = 0;
 
 static void findPathOfMe(const char * argv0) {
   char buf[BUFSIZ] = {0};
+  ssize_t len = 0;
 #if defined(_WIN32)
   /* tous les compilateurs sous windows ? */
-  GetModuleFileNameA(NULL, buf, sizeof buf);
+  if(GetModuleFileNameA(NULL, buf, sizeof buf - 1) == 0)
+    fprintf(stderr, "%s (%s:%d) - error while GetModuleFileNameA(), error: %s\n",
+	    __func__, __FILE__, __LINE__, GetLastError());
 #elif defined(__FreeBSD__)
   struct kinfo_proc *proc = kinfo_getproc(getpid());
   if(proc) {
-    strncpy(buf, proc->ki_comm, sizeof buf);
+    strncpy(buf, proc->ki_comm, sizeof buf - 1);
     free(proc);
   } else {
     fprintf(stderr, "%s (%s:%d) - error while kinfo_getproc(getpid()), trying with readlink\n",
 	    __func__, __FILE__, __LINE__);
-    if(readlink("/proc/curproc/file", buf, sizeof buf) <= 0) {
-      fprintf(stderr, "%s (%s:%d) - finding exec path failed with readlink\n",
-	      __func__, __FILE__, __LINE__);
+    if((len = readlink("/proc/curproc/file", buf, sizeof buf - 1)) < 0) { /* only if it has procfs which it does not by default */
+      fprintf(stderr, "%s (%s:%d) - finding exec path failed with readlink, error: %s\n",
+	      __func__, __FILE__, __LINE__, strerror(errno));
       /* sinon essayer sysctl CTL_KERN KERN_PROC KERN_PROC_PATHNAME -1 ??? */
-    }
+	} else {
+		buf[len] = '\0';
+	}
   }
 #elif defined(__MACOSX__)
   pid_t pid = getpid();
+  char symlinkpath[BUFSIZ];
+  uint32_t size = BUFSIZ;
   if(proc_pidpath(pid, buf, sizeof buf) <= 0) {
     fprintf(stderr, "%s (%s:%d) - proc_pidpath(%d ...) error: %s\n",
 	    __func__, __FILE__, __LINE__, pid, strerror(errno));
-    /* essayer _NSGetExecutablePath() (man 3 dyld) ??? */
   }
+  if (_NSGetExecutablePath(symlinkpath, &size) == 0)
+	realpath(symlinkpath, buf);
+  else
+    fprintf(stderr, "%s (%s:%d) - _NSGetExecutablePath() returns a path that exceeds the buffer size, size needed: %d\n",
+			__func__, __FILE__, __LINE__, size);
 #else /* autres unices */
-  if(readlink("/proc/self/exe", buf, sizeof buf) <= 0 &&       /*  (Linux)  */
-     readlink("/proc/curproc/file", buf, sizeof buf) <= 0 &&    /* (BSD ?) */
-     readlink("/proc/curproc/exe", buf, sizeof buf) <= 0 &&    /* (NetBSD) */
-     readlink("/proc/self/path/a.out", buf, sizeof buf) <= 0  /* (Solaris) sinon strncpy(buf, getexecname(), sizeof buf) ?? */)
-    fprintf(stderr, "%s (%s:%d) - finding exec path failed with readlink\n",
-	    __func__, __FILE__, __LINE__);
+  if((len = readlink("/proc/self/exe", buf, sizeof buf - 1)) > 0) /*  (Linux)  */
+	buf[len] = '\0';
+  else if((len = readlink("/proc/curproc/file", buf, sizeof buf - 1)) > 0)    /* (BSD ?) */
+	buf[len] = '\0';
+  else if((len = readlink("/proc/curproc/exe", buf, sizeof buf - 1)) > 0)    /* (NetBSD) */
+	buf[len] = '\0';
+  else if((len = readlink("/proc/self/path/a.out", buf, sizeof buf - 1)) > 0)  /* (Solaris) sinon strncpy(buf, getexecname(), sizeof buf) ?? */
+	buf[len] = '\0';
+  else
+    fprintf(stderr, "%s (%s:%d) - finding exec path failed with readlink, error: %s\n",
+	    __func__, __FILE__, __LINE__, strerror(errno));
 #endif
-  strncpy(_pathOfMe, pathOf(strlen(buf) > 0 ? buf : argv0), sizeof _pathOfMe);
+  strncpy(_pathOfMe, pathOf(strlen(buf) > 0 ? buf : argv0), sizeof _pathOfMe - 1);
   _pathOfMeInit = 1;
 }
 
