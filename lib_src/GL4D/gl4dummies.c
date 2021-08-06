@@ -344,9 +344,9 @@ char * pathOf(const char * path) {
  *
  */
 char * filenameOf(const char * path) {
-  if (*path == '\0')
-  	return strdup(path);
   char * tmp = strrchr(path, '/');
+  if (*path == '\0' || tmp == NULL)
+  	return strdup(path);
   tmp++;
   assert(tmp);
   return strdup(tmp);
