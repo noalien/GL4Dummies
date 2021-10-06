@@ -43,7 +43,7 @@ ifneq (,$(shell ls -d $(HOME)/local/lib 2>/dev/null | tail -n 1))
 endif
 ifeq ($(shell uname),Darwin)
 	MACOSX_DEPLOYMENT_TARGET = 10.8
-        CFLAGS += -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
+        CFLAGS += -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET) -I/opt/local/include 
         LDFLAGS += -framework OpenGL -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 else
         LDFLAGS += -lGL

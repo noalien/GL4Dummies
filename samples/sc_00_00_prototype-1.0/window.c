@@ -1,7 +1,22 @@
 /*!\file window.c
  * \brief GL4Dummies, exemple simple 2D avec GL4Dummies
- * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
+ * \author Farès BELHADJ, amsi@up8.edu
  * \date February 04 2018
+ *
+ * A l'exécution, il est possible de constater un scintillement de
+ * l'image. Ceci est dû au fait que le screen créé dans cet exemple
+ * n'est copié qu'une seule fois dans le buffer couleur de la surface
+ * GL (par le biais de gl4dpUpdateScreen) ; or il y a deux buffers (en
+ * double buffering) le second peut donc s'afficher avec son contenu
+ * non initialisé (ou initialisé par défaut). Si les deux contenus
+ * diffèrent, on observe un scintillement. Ceci n'apparaît pas si on
+ * créé une callback sur une fonction display qui raffraîchit les
+ * buffers à chaque frame (toujours par le biais de
+ * gl4dpUpdateScreen). Une autre solution consisterait à forcer le
+ * second buffer à se raffraîchir au moins une fois juste avant
+ * d'entrer dans la mainloop :
+ * SDL_GL_SwapWindow(gl4duwGetSDL_Window()); 
+ * gl4dpUpdateScreen(NULL);
  */
 
 /* inclusion des entêtes de fonctions de gestion de primitives simples
