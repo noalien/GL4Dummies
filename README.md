@@ -46,9 +46,10 @@ make # you can also run `make -j` for parallel compilation
 sudo make install
 ```
 
-You will then need to edit your `.profile`, `.bash_profile`, or your `.bashrc`
+You will then need to edit your `.profile`, `.bash_profile`, `.zprofile` or your `.bashrc`
 and add the following line:
 ```bash
+export PATH=/usr/local/bin:$PATH
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 ```
 Or, if you use fish, edit your `~/.config/fish/config.fish` file and add the
@@ -66,7 +67,7 @@ GL4Dummies locally, you can run the following instead:
 make
 make install
 ```
-You will then need to add to your `.profile`, `.bash_profile`, or `.bashrc` the
+You will then need to add to your `.profile`, `.bash_profile`, `.zprofile` or `.bashrc` the
 following lines:
 ```bash
 export PATH=$HOME/local/bin:$PATH
