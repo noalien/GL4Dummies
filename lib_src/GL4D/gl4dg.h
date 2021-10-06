@@ -61,7 +61,7 @@ extern "C" {
    *
    * \return l'identifiant (référence) de l'objet-géométrie généré.
    * \see gl4dgDraw pour le dessiner.
-   * \see gl4dgDraw pour le détruire.
+   * \see gl4dgDelete pour le détruire.
    */
   GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenQuadf(void);
   /*!\brief Génère un objet-géométrie de type cube et renvoie son identifiant (référence).
@@ -70,7 +70,7 @@ extern "C" {
    *
    * \return l'identifiant (référence) de l'objet-géométrie généré.
    * \see gl4dgDraw pour le dessiner.
-   * \see gl4dgDraw pour le détruire.
+   * \see gl4dgDelete pour le détruire.
    */
   GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenCubef(void);
   /*!\brief Génère un objet-géométrie de type sphère et renvoie son identifiant (référence).
@@ -81,7 +81,7 @@ extern "C" {
    * \param stacks le nombre de latitudes de la sphère.
    * \return l'identifiant (référence) de l'objet-géométrie généré.
    * \see gl4dgDraw pour le dessiner.
-   * \see gl4dgDraw pour le détruire.
+   * \see gl4dgDelete pour le détruire.
    * \see gl4dgSetGeometryOptimizationLevel
    */
   GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenSpheref(GLuint slices, GLuint stacks);
@@ -93,7 +93,7 @@ extern "C" {
    * \param base indique s'il y a ou pas une base au cone.
    * \return l'identifiant (référence) de l'objet-géométrie généré.
    * \see gl4dgDraw pour le dessiner.
-   * \see gl4dgDraw pour le détruire.
+   * \see gl4dgDelete pour le détruire.
    */
   GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenConef(GLuint slices, GLboolean base);
   /*!\brief Génère un objet-géométrie de type fan-cone et renvoie son identifiant (référence).
@@ -104,7 +104,7 @@ extern "C" {
    * \param base indique s'il y a ou pas une base au cone.
    * \return l'identifiant (référence) de l'objet-géométrie généré.
    * \see gl4dgDraw pour le dessiner.
-   * \see gl4dgDraw pour le détruire.
+   * \see gl4dgDelete pour le détruire.
    */
   GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenFanConef(GLuint slices, GLboolean base);
   /*!\brief Génère un objet-géométrie de type cylindre et renvoie son identifiant (référence).
@@ -115,7 +115,7 @@ extern "C" {
    * \param base indique s'il y a ou pas deux bases au cylindre (top et bas).
    * \return l'identifiant (référence) de l'objet-géométrie généré.
    * \see gl4dgDraw pour le dessiner.
-   * \see gl4dgDraw pour le détruire.
+   * \see gl4dgDelete pour le détruire.
    */
   GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenCylinderf(GLuint slices, GLboolean base);
   /*!\brief Génère un objet-géométrie de type disque et renvoie son identifiant (référence).
@@ -125,7 +125,7 @@ extern "C" {
    * \param slices le nombre de longitudes du disque.
    * \return l'identifiant (référence) de l'objet-géométrie généré.
    * \see gl4dgDraw pour le dessiner.
-   * \see gl4dgDraw pour le détruire.
+   * \see gl4dgDelete pour le détruire.
    */
   GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenDiskf(GLuint slices);
   /*!\brief Génère un objet-géométrie de type tore et renvoie son identifiant (référence).
@@ -135,7 +135,7 @@ extern "C" {
    * \param radius le rayon d'une section verticale du tore (eq. rayon du pneu).
    * \return l'identifiant (référence) de l'objet-géométrie généré.
    * \see gl4dgDraw pour le dessiner.
-   * \see gl4dgDraw pour le détruire.
+   * \see gl4dgDelete pour le détruire.
    * \see gl4dgSetGeometryOptimizationLevel
    */
   GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenTorusf(GLuint slices, GLuint stacks, GLfloat radius);
@@ -147,7 +147,7 @@ extern "C" {
    * \param height la hauteur de la grille.
    * \return l'identifiant (référence) de l'objet-géométrie généré.
    * \see gl4dgDraw pour le dessiner.
-   * \see gl4dgDraw pour le détruire.
+   * \see gl4dgDelete pour le détruire.
    * \see gl4dgSetGeometryOptimizationLevel
    */
   GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenGrid2df(GLuint width, GLuint height);
@@ -164,10 +164,20 @@ extern "C" {
    * afin d'obtenir une grille dont les y varient entre -1 et +1.
    * \return l'identifiant (référence) de l'objet-géométrie généré.
    * \see gl4dgDraw pour le dessiner.
-   * \see gl4dgDraw pour le détruire.
+   * \see gl4dgDelete pour le détruire.
    * \see gl4dgSetGeometryOptimizationLevel
    */
   GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenGrid2dFromHeightMapf(GLuint width, GLuint height, GLfloat * heightmap);
+  /*!\brief Génère un objet-géométrie de type théière et renvoie son identifiant (référence).
+   * 
+   * La théière est meshée à l'aide d'un triangle_strip.
+   *
+   * \param slices le nombre de longitudes de la théière.
+   * \return l'identifiant (référence) de l'objet-géométrie généré.
+   * \see gl4dgDraw pour le dessiner.
+   * \see gl4dgDelete pour le détruire.
+   */
+  GL4DAPI GLuint    GL4DAPIENTRY gl4dgGenTeapotf(GLuint slices);
   /*!\brief Dessine un objet-géométrie dont l'identifiant (référence)
    * est passé en argument.
    * 
