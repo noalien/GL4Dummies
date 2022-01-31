@@ -344,18 +344,12 @@ char * pathOf(const char * path) {
  *
  */
 char * filenameOf(const char * path) {
-  int spos = -1, l;
-  const char * ptr = path;
-  char * tmp;
-  while(*ptr) {
-    if(*ptr == '/')
-      spos = ptr - path;
-    ++ptr;
-  }
-  tmp = malloc((l = (int)strlen(&path[++spos]) + 1) * sizeof *tmp);
+  char * tmp = strrchr(path, '/');
+  if (*path == '\0' || tmp == NULL)
+  	return strdup(path);
+  tmp++;
   assert(tmp);
-  strncpy(tmp, &path[spos], l - 1); tmp[l - 1] = 0;
-  return tmp;
+  return strdup(tmp);
 }
 
 
