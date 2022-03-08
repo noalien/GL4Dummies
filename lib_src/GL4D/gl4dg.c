@@ -677,7 +677,7 @@ static GLfloat * mkSphereVerticesf(GLuint slices, GLuint stacks) {
       data[k++] = r * cos(phi);
       data[k++] = y;
       data[k++] = r * sin(phi);
-      data[k++] = phi / (2.0 * M_PI);
+      data[k++] = 1.0f - phi / (2.0 * M_PI);
       data[k++] = (theta + M_PI_2) / M_PI;
     }
   }
