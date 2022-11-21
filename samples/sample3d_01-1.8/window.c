@@ -118,7 +118,7 @@ static void initData(void) {
   /* a red-white texture used to draw a compass */
   GLuint northsouth[] = {(255 << 24) + 255, -1};
   /* a fractal texture generated usind a midpoint displacement algorithm */
-  GLfloat * hm = gl4dmTriangleEdge(257, 257, 0.4);
+  GLfloat * hm = gl4dmTriangleEdge(257, 257, 0.3);
   /* generates a quad using GL4Dummies */
   _plane = gl4dgGenQuadf();
   /* generates a sphere using GL4Dummies */
