@@ -8,7 +8,7 @@ out vec4 fragColor;
 
 void main(void) {
   const float SQRT2 = 1.442695, fog_density2 = 0.01;
-  const vec4 fog_color = vec4(0.5, 0.5, 0.5, 1.0);
+  const vec4 fog_color = vec4(0.2, 0.5, 0.5, 1.0);
   if(sky != 0) {
     float x = 0.02 + 0.96 * abs(2.0 * vsoTexCoord.x - 1);
     float y = clamp(2.0 * (1.0 - vsoTexCoord.y), 0, 1);
