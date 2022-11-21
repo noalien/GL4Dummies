@@ -55,7 +55,8 @@ static void draw(void) {
   gl4dpSetColor(RGB(255, 255, 255));
   gl4dpSetScreen(_screen);
   gl4dpClearScreen();
-  for(i = 0; i < ECHANTILLONS/*  - 1 */; i+=2) {
+
+  for(i = 0; i < ECHANTILLONS; i+=2) {
     int x0, y0;//, x1, y1;
     x0 = (i * (_wW - 1)) / (ECHANTILLONS - 1);
     y0 = _hauteurs[i];
@@ -66,7 +67,7 @@ static void draw(void) {
     //gl4dpLine(x0, y0, x1, y1);
   }
   gl4dpSetColor(RGB(255, 0, 0));
-  for(i = 1; i < ECHANTILLONS/*  - 1 */; i+=2) {
+  for(i = 1; i < ECHANTILLONS; i+=2) {
     int x0, y0;//, x1, y1;
     x0 = (i * (_wW - 1)) / (ECHANTILLONS - 1);
     y0 = _hauteurs[i];
