@@ -23,10 +23,18 @@ static void quitte(void) {
 /*!\brief fonction appelée à chaque draw par la gl4duwMainLoop.*/
 static void dessine(void) {
   /* sélection au hasard d'une intensité de rouge, de vert et de bleu */
-  GLubyte r = rand() % 256, g = rand() % 256, b = rand() % 256;
+  //GLubyte r = rand() % 256, g = rand() % 256, b = rand() % 256;
   /* effacement du screen en cours en utilisant une couleur au hasard */
-  gl4dpClearScreenWith(RGB(r, g, b));
+  //gl4dpClearScreenWith(RGB(r, g, b));
+  int x, y, w = gl4dpGetWidth(), h = gl4dpGetHeight();
+  GLuint * p = gl4dpGetPixels();
+  for(y = 0; y < h; ++y)
+    for(x = 0; x < w; ++x) {
+      GLubyte r = rand() % 256, g = rand() % 256, b = rand() % 256;
+      p[y * w + x] = RGB(r, g, b);
+    }
   /* mise à jour du screen côté OpenGL */
+  gl4dpScreenHasChanged();
   gl4dpUpdateScreen(NULL);
 }
 
@@ -36,7 +44,7 @@ int main(int argc, char ** argv) {
   /* tentative de création d'une fenêtre pour GL4Dummies */
   if(!gl4duwCreateWindow(argc, argv, /* args du programme */
 			 "GL4Dummies' Hello World", /* titre */
-			 10, 10, 320, 240, /* x,y, largeur, heuteur */
+			 10, 10, 1280, 960, /* x,y, largeur, heuteur */
 			 GL4DW_SHOWN) /* état visible */) {
     /* ici si échec de la création souvent lié à un problème d'absence
      * de contexte graphique ou d'impossibilité d'ouverture d'un
@@ -45,7 +53,7 @@ int main(int argc, char ** argv) {
   }
   /* création d'un screen GL4Dummies (texture dans laquelle nous
    * pouvons dessiner) aux dimensions de la fenêtre */
-  gl4dpInitScreen();
+  gl4dpInitScreenWithDimensions(320, 240);
   /* ajoute la fonction quitte à la pile des choses à faire en sortant
    * du programme */
   atexit(quitte);
