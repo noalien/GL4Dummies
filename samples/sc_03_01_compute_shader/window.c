@@ -7,6 +7,7 @@
 
 #include <GL4D/gl4du.h>
 #include <GL4D/gl4dg.h>
+#include <GL4D/gl4df.h>
 #include <GL4D/gl4duw_SDL2.h>
 #include <stdlib.h>
 #include <assert.h>
