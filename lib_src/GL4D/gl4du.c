@@ -351,8 +351,15 @@ void gl4duDeleteShader(GLuint id) {
  * Les arguments sont les noms des fichiers shaders précédés d'un tag
  * indiquant le type de shader : \<vs\> pour un vertex shader, \<tcs\>
  * pour un tessellation control shader, \<tes\> pour un tessellation
- * evaluation shader, \<gs\> pour un geometry shader et \<fs\> pour un
- * fragment shader.
+ * evaluation shader, \<gs\> pour un geometry shader, \<fs\> pour un
+ * fragment shader et \<cs\> pour un compute shader.
+ *
+ * Sur le même principe, au lieu d'avoir le tag suivi du nom de
+ * fichier shader correspondant, utiliser le tag ouvrant <im*> et
+ * fermant </im*> pour inclure directement le code du shader dans la
+ * chaîne en mémoire (im => in memory). Ce qui donne par exemple pour
+ * le vertex shader : "<imvs> ... le code du vertex shader
+ * ... </imvs>".
  *
  * \return l'identifiant openGL du program créé sinon 0. Dans ce
  * dernier cas les shaders créés (compilés) avant l'échec ne sont pas
@@ -403,7 +410,22 @@ GLuint gl4duCreateProgram(const char * firstone, ...) {
       attachShader(*prg, *findidInShadersList(sId));
     }
 #ifndef __ANDROID__
-    else if(!strncmp("<gs>", filename, 4)) { /* geometry shader */
+    else if(!strncmp("<cs>", filename, 4)) { /* compute shader */
+      fprintf(stderr, "%s : compute shader\n", &filename[4]);
+      if(!(sId = gl4duCreateShader(GL_COMPUTE_SHADER, &filename[4]))) goto gl4duCreateProgram_ERROR;
+      attachShader(*prg, *findidInShadersList(sId));
+    } else if(!strncmp("<imcs>", filename, 6)) { /* in memory compute shader */
+      fn[0] = 0;
+      snprintf(format, sizeof format, "<imcs>%%%d[^\t\n<>$!:;,=\"|]</imcs>", BUFSIZ - 1);
+      if(sscanf(filename, format, fn) != 1 || strncmp("</imcs>", &filename[6 + strlen(fn)], 7)) {
+	fprintf(stderr, "%s (%d): %s: erreur lors du parsing de %s\n",
+		__FILE__, __LINE__, __func__, filename);
+	continue;
+      }
+      fprintf(stderr, "%s : compute shader\n", fn);
+      if(!(sId = gl4duCreateShaderIM(GL_COMPUTE_SHADER, fn, &filename[13 + strlen(fn)]))) goto gl4duCreateProgram_ERROR;
+      attachShader(*prg, *findidInShadersList(sId));
+    } else if(!strncmp("<gs>", filename, 4)) { /* geometry shader */
       fprintf(stderr, "%s : geometry shader\n", &filename[4]);
       if(!(sId = gl4duCreateShader(GL_GEOMETRY_SHADER, &filename[4]))) goto gl4duCreateProgram_ERROR;
       attachShader(*prg, *findidInShadersList(sId));
@@ -475,8 +497,10 @@ GLuint gl4duCreateProgram(const char * firstone, ...) {
  * arguments variables ; ces arguments donnent les noms de fichiers
  * contenus dans l'archive cryptée \a endCata.  Ces noms de fichiers
  * shaders sont précédés d'un tag indiquant le type de shader : \<vs\>
- * pour un vertex shader et \<fs\> pour un fragment shader et \<gs\>
- * pour un geometry shader.
+ * pour un vertex shader, \<tcs\> pour un tessellation control shader,
+ * \<tes\> pour un tessellation evaluation shader, \<gs\> pour un
+ * geometry shader, \<fs\> pour un fragment shader et \<cs\> pour un
+ * compute shader.
  *
  * \return l'identifiant openGL du program créé sinon 0. Dans ce
  * dernier cas les shaders créés (compilés) avant l'échec ne sont pas
@@ -511,7 +535,11 @@ GLuint gl4duCreateProgramFED(const char * encData, const char * firstone, ...) {
       attachShader(*prg, *findidInShadersList(sId));
     }
 #ifndef __ANDROID__
-    else if(!strncmp("<gs>", filename, 4)) { /* geometry shader */
+    else if(!strncmp("<cs>", filename, 4)) { /* compute shader */
+      fprintf(stderr, "%s : compute shader\n", &filename[4]);
+      if(!(sId = gl4duCreateShaderFED(decData, GL_COMPUTE_SHADER, &filename[4]))) goto gl4duCreateProgram_ERROR;
+      attachShader(*prg, *findidInShadersList(sId));
+    } else if(!strncmp("<gs>", filename, 4)) { /* geometry shader */
       fprintf(stderr, "%s : geometry shader\n", &filename[4]);
       if(!(sId = gl4duCreateShaderFED(decData, GL_GEOMETRY_SHADER, &filename[4]))) goto gl4duCreateProgram_ERROR;
       attachShader(*prg, *findidInShadersList(sId));
