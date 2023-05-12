@@ -240,7 +240,7 @@ void draw(void) {
 
   
   a += 0.4f * M_PI * get_dt();
- 
+}
 
 void sortie(void) {
   if(_fbo) {
