@@ -5,8 +5,6 @@ in vec3 mnormal;
 in vec2 tcoord;
 out vec4 fragColor;
 
-uniform float zoom;
-
 /*
  * 2D, 3D and 4D Perlin noise, classic and simplex, in a GLSL fragment shader.
  *
@@ -558,7 +556,7 @@ float snoise(vec4 P) {
 void main(void) {
   float n = 0.0, A = 1.0, mf = 1.0;
   for(int i = 0; i < 5; ++i) {
-    n += A * noise(tcoord * zoom * mf);
+    n += A * noise(tcoord * mf);
     A = A / 2.0;
     mf = mf * 2.0;
   }

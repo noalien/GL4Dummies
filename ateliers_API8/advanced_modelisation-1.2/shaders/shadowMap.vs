@@ -10,6 +10,9 @@
 uniform mat4 model;
 uniform mat4 lightViewMatrix;
 uniform mat4 lightProjectionMatrix;
+
+uniform mat4 proj, view;
+
 layout (location = 0) in vec3 vsiPosition;
 layout (location = 1) in vec3 vsiNormal;
 layout (location = 2) in vec2 vsiTexCoord;

@@ -26,15 +26,16 @@ void main() {
 
   vec3 smpcoord = smcoord.xyz / smcoord.w;
   float ild = clamp(dot(N, -Ld), 0.0, 1.0);
-  if(texture(tex, smpcoord.xy).r  <  smpcoord.z)
-      ild = 0.0;
-
+  float z = texture(sm, smpcoord.xy).r;
+  if(z < smpcoord.z)
+    ild = 0.0;
+  
   vec3 R = reflect(Ld, N);
   R = normalize((transpose(inverse(view)) * vec4(R, 0.0)).xyz);
   float ils = pow(clamp(dot(R, -V), 0.0, 1.0), 10.0);
   vec4 tmp = ils * vec4(1.0, 1.0, 1.0, 1.0) + 0.15 * acouleur + 0.85 * ild * couleur;
   if(use_tex == 1)
-    fragColor = mix(tmp, texture(tex, tcoord), 0.4);
+    fragColor = mix(tmp, texture(tex, tcoord), 0.25);
   else
     fragColor = tmp;
 }
