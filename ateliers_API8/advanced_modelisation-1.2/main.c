@@ -7,7 +7,6 @@
 
 #define SHADOW_MAP_SIDE 1024
 
-
 static void init(void);
 /* TODO : gérer le retaillage de la fenêtre */
 /* static void resize(int width, int height); */
@@ -46,7 +45,8 @@ void init(void) {
   SDL_GL_SetSwapInterval(1);
   glEnable(GL_DEPTH_TEST);
   /* Attention on change la valeur par défaut et on active la CULL FACE */
-  //PB2 bien activer le cull face mais l'inverser pour SM
+  /* ATTENTION à bien activer le cull-face mais à l'inverser pour la
+     shadow map afin d'avoir l'ombre des faces internes */
   glEnable(GL_CULL_FACE);
   _coneId = gl4dgGenConef(3, GL_TRUE);
   _quadId = gl4dgGenQuadf();
@@ -143,13 +143,16 @@ void draw(void) {
   gl4duLoadIdentityf();
   gl4duLookAtf(lumpos[0], lumpos[1], lumpos[2], 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
   /* Attention le CULL FACE est sur les faces arrières */
-  //PB6
+  /* ATTENTION : donc ici il nous faut rendre la depth des faces
+     internes, pour cela on cull les faces FRONT */
   glCullFace(GL_FRONT);
 
 
   glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _smTex, 0);
-  //PB4 viewport adapté à la texture
+  /* ATTENTION : petit détail pouvant produire un résultat incomplet,
+     le viewport doit ici être adapté aux dimensions de la texture
+     dans laquelle la depth est stockée (peut être automatisée) */
   glViewport(0, 0, SHADOW_MAP_SIDE, SHADOW_MAP_SIDE);
   glClear(GL_DEPTH_BUFFER_BIT);
   glUseProgram(_pId[2]);
@@ -168,11 +171,13 @@ void draw(void) {
   gl4dgDraw(_quadId);
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  //PB7
+  /* ATTENTION : maintenant qu'on est revenu à l'écran pour le rendu
+     final, remettre le cull-face sur les faces arrières */
   glCullFace(GL_BACK);
   glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
-  //PB5 viewport adapté à la texture puis la fenêtre
+  /* ATTENTION : maintenant qu'on est revenu à l'écran, le viewport
+     doit être adapté aux dimensions de la fenêtre */
   glViewport(0, 0, _wW, _wH);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glUseProgram(_pId[0]);
@@ -208,9 +213,11 @@ void draw(void) {
   gl4duSendMatrices();
   glUniform4fv(glGetUniformLocation(_pId[0], "couleur") , 1, rouge);
 
-  //PB de rapidité
-  //Pour le même shader, avoir placé sm en 1 puis en 2
-  //ça l'a ralenti drastiquement !!!
+  /* ATTENTION : PB de rapidité qu'on a eu (c'est une découverte pour
+     moi), il semble que pour le même shader, avoir placé le sampler2D
+     sm en étage de texture 1 puis en 2, a ralenti drastiquement le
+     shader !!! J'ai cherché loooooongtemps avant de trouver l'origine
+     de ce problème. */
   glActiveTexture(GL_TEXTURE0 + 2);
   glBindTexture(GL_TEXTURE_2D, _texId[2]);
   glActiveTexture(GL_TEXTURE0);
@@ -223,7 +230,9 @@ void draw(void) {
   glBindTexture(GL_TEXTURE_2D, 0);
 
 
-  /* Attention le CULL FACE est sur les faces avant */
+  /* ATTENTION : enfin, le CULL FACE est sur les faces avant ici car
+     on est dans la sphère englobante (rien à voir avec la
+     shadowmap) */
   glCullFace(GL_FRONT);
   /* sphere */
   glUseProgram(_pId[1]);
