@@ -133,6 +133,21 @@ void gl4dhUpdateWithAudio(void) {
   drawOrUpdateWithAudio(_animations, GL4DH_UPDATE_WITH_AUDIO);
 }
 
+/*!\brief met à jour la largeur et la hauteur de la texture dans laquelle sont
+ * réalisées les animations.
+ */
+void gl4dhResize(int w, int h) {
+  _w = w; _h = h;
+
+  glBindTexture(GL_TEXTURE_2D, _wTexId);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+  glBindTexture(GL_TEXTURE_2D, _wdTexId);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, w, h, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+  
+  glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 /*!\brief regarde si le pointeur \a func est un élément du tableau
  * \a funcList 
  * \param func un élément dont il faut tester la présence.
