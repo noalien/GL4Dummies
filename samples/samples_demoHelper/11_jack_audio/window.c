@@ -1,9 +1,10 @@
 /*!\file window.c
  *
- * \brief Utilisation SDL2_Mixer et fftw pour l'affichage des
+ * \brief Utilisation jack et fftw pour l'affichage des
  * fréquences du son.
  * \author Farès BELHADJ, amsi@ai.univ-paris8.fr
- * \date May 13 2017
+ * \author ObaniGemini/ObaniGarage, obani@pi-et-ro.net
+ * \date June 01 2023
  */
 
 #include <math.h>
