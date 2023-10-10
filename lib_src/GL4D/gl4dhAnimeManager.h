@@ -37,6 +37,7 @@ extern "C" {
   GL4DAPI Uint32 GL4DAPIENTRY gl4dhGetTicks(void);
   GL4DAPI void   GL4DAPIENTRY gl4dhDraw(void);
   GL4DAPI void   GL4DAPIENTRY gl4dhUpdateWithAudio(void);
+  GL4DAPI void   GL4DAPIENTRY gl4dhResize(int w, int h);
 
 #ifdef __cplusplus
 }
