@@ -130,7 +130,7 @@ static int  _hasInit = 0;
 
 static void findPathOfMe(const char * argv0) {
   char buf[BUFSIZ] = {0};
-  ssize_t len = 0;
+  size_t len = 0;
 #if defined(_WIN32)
   /* tous les compilateurs sous windows ? */
   if(GetModuleFileNameA(NULL, buf, sizeof buf - 1) == 0)
