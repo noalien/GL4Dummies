@@ -70,7 +70,7 @@ dnl MACOS X
 dnl FREEBSD
 *-*-freebsd*)
         CPPFLAGS="$CPPFLAGS -I/usr/local/include"
-        LDFLAGS="-L/usr/local/lib $LDFLAGS -lGL -lGLU"
+        LDFLAGS="-L/usr/local/lib $LDFLAGS -lGL"
 ;;
 dnl CYGWIN
 *-*-cygwin*)
@@ -90,7 +90,7 @@ i386-pc-mingw32msvc)
 ;;
 dnl OTHER SYSTEMS
 *)
-        LDFLAGS="$LDFLAGS -lGL -lGLU"
+        LDFLAGS="$LDFLAGS -lGL"
 ;;
 esac
 
