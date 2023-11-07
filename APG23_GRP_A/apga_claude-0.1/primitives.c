@@ -4,7 +4,7 @@
 #include <assert.h>
 
 
-static inline void _hline(int x0, int x1, int y);
+static inline void _hline(vertex_t * p0, vertex_t * p1);
 static inline void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace);
 
 void fill_triangle(triangle_t * t) {
@@ -72,14 +72,16 @@ void fill_triangle(triangle_t * t) {
   int h = get_height();
   for(i = 0; i < n; ++i) {
     if( aG[i].y >= 0 && aG[i].y < h )
-      _hline(aG[i].x, aD[i].x, aD[i].y ); /* modifier celle vue la semaine dernière */
+      _hline(&aG[i], &aD[i]);
   }
   free(aG);
   free(aD);  
 }
 
 void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace) {
+  int dx, dy;
   int u = p1->x - p0->x, v = p1->y - p0->y, pasX = u < 0 ? -1 : 1, pasY = v < 0 ? -1 : 1;
+  float d = sqrt(u * u + v * v), w = 0.0f, cw = 1.0f;
   u = abs(u); v = abs(v);
   if(u > v) { // 1er octan
     if(replace) {
@@ -88,6 +90,13 @@ void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace) {
       for (int x = 0, y = 0, k = 0; x != objX; x += pasX) {
 	absc[k].x = x + p0->x;
 	absc[k].y = y + p0->y;
+	dx = absc[k].x - p0->x;
+	dy = absc[k].y - p0->y;
+	w = sqrt(dx * dx + dy * dy) / d;
+	cw = 1.0f - w;
+	absc[k].r = w * p1->r + cw * p0->r;
+	absc[k].g = w * p1->g + cw * p0->g;
+	absc[k].b = w * p1->b + cw * p0->b;
 	if(delta < 0) {
 	  ++k;
 	  y += pasY;
@@ -102,6 +111,13 @@ void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace) {
 	if(!done) {
 	  absc[k].x = x + p0->x;
 	  absc[k].y = y + p0->y;
+	  dx = absc[k].x - p0->x;
+	  dy = absc[k].y - p0->y;
+	  w = sqrt(dx * dx + dy * dy) / d;
+	  cw = 1.0f - w;
+	  absc[k].r = w * p1->r + cw * p0->r;
+	  absc[k].g = w * p1->g + cw * p0->g;
+	  absc[k].b = w * p1->b + cw * p0->b;
 	  done = 1;
 	}
 	if(delta < 0) {
@@ -119,6 +135,13 @@ void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace) {
     for (int x = 0, y = 0, k = 0; y != objY; y += pasY) {
       absc[k].x = x + p0->x;
       absc[k].y = y + p0->y;
+      dx = absc[k].x - p0->x;
+      dy = absc[k].y - p0->y;
+      w = sqrt(dx * dx + dy * dy) / d;
+      cw = 1.0f - w;
+      absc[k].r = w * p1->r + cw * p0->r;
+      absc[k].g = w * p1->g + cw * p0->g;
+      absc[k].b = w * p1->b + cw * p0->b;
       ++k;
       if(delta < 0) {
 	x += pasX;
@@ -129,10 +152,9 @@ void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace) {
   }
 }
 
-/* droite horizontale ATTENTION x0 <= x1 */
-static inline void _hline(int x0, int x1, int y) {
-  
-
+/* droite horizontale ATTENTION p0->x <= p1->x */
+void _hline(vertex_t * p0, vertex_t * p1) {
+  int x0 = p0->x, x1 = p1->x, y = p0->y; /* y = p1->y est possible aussi */
   int w = get_width(), h = get_height();
   if(y < 0 || y >= h) /* pas besoin de dessiner */
     return;
@@ -141,8 +163,16 @@ static inline void _hline(int x0, int x1, int y) {
   x1 = x1 >= w ? w - 1 : x1;
   if(x0 >= w || x1 < 0) /* pas besoin de dessiner */
     return;
+  float d = p1->x - p0->x;
+  float ww = 0.0f, cww = 1.0f;
   GLuint * p = get_pixels();
   /* voir si mieux avec une sorte de memset */
-  for(int x = x0, yw = y * w; x <= x1; ++x)
-    p[yw + x] = -1; //blanc
+  for(int x = x0, yw = y * w; x <= x1; ++x) {
+    GLubyte r, g, b;
+    ww = (x - x0) / d; cww = 1.0f - ww;
+    r = (ww * p1->r + cww * p0->r) * 255.999f;
+    g = (ww * p1->g + cww * p0->g) * 255.999f;
+    b = (ww * p1->b + cww * p0->b) * 255.999f;
+    p[yw + x] = rgb(r, g, b);
+  }  
 }

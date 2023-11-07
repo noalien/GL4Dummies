@@ -8,7 +8,7 @@
 #include "primitives.h"
 
 static void dis(void) {
-  triangle_t t = { { {0, 0}, {300, 100}, {10, 230}  } };
+  triangle_t t = { { {0, 0, 1.0f, 0.0f, 0.0f}, {300, 100, 0.0f, 1.0f, 0.0f}, {10, 230, 0.0f, 0.0f, 1.0f}  } };
   GLuint * p = get_pixels();
   /* on remplit le 1/5 de l'écran de rouge */
   for(int i = 0; i < get_width() * get_height() / 5; ++i)
