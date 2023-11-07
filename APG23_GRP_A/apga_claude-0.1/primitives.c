@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
+static GLuint * _texels = NULL;
+static int _tw = 0, _th = 0;
 
 static inline void _hline(vertex_t * p0, vertex_t * p1);
 static inline void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace);
@@ -78,6 +80,22 @@ void fill_triangle(triangle_t * t) {
   free(aD);  
 }
 
+void apply_texture(const char * file) {
+  SDL_Surface * s = SDL_LoadBMP(file);
+  assert(s);
+  assert(s->format->BytesPerPixel == 4);
+  if(_texels)
+    free(_texels);
+  _tw = s->w;
+  _th = s->h;
+  _texels = malloc(_tw * _th * sizeof *_texels);
+  assert(_texels);
+  memcpy(_texels, s->pixels, _tw * _th * sizeof *_texels);
+  SDL_FreeSurface(s);
+}
+
+
+
 void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace) {
   int dx, dy;
   int u = p1->x - p0->x, v = p1->y - p0->y, pasX = u < 0 ? -1 : 1, pasY = v < 0 ? -1 : 1;
@@ -97,6 +115,8 @@ void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace) {
 	absc[k].r = w * p1->r + cw * p0->r;
 	absc[k].g = w * p1->g + cw * p0->g;
 	absc[k].b = w * p1->b + cw * p0->b;
+	absc[k].s = w * p1->s + cw * p0->s;
+	absc[k].t = w * p1->t + cw * p0->t;
 	if(delta < 0) {
 	  ++k;
 	  y += pasY;
@@ -118,6 +138,8 @@ void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace) {
 	  absc[k].r = w * p1->r + cw * p0->r;
 	  absc[k].g = w * p1->g + cw * p0->g;
 	  absc[k].b = w * p1->b + cw * p0->b;
+	  absc[k].s = w * p1->s + cw * p0->s;
+	  absc[k].t = w * p1->t + cw * p0->t;
 	  done = 1;
 	}
 	if(delta < 0) {
@@ -142,6 +164,8 @@ void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace) {
       absc[k].r = w * p1->r + cw * p0->r;
       absc[k].g = w * p1->g + cw * p0->g;
       absc[k].b = w * p1->b + cw * p0->b;
+      absc[k].s = w * p1->s + cw * p0->s;
+      absc[k].t = w * p1->t + cw * p0->t;
       ++k;
       if(delta < 0) {
 	x += pasX;
@@ -169,10 +193,15 @@ void _hline(vertex_t * p0, vertex_t * p1) {
   /* voir si mieux avec une sorte de memset */
   for(int x = x0, yw = y * w; x <= x1; ++x) {
     GLubyte r, g, b;
+    int s, t;
     ww = (x - x0) / d; cww = 1.0f - ww;
     r = (ww * p1->r + cww * p0->r) * 255.999f;
     g = (ww * p1->g + cww * p0->g) * 255.999f;
     b = (ww * p1->b + cww * p0->b) * 255.999f;
-    p[yw + x] = rgb(r, g, b);
+    s = (ww * p1->s + cww * p0->s) * (_tw - 0.001f);
+    t = (ww * p1->t + cww * p0->t) * (_th - 0.001f);
+    if(s < 0) s = 0; if(s > _tw - 1) s = _tw - 1;
+    if(t < 0) t = 0; if(t > _th - 1) t = _th - 1;
+    p[yw + x] = _texels[t * _tw + s];//rgb(r, g, b);
   }  
 }
