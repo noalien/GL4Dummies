@@ -43,6 +43,8 @@
 #  define A_MASK 0xff000000
 #endif
 
+#define EL_EPSILON 0.00001f
+
 #ifdef __cplusplus
 extern "C" {
 #endif

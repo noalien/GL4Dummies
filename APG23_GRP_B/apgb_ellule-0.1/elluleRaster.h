@@ -14,6 +14,7 @@ extern "C" {
   struct vertex_t {
     int x, y; /* coordonnée dans l’espace écran */
     float r, g, b, a;
+    float s, t;
   };
   
   /*!\brief le triangle */
@@ -22,6 +23,7 @@ extern "C" {
   };
 
   extern void elFillTriangle(triangle_t * t);
+  extern void elUseTexture(const char * filename);
 
 #ifdef __cplusplus
 }

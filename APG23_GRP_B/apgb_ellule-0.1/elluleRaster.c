@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
+static int _tw = 0, _th = 0;
+static uint32_t * _texels = NULL;
 
 static inline void _hline(vertex_t * aG, vertex_t * aD);
 static inline void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace);
@@ -77,6 +79,25 @@ void elFillTriangle(triangle_t * t) {
   free(aD);  
 }
 
+void elUseTexture(const char * filename) {
+  SDL_Surface * s = SDL_LoadBMP(filename);
+  if(s == NULL) {
+    if(_texels != NULL) {
+      free(_texels);
+      _texels = NULL;
+    }
+    return;
+  }
+  assert(s->format->BytesPerPixel == 4);
+  _tw = s->w;
+  _th = s->h;
+  _texels = malloc(_tw * _th * sizeof *_texels);
+  assert(_texels);
+  memcpy(_texels, s->pixels, _tw * _th * sizeof *_texels);
+  SDL_FreeSurface(s);
+}
+
+
 void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace) {
   int u = p1->x - p0->x, v = p1->y - p0->y, pasX = u < 0 ? -1 : 1, pasY = v < 0 ? -1 : 1;
   u = abs(u); v = abs(v);
@@ -93,6 +114,8 @@ void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace) {
 	absc[k].g = (1.0f - pp1) * p0->g + pp1 * p1->g;
 	absc[k].b = (1.0f - pp1) * p0->b + pp1 * p1->b;
 	absc[k].a = (1.0f - pp1) * p0->a + pp1 * p1->a;
+	absc[k].s = (1.0f - pp1) * p0->s + pp1 * p1->s;
+	absc[k].t = (1.0f - pp1) * p0->t + pp1 * p1->t;
 	if(delta < 0) {
 	  ++k;
 	  y += pasY;
@@ -112,6 +135,8 @@ void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace) {
 	  absc[k].g = (1.0f - pp1) * p0->g + pp1 * p1->g;
 	  absc[k].b = (1.0f - pp1) * p0->b + pp1 * p1->b;
 	  absc[k].a = (1.0f - pp1) * p0->a + pp1 * p1->a;
+	  absc[k].s = (1.0f - pp1) * p0->s + pp1 * p1->s;
+	  absc[k].t = (1.0f - pp1) * p0->t + pp1 * p1->t;
 	  done = 1;
 	}
 	if(delta < 0) {
@@ -134,6 +159,8 @@ void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace) {
       absc[k].g = (1.0f - pp1) * p0->g + pp1 * p1->g;
       absc[k].b = (1.0f - pp1) * p0->b + pp1 * p1->b;
       absc[k].a = (1.0f - pp1) * p0->a + pp1 * p1->a;
+      absc[k].s = (1.0f - pp1) * p0->s + pp1 * p1->s;
+      absc[k].t = (1.0f - pp1) * p0->t + pp1 * p1->t;
       ++k;
       if(delta < 0) {
 	x += pasX;
@@ -161,12 +188,17 @@ void _hline(vertex_t * aG, vertex_t * aD) {
   /* voir si mieux avec une sorte de memset */
   for(int x = x0, yw = y * w; x <= x1; ++x) {
     uint8_t r, g, b, a;
+    int s, t;
     dx = x - x0;
     paD = dx / d;
-    r = (uint8_t)(((1.0f - paD) * aG->r + paD * aD->r) * 255.9999f);
-    g = (uint8_t)(((1.0f - paD) * aG->g + paD * aD->g) * 255.9999f);
-    b = (uint8_t)(((1.0f - paD) * aG->b + paD * aD->b) * 255.9999f);
-    a = (uint8_t)(((1.0f - paD) * aG->a + paD * aD->a) * 255.9999f);
-    p[yw + x] = _rgba(r, g, b, a);
+    r = (uint8_t)(((1.0f - paD) * aG->r + paD * aD->r) * (256.0f - EL_EPSILON));
+    g = (uint8_t)(((1.0f - paD) * aG->g + paD * aD->g) * (256.0f - EL_EPSILON));
+    b = (uint8_t)(((1.0f - paD) * aG->b + paD * aD->b) * (256.0f - EL_EPSILON));
+    a = (uint8_t)(((1.0f - paD) * aG->a + paD * aD->a) * (256.0f - EL_EPSILON));
+    s = (uint8_t)(((1.0f - paD) * aG->s + paD * aD->s) * (_tw - EL_EPSILON));
+    t = (uint8_t)(((1.0f - paD) * aG->t + paD * aD->t) * (_th - EL_EPSILON));
+    s = s % _tw; while(s < 0) s += _tw;
+    t = t % _th; while(t < 0) t += _th;
+    p[yw + x] = _texels[t * _tw + s];//_rgba(r, g, b, a);
   }
 }
