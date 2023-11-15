@@ -13,6 +13,7 @@ extern "C" {
   /*!\brief le sommet et l'ensemble de ses attributs */
   struct vertex_t {
     int x, y; /* coordonnée dans l’espace écran */
+    float r, g, b, a;
   };
   
   /*!\brief le triangle */

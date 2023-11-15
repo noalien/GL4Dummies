@@ -7,7 +7,7 @@
 #include "elluleRaster.h"
 
 static void dis(void) {
-  triangle_t t = { { {10, 10}, {300, 100}, {30, 230}  } };
+  triangle_t t = { { {10, 10, 1.0f, 0.0f, 0.0f, 1.0f}, {700, 100, 0.0f, 1.0f, 0.0f, 1.0f}, {30, 530, 0.0f, 0.0f, 1.0f, 1.0f}  } };
   elFillTriangle(&t);
   elUpdate();
 }
@@ -15,7 +15,7 @@ static void dis(void) {
 int main(int argc, char ** argv) {
   if(!elInit(argc, argv, /* args du programme */
 	     "Ellule' Hello World", /* titre */
-	     320, 240, 320, 240) /* largeur_f, hauteur_f, largeur_e, hauteur_e */) {
+	     800, 600, 800, 600) /* largeur_f, hauteur_f, largeur_e, hauteur_e */) {
     /* ici si échec de la création souvent lié à un problème d'absence
      * de contexte graphique ou d'impossibilité d'ouverture d'un
      * contexte OpenGL (au moins 3.2) */
