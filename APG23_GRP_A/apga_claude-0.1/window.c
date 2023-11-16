@@ -1,16 +1,14 @@
 /*!\file window.c
- * \brief 
- * \author 
- * \date 
+ * \brief test de la lib claude
+ * \author Farès Belhadj et le groupe A de L2 (23/24)
+ * \date octobre-novembre 2023
  */
 
 #include "claude.h"
 #include "primitives.h"
 
 static void dis(void) {
-  //triangle_t t = { { {0, 0, 1.0f, 0.0f, 0.0f}, {300, 100, 0.0f, 1.0f, 0.0f}, {10, 230, 0.0f, 0.0f, 1.0f}  } };
   triangle_t t = { { {0, 0, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f}, {900, 300, 0.6f, 1.0f, 0.6f, 1.0f, 0.0f}, {10, 700, 0.6f, 0.6f, 1.0f, 0.0f, 1.0f}  } };
-  GLuint * p = get_pixels();
   /* on dessine un triangle dessus */
   fill_triangle(&t);
   update_screen();  

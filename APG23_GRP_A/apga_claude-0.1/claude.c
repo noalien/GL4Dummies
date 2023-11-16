@@ -1,12 +1,12 @@
 #include "claude.h"
 
-static GLuint _width = 0, _height = 0;
-static GLuint * _pixels = NULL;
+static uint32_t _width = 0, _height = 0;
+static uint32_t * _pixels = NULL;
 
 /* ** interne ** */
-static GLuint _id = 0;
-static GLuint _pId = 0;
-static GLuint _quadId = 0;
+static uint32_t _id = 0;
+static uint32_t _pId = 0;
+static uint32_t _quadId = 0;
 /******************/
 
 
@@ -57,12 +57,12 @@ int claude_init(int argc, char ** argv, const char * title, int ww, int wh, int 
 }
 
 /*!\brief retourne la largeur de l'écran. */
-GLuint get_width(void) {
+uint32_t get_width(void) {
   return _width;
 }
 
 /*!\brief retourne la largeur de l'écran. */
-GLuint get_height(void) {
+uint32_t get_height(void) {
   return _height;
 }
 
@@ -72,7 +72,7 @@ void clear_screen(void) {
 }
 
 /*!\brief retourne le pointeur vers les pixels de l'écran courant. */
-GLuint * get_pixels(void) {
+uint32_t * get_pixels(void) {
   return _pixels;
 }
 

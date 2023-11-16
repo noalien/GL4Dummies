@@ -1,3 +1,15 @@
+/*!\file claude.h
+ * \brief bibliothèque de rastérisation développée par le groupe A du
+ * cours de L2 "Algo pour la programmation graphique" (licence
+ * informatique, Univ. Paris 8) en collaboration avec l'enseignant
+ * (Farès Belhadj).
+ * \date d'octobre à fin novembre 2023
+ */
+
+#ifndef CLAUDE_H
+#define CLAUDE_H
+
+#include <stdint.h>
 #include <GL4D/gl4duw_SDL2.h>
 #include <GL4D/gl4du.h>
 
@@ -37,17 +49,45 @@
 #  define A_MASK 0xff000000
 #endif
 
-static inline GLuint rgba(GLubyte r, GLubyte g, GLubyte b, GLubyte a) {
-  return (((GLuint)r) << R_SHIFT | ((GLuint)g) << G_SHIFT |  ((GLuint)b) << B_SHIFT | ((GLuint)a) << A_SHIFT );
-}
+#define CL_EPSILON 0.00001f
 
-static inline GLuint rgb(GLubyte r, GLubyte g, GLubyte b) {
-  return rgba(r, g, b,255);
-}
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-extern int claude_init(int argc, char ** argv, const char * title, int ww, int wh, int width, int height);
-extern GLuint get_width(void);
-extern GLuint get_height(void);
-extern void clear_screen(void);
-extern GLuint * get_pixels(void);
-extern void update_screen(void);
+  static inline uint32_t rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    return (((uint32_t)r) << R_SHIFT | ((uint32_t)g) << G_SHIFT |  ((uint32_t)b) << B_SHIFT | ((uint32_t)a) << A_SHIFT );
+  }
+  
+  static inline uint32_t rgb(uint8_t r, uint8_t g, uint8_t b) {
+    return rgba(r, g, b,255);
+  }
+  
+  static inline uint8_t extract_comp(uint32_t coul, int shift) {
+    return (uint8_t)((((uint32_t)(coul)) >> (shift)) & 0xFF);
+  }
+
+  static inline uint8_t red(uint32_t coul) {
+    return extract_comp(coul, R_SHIFT);
+  }
+  
+  static inline uint8_t green(uint32_t coul) {
+    return extract_comp(coul, G_SHIFT);
+  }
+  
+  static inline uint8_t blue(uint32_t coul) {
+    return extract_comp(coul, B_SHIFT);
+  }
+  
+  extern int        claude_init(int argc, char ** argv, const char * title, int ww, int wh, int width, int height);
+  extern uint32_t   get_width(void);
+  extern uint32_t   get_height(void);
+  extern void       clear_screen(void);
+  extern uint32_t * get_pixels(void);
+  extern void       update_screen(void);
+
+#ifdef __cplusplus
+}
+#endif
+  
+#endif /* du #ifndef CLAUDE_H */

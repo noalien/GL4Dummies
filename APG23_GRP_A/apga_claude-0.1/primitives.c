@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-static GLuint * _texels = NULL;
+static uint32_t * _texels = NULL;
 static int _tw = 0, _th = 0;
 
 static inline void _hline(vertex_t * p0, vertex_t * p1);
@@ -80,18 +80,33 @@ void fill_triangle(triangle_t * t) {
   free(aD);  
 }
 
+/* pour libérer la texture dans _texels */
+static void _quit(void) {
+  if(_texels) {
+    free(_texels);
+    _texels = NULL;
+  }
+}
+
 void apply_texture(const char * file) {
   SDL_Surface * s = SDL_LoadBMP(file);
   assert(s);
-  assert(s->format->BytesPerPixel == 4);
+  /* assert(s->format->BytesPerPixel == 4);
+     plus besoin, on convertit la surface au
+     format souhaité */
+  SDL_Surface * d = SDL_CreateRGBSurface(0, s->w, s->h, 32, R_MASK, G_MASK, B_MASK, A_MASK);
+  SDL_BlitSurface(s, NULL, d, NULL);
+  SDL_FreeSurface(s);
+  _tw = d->w;
+  _th = d->h;
   if(_texels)
     free(_texels);
-  _tw = s->w;
-  _th = s->h;
+  else
+    atexit(_quit);
   _texels = malloc(_tw * _th * sizeof *_texels);
   assert(_texels);
-  memcpy(_texels, s->pixels, _tw * _th * sizeof *_texels);
-  SDL_FreeSurface(s);
+  memcpy(_texels, d->pixels, _tw * _th * sizeof *_texels);
+  SDL_FreeSurface(d);
 }
 
 
@@ -189,19 +204,26 @@ void _hline(vertex_t * p0, vertex_t * p1) {
     return;
   float d = p1->x - p0->x;
   float ww = 0.0f, cww = 1.0f;
-  GLuint * p = get_pixels();
+  uint32_t * p = get_pixels();
   /* voir si mieux avec une sorte de memset */
   for(int x = x0, yw = y * w; x <= x1; ++x) {
-    GLubyte r, g, b;
+    uint8_t r, g, b;
     int s, t;
+    uint32_t tex;
     ww = (x - x0) / d; cww = 1.0f - ww;
-    r = (ww * p1->r + cww * p0->r) * 255.999f;
-    g = (ww * p1->g + cww * p0->g) * 255.999f;
-    b = (ww * p1->b + cww * p0->b) * 255.999f;
-    s = (ww * p1->s + cww * p0->s) * (_tw - 0.001f);
-    t = (ww * p1->t + cww * p0->t) * (_th - 0.001f);
+    r = (ww * p1->r + cww * p0->r) * (256.0f - CL_EPSILON);
+    g = (ww * p1->g + cww * p0->g) * (256.0f - CL_EPSILON);
+    b = (ww * p1->b + cww * p0->b) * (256.0f - CL_EPSILON);
+    s = (ww * p1->s + cww * p0->s) * (_tw - CL_EPSILON);
+    t = (ww * p1->t + cww * p0->t) * (_th - CL_EPSILON);
+    /* on fait un clamp */
     if(s < 0) s = 0; if(s > _tw - 1) s = _tw - 1;
     if(t < 0) t = 0; if(t > _th - 1) t = _th - 1;
-    p[yw + x] = _texels[t * _tw + s];//rgb(r, g, b);
+    tex = _texels[t * _tw + s];
+    /* on fait le choix de la multiplication */
+    r *= red(tex)   / 255.0f;
+    g *= green(tex) / 255.0f;
+    b *= blue(tex)  / 255.0f;
+    p[yw + x] = rgb(r, g, b);
   }  
 }
