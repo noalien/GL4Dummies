@@ -6,7 +6,7 @@
 
 * version 0.2
   - TODO : créer une structure surface_t à n triangles.
-  - TODO : ajouter/modifier le sommet : coordonnée 4D (x, y, z, w) ; couleur r, g, b, a ; texture s, t ; vecteur normal nx, ny, nz.
+  - TODO : ajouter/modifier le sommet : coordonnée 4D (x, y, z, w) ; couleur r, g, b, a ; texture s, t ; vecteur normal nx, ny, nz et enfin les coordonnées écran xe, ye (la depth ? le depth-buffer ? dans la v0.2.1 ?).
   - TODO : un fichier (.h ?) contenant les opérations sur les matrices et vecteurs
   - TODO : un transformations.c avec
     -	 -> claude_apply_transforms(M, V, P, s, s’) -> void avec s’ transformation de s (clipping non compris)

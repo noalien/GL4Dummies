@@ -11,10 +11,10 @@ static inline void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int
 
 void fill_triangle(triangle_t * t) {
   int bas, median, haut, i;
-  if(t->v[0].y < t->v[1].y) {
-    if(t->v[0].y < t->v[2].y) {
+  if(t->v[0].ye < t->v[1].ye) {
+    if(t->v[0].ye < t->v[2].ye) {
       bas = 0;
-      if(t->v[1].y < t->v[2].y) {
+      if(t->v[1].ye < t->v[2].ye) {
 	median = 1;
 	haut = 2;
       } else {
@@ -27,9 +27,9 @@ void fill_triangle(triangle_t * t) {
       haut = 1;
     }
   } else { /* p0 au dessus de p1 */
-    if(t->v[1].y < t->v[2].y) {
+    if(t->v[1].ye < t->v[2].ye) {
       bas = 1;
-      if(t->v[0].y < t->v[2].y) {
+      if(t->v[0].ye < t->v[2].ye) {
 	median = 0;
 	haut = 2;
       } else {
@@ -42,7 +42,7 @@ void fill_triangle(triangle_t * t) {
       haut = 0;
     }
   }
-  int signe, n = t->v[haut].y - t->v[bas].y + 1;
+  int signe, n = t->v[haut].ye - t->v[bas].ye + 1;
   vertex_t * aG = malloc(n * sizeof *aG);
   assert(aG);
   vertex_t * aD = malloc(n * sizeof *aD);
@@ -50,30 +50,30 @@ void fill_triangle(triangle_t * t) {
 
   /* est-ce que Pm est à gauche (+) ou à droite (-) de la droite (Pb->Ph) ? */
   /* idée TODO?, un produit vectoriel pourrait s'avérer mieux */
-  if(t->v[haut].x == t->v[bas].x || t->v[haut].y == t->v[bas].y) {
-    /* eq de la droite x = t->v[haut].x; ou y = t->v[haut].y; */
-    signe = (t->v[median].x > t->v[haut].x) ? -1 : 1;
+  if(t->v[haut].xe == t->v[bas].xe || t->v[haut].ye == t->v[bas].ye) {
+    /* eq de la droite x = t->v[haut].xe; ou y = t->v[haut].ye; */
+    signe = (t->v[median].xe > t->v[haut].xe) ? -1 : 1;
   } else {
     /* eq ax + y + c = 0 */
     float a, c, x;
-    a = (t->v[haut].y - t->v[bas].y) / (float)(t->v[bas].x - t->v[haut].x);
-    c = -a * t->v[haut].x - t->v[haut].y;
+    a = (t->v[haut].ye - t->v[bas].ye) / (float)(t->v[bas].xe - t->v[haut].xe);
+    c = -a * t->v[haut].xe - t->v[haut].ye;
     /* on cherche le x sur la DROITE au même y que le median et on compare */
-    x = -(c + t->v[median].y) / a;
-    signe = (t->v[median].x >= x) ? -1 : 1;
+    x = -(c + t->v[median].ye) / a;
+    signe = (t->v[median].xe >= x) ? -1 : 1;
   }
   if(signe < 0) { /* aG reçoit Ph->Pb, et aD reçoit Ph->Pm puis Pm vers Pb */
     _abscisses(&(t->v[haut]), &(t->v[bas]), aG, 1);
     _abscisses(&(t->v[haut]), &(t->v[median]), aD, 1);
-    _abscisses(&(t->v[median]), &(t->v[bas]), &aD[t->v[haut].y - t->v[median].y], 0);
+    _abscisses(&(t->v[median]), &(t->v[bas]), &aD[t->v[haut].ye - t->v[median].ye], 0);
   } else { /* aG reçoit Ph->Pm puis Pm vers Pb, et aD reçoit Ph->Pb */
     _abscisses(&(t->v[haut]), &(t->v[bas]), aD, 1);
     _abscisses(&(t->v[haut]), &(t->v[median]), aG, 1);
-    _abscisses(&(t->v[median]), &(t->v[bas]), &aG[t->v[haut].y - t->v[median].y], 0);
+    _abscisses(&(t->v[median]), &(t->v[bas]), &aG[t->v[haut].ye - t->v[median].ye], 0);
   }
   int h = get_height();
   for(i = 0; i < n; ++i) {
-    if( aG[i].y >= 0 && aG[i].y < h )
+    if( aG[i].ye >= 0 && aG[i].ye < h )
       _hline(&aG[i], &aD[i]);
   }
   free(aG);
@@ -113,7 +113,7 @@ void apply_texture(const char * file) {
 
 void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace) {
   int dx, dy;
-  int u = p1->x - p0->x, v = p1->y - p0->y, pasX = u < 0 ? -1 : 1, pasY = v < 0 ? -1 : 1;
+  int u = p1->xe - p0->xe, v = p1->ye - p0->ye, pasX = u < 0 ? -1 : 1, pasY = v < 0 ? -1 : 1;
   float d = sqrt(u * u + v * v), w = 0.0f, cw = 1.0f;
   u = abs(u); v = abs(v);
   if(u > v) { // 1er octan
@@ -121,10 +121,10 @@ void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace) {
       int objX = (u + 1) * pasX;
       int delta = u - 2 * v, incH = -2 * v, incO = 2 * u - 2 * v;
       for (int x = 0, y = 0, k = 0; x != objX; x += pasX) {
-	absc[k].x = x + p0->x;
-	absc[k].y = y + p0->y;
-	dx = absc[k].x - p0->x;
-	dy = absc[k].y - p0->y;
+	absc[k].xe = x + p0->xe;
+	absc[k].ye = y + p0->ye;
+	dx = absc[k].xe - p0->xe;
+	dy = absc[k].ye - p0->ye;
 	w = sqrt(dx * dx + dy * dy) / d;
 	cw = 1.0f - w;
 	absc[k].r = w * p1->r + cw * p0->r;
@@ -144,10 +144,10 @@ void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace) {
       int delta = u - 2 * v, incH = -2 * v, incO = 2 * u - 2 * v;
       for (int x = 0, y = 0, k = 0, done = 0; x != objX; x += pasX) {
 	if(!done) {
-	  absc[k].x = x + p0->x;
-	  absc[k].y = y + p0->y;
-	  dx = absc[k].x - p0->x;
-	  dy = absc[k].y - p0->y;
+	  absc[k].xe = x + p0->xe;
+	  absc[k].ye = y + p0->ye;
+	  dx = absc[k].xe - p0->xe;
+	  dy = absc[k].ye - p0->ye;
 	  w = sqrt(dx * dx + dy * dy) / d;
 	  cw = 1.0f - w;
 	  absc[k].r = w * p1->r + cw * p0->r;
@@ -170,10 +170,10 @@ void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace) {
     int objY = (v + 1) * pasY;
     int delta = v - 2 * u, incH = -2 * u, incO = 2 * v - 2 * u;
     for (int x = 0, y = 0, k = 0; y != objY; y += pasY) {
-      absc[k].x = x + p0->x;
-      absc[k].y = y + p0->y;
-      dx = absc[k].x - p0->x;
-      dy = absc[k].y - p0->y;
+      absc[k].xe = x + p0->xe;
+      absc[k].ye = y + p0->ye;
+      dx = absc[k].xe - p0->xe;
+      dy = absc[k].ye - p0->ye;
       w = sqrt(dx * dx + dy * dy) / d;
       cw = 1.0f - w;
       absc[k].r = w * p1->r + cw * p0->r;
@@ -191,9 +191,9 @@ void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace) {
   }
 }
 
-/* droite horizontale ATTENTION p0->x <= p1->x */
+/* droite horizontale ATTENTION p0->xe <= p1->xe */
 void _hline(vertex_t * p0, vertex_t * p1) {
-  int x0 = p0->x, x1 = p1->x, y = p0->y; /* y = p1->y est possible aussi */
+  int x0 = p0->xe, x1 = p1->xe, y = p0->ye; /* y = p1->ye est possible aussi */
   int w = get_width(), h = get_height();
   if(y < 0 || y >= h) /* pas besoin de dessiner */
     return;
@@ -202,7 +202,7 @@ void _hline(vertex_t * p0, vertex_t * p1) {
   x1 = x1 >= w ? w - 1 : x1;
   if(x0 >= w || x1 < 0) /* pas besoin de dessiner */
     return;
-  float d = p1->x - p0->x;
+  float d = p1->xe - p0->xe;
   float ww = 0.0f, cww = 1.0f;
   uint32_t * p = get_pixels();
   /* voir si mieux avec une sorte de memset */

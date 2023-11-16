@@ -20,7 +20,7 @@ PACKNAME = apga
 PROGNAME = claude
 VERSION = 0.2.0
 distdir = $(PACKNAME)_$(PROGNAME)-$(VERSION)
-HEADERS = claude.h primitives.h
+HEADERS = claude.h claude_math.h primitives.h
 SOURCES = window.c claude.c primitives.c
 MSVCSRC = $(patsubst %,<ClCompile Include=\"%\\\" \\/>,$(SOURCES))
 OBJ = $(SOURCES:.c=.o)

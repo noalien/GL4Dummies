@@ -8,15 +8,23 @@ extern "C" {
 
   typedef struct vertex_t vertex_t;
   typedef struct triangle_t triangle_t;
+  typedef struct surface_t surface_t;
   /*!\brief le sommet et l'ensemble de ses attributs */
   struct vertex_t {
-    int x, y; /* coordonnée dans l’espace écran */
-    float r, g, b; /* couleur du sommet */
+    float x, y, z, w; /* coordonnée dans l’espace objet (3D/4D) */
+    float r, g, b, a; /* couleur du sommet */
     float s, t; /* coordonnée de texture du sommet */
+    float nx, ny, nz; /* vecteur normal */
+    int xe, ye; /* coordonnée dans l’espace écran */
   };
   /*!\brief le triangle */
   struct triangle_t {
     vertex_t v[3];
+  };
+  /*!\brief la surface composée de n triangles et ayant des propriétés de matériau */
+  struct surface_t {
+    triangle_t * triagles;
+    int n;
   };
 
   extern void fill_triangle(triangle_t * t);
