@@ -9,5 +9,5 @@
   - TODO : ajouter/modifier le sommet : coordonnée 4D (x, y, z, w) ; couleur r, g, b, a ; texture s, t ; vecteur normal nx, ny, nz.
   - TODO : un fichier (.h ?) contenant les opérations sur les matrices et vecteurs
   - TODO : un transformations.c avec
-    -> claude_apply_transforms(M, V, P, s, s’) -> void avec s’ transformation de s (clipping non compris)
-    -> claude_draw(s’, viewport) -> (clipping à faire ici)
+    -	 -> claude_apply_transforms(M, V, P, s, s’) -> void avec s’ transformation de s (clipping non compris)
+    -	 -> claude_draw(s’, viewport) -> (clipping à faire ici)
