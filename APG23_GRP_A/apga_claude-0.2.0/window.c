@@ -33,7 +33,7 @@ static void dis(void) {
       }
     }
   };
-  /* on dessine un triangle dessus */
+  /* on dessine un triangle */
   fill_triangle(&t);
   update_screen();  
 }
