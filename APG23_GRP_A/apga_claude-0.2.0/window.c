@@ -22,14 +22,14 @@ static void dis(void) {
 	0.0f, 1.0f, 0.0f, 1.0f, /* r, g, b, a */
 	1.0f, 0.0f, /* s, t */
 	0.0f, 0.0f, 1.0f, /* nx, ny */
-	900, 300 /* xe, ye */
+	0, 0 /* xe, ye */
       },
       { /* vertex 3 */
 	-0.9f, 0.95f, 0.0f, 1.0f, /* x, y, z, w */
 	0.0f, 0.0f, 1.0f, 1.0f, /* r, g, b, a */
 	0.0f, 1.0f, /* s, t */
 	0.0f, 0.0f, 1.0f, /* nx, ny */
-	10, 700 /* xe, ye */
+	0, 0 /* xe, ye */
       }
     }
   };
@@ -46,7 +46,8 @@ static void dis(void) {
   /* on teste la rotation (décommentez) */
   /* static float a = 0.0f; */
   /* rotate(model, a++, 0.0f, 1.0f, 0.0f); */
-
+  /* TODO : il y a un bug quand on fait un rotation z, donc à trouver
+   * et à corriger */
   
   /* on transforme */
   claude_apply_transforms(model, view, projection, &s, &sp);

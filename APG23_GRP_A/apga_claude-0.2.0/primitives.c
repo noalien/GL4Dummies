@@ -109,8 +109,6 @@ void apply_texture(const char * file) {
   SDL_FreeSurface(d);
 }
 
-
-
 void _abscisses(const vertex_t * p0, const vertex_t * p1, vertex_t * absc, int replace) {
   int dx, dy;
   int u = p1->xe - p0->xe, v = p1->ye - p0->ye, pasX = u < 0 ? -1 : 1, pasY = v < 0 ? -1 : 1;
