@@ -13,6 +13,11 @@
 #include <GL4D/gl4duw_SDL2.h>
 #include <GL4D/gl4du.h>
 
+#include "primitives.h"
+
+/* nouvel arrivant */
+#include "claude_math.h"
+
 #if SDL_BYTEORDER == SDL_BIGENDIAN 
 /*!\brief décalage pour la composante rouge */
 #  define R_SHIFT 24
@@ -79,12 +84,17 @@ extern "C" {
     return extract_comp(coul, B_SHIFT);
   }
   
+  /* dans claude.c */
   extern int        claude_init(int argc, char ** argv, const char * title, int ww, int wh, int width, int height);
   extern uint32_t   get_width(void);
   extern uint32_t   get_height(void);
   extern void       clear_screen(void);
   extern uint32_t * get_pixels(void);
   extern void       update_screen(void);
+  /* dans transformations.c */
+  extern void claude_apply_transforms(const mat4 M, const mat4 V, const mat4 P, const surface_t * s, surface_t * sp);
+  extern void claude_draw(surface_t * sp, const int * viewport);
+
 
 #ifdef __cplusplus
 }

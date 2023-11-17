@@ -21,7 +21,7 @@ PROGNAME = claude
 VERSION = 0.2.0
 distdir = $(PACKNAME)_$(PROGNAME)-$(VERSION)
 HEADERS = claude.h claude_math.h primitives.h
-SOURCES = window.c claude.c primitives.c
+SOURCES = window.c claude.c primitives.c transformations.c
 MSVCSRC = $(patsubst %,<ClCompile Include=\"%\\\" \\/>,$(SOURCES))
 OBJ = $(SOURCES:.c=.o)
 DOXYFILE = documentation/Doxyfile

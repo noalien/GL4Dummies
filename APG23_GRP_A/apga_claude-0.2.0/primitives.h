@@ -23,8 +23,8 @@ extern "C" {
   };
   /*!\brief la surface composée de n triangles et ayant des propriétés de matériau */
   struct surface_t {
-    triangle_t * triagles;
     int n;
+    triangle_t * triangles;
   };
 
   extern void fill_triangle(const triangle_t * t);

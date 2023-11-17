@@ -8,24 +8,24 @@
 #include "primitives.h"
 
 static void dis(void) {
-  static const triangle_t t = {
+  static triangle_t t = {
     {
       { /* vertex 1 */
-	0.0f, 0.0f, 0.0f, 1.0f, /* x, y, z, w */
+	-1.0f, -1.0f, 0.0f, 1.0f, /* x, y, z, w */
 	1.0f, 0.0f, 0.0f, 1.0f, /* r, g, b, a */
 	0.0f, 0.0f, /* s, t */
 	0.0f, 0.0f, 1.0f, /* nx, ny */
 	0, 0 /* xe, ye */
       },
       { /* vertex 2 */
-	0.9f, 0.4f, 0.0f, 1.0f, /* x, y, z, w */
+	0.9f, 0.0f, 0.0f, 1.0f, /* x, y, z, w */
 	0.0f, 1.0f, 0.0f, 1.0f, /* r, g, b, a */
 	1.0f, 0.0f, /* s, t */
 	0.0f, 0.0f, 1.0f, /* nx, ny */
 	900, 300 /* xe, ye */
       },
       { /* vertex 3 */
-	0.01f, 0.95f, 0.0f, 1.0f, /* x, y, z, w */
+	-0.9f, 0.95f, 0.0f, 1.0f, /* x, y, z, w */
 	0.0f, 0.0f, 1.0f, 1.0f, /* r, g, b, a */
 	0.0f, 1.0f, /* s, t */
 	0.0f, 0.0f, 1.0f, /* nx, ny */
@@ -33,8 +33,26 @@ static void dis(void) {
       }
     }
   };
+  triangle_t tp = { { 0 } }; /* contenu sera écrasé après transformation de t */
+  surface_t s = { 1, NULL }, sp = { 1, NULL };
+  s.triangles  = &t;
+  sp.triangles = &tp;
+  
+  mat4 projection, view, model;
+  mat4identite(projection);
+  mat4identite(view);
+  mat4identite(model);
+
+  /* on teste la rotation (décommentez) */
+  /* static float a = 0.0f; */
+  /* rotate(model, a++, 0.0f, 1.0f, 0.0f); */
+
+  
+  /* on transforme */
+  claude_apply_transforms(model, view, projection, &s, &sp);
   /* on dessine un triangle */
-  fill_triangle(&t);
+  static const int viewport[] = { 0, 0, 960, 720};
+  claude_draw(&sp, viewport);
   update_screen();  
 }
 
