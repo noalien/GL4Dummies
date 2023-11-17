@@ -8,7 +8,31 @@
 #include "primitives.h"
 
 static void dis(void) {
-  triangle_t t = { { {0, 0, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f}, {900, 300, 0.6f, 1.0f, 0.6f, 1.0f, 0.0f}, {10, 700, 0.6f, 0.6f, 1.0f, 0.0f, 1.0f}  } };
+  static const triangle_t t = {
+    {
+      { /* vertex 1 */
+	0.0f, 0.0f, 0.0f, 1.0f, /* x, y, z, w */
+	1.0f, 0.0f, 0.0f, 1.0f, /* r, g, b, a */
+	0.0f, 0.0f, /* s, t */
+	0.0f, 0.0f, 1.0f, /* nx, ny */
+	0, 0 /* xe, ye */
+      },
+      { /* vertex 2 */
+	0.9f, 0.4f, 0.0f, 1.0f, /* x, y, z, w */
+	0.0f, 1.0f, 0.0f, 1.0f, /* r, g, b, a */
+	1.0f, 0.0f, /* s, t */
+	0.0f, 0.0f, 1.0f, /* nx, ny */
+	900, 300 /* xe, ye */
+      },
+      { /* vertex 3 */
+	0.01f, 0.95f, 0.0f, 1.0f, /* x, y, z, w */
+	0.0f, 0.0f, 1.0f, 1.0f, /* r, g, b, a */
+	0.0f, 1.0f, /* s, t */
+	0.0f, 0.0f, 1.0f, /* nx, ny */
+	10, 700 /* xe, ye */
+      }
+    }
+  };
   /* on dessine un triangle dessus */
   fill_triangle(&t);
   update_screen();  

@@ -27,7 +27,7 @@ extern "C" {
     int n;
   };
 
-  extern void fill_triangle(triangle_t * t);
+  extern void fill_triangle(const triangle_t * t);
   extern void apply_texture(const char * file);
   
 #ifdef __cplusplus

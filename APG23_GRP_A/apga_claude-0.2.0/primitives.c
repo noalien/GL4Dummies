@@ -7,9 +7,9 @@ static uint32_t * _texels = NULL;
 static int _tw = 0, _th = 0;
 
 static inline void _hline(vertex_t * p0, vertex_t * p1);
-static inline void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace);
+static inline void _abscisses(const vertex_t * p0, const vertex_t * p1, vertex_t * absc, int replace);
 
-void fill_triangle(triangle_t * t) {
+void fill_triangle(const triangle_t * t) {
   int bas, median, haut, i;
   if(t->v[0].ye < t->v[1].ye) {
     if(t->v[0].ye < t->v[2].ye) {
@@ -111,7 +111,7 @@ void apply_texture(const char * file) {
 
 
 
-void _abscisses(vertex_t * p0, vertex_t * p1, vertex_t * absc, int replace) {
+void _abscisses(const vertex_t * p0, const vertex_t * p1, vertex_t * absc, int replace) {
   int dx, dy;
   int u = p1->xe - p0->xe, v = p1->ye - p0->ye, pasX = u < 0 ? -1 : 1, pasY = v < 0 ? -1 : 1;
   float d = sqrt(u * u + v * v), w = 0.0f, cw = 1.0f;
