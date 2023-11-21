@@ -86,6 +86,7 @@ extern "C" {
   
   /* dans claude.c */
   extern int        claude_init(int argc, char ** argv, const char * title, int ww, int wh, int width, int height);
+  extern void       claude_clear(void);
   extern uint32_t   get_width(void);
   extern uint32_t   get_height(void);
   extern void       clear_screen(void);

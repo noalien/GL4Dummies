@@ -56,6 +56,10 @@ int claude_init(int argc, char ** argv, const char * title, int ww, int wh, int 
   return 1;
 }
 
+void claude_clear(void) {
+  memset(_pixels, 0, _width * _height * sizeof *_pixels);
+}
+
 /*!\brief retourne la largeur de l'écran. */
 uint32_t get_width(void) {
   return _width;

@@ -44,8 +44,8 @@ static void dis(void) {
   mat4identite(model);
 
   /* on teste la rotation (décommentez) */
-  /* static float a = 0.0f; */
-  /* rotate(model, a++, 0.0f, 1.0f, 0.0f); */
+  static float a = 0.0f;
+  rotate(model, a++, 0.0f, 1.0f, 0.0f);
   /* TODO : il y a un bug quand on fait un rotation z, donc à trouver
    * et à corriger */
   
@@ -53,8 +53,9 @@ static void dis(void) {
   claude_apply_transforms(model, view, projection, &s, &sp);
   /* on dessine un triangle */
   static const int viewport[] = { 0, 0, 960, 720};
+  claude_clear();
   claude_draw(&sp, viewport);
-  update_screen();  
+  update_screen();
 }
 
 /*!\brief créé la fenêtre, un screen 2D effacé en noir et lance une
