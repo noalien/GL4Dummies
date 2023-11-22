@@ -16,17 +16,17 @@ CFLAGS = -Wall -O3
 CPPFLAGS = -I.
 LDFLAGS = -lm
 # définition des fichiers et dossiers
-PACKNAME = apgb
-PROGNAME = ellule
-VERSION = 0.1
+PACKNAME = apga
+PROGNAME = claude
+VERSION = 0.2.1
 distdir = $(PACKNAME)_$(PROGNAME)-$(VERSION)
-HEADERS = ellule.h elluleRaster.h
-SOURCES = window.c ellule.c elluleRaster.c
+HEADERS = claude.h claude_math.h primitives.h
+SOURCES = window.c claude.c primitives.c transformations.c
 MSVCSRC = $(patsubst %,<ClCompile Include=\"%\\\" \\/>,$(SOURCES))
 OBJ = $(SOURCES:.c=.o)
 DOXYFILE = documentation/Doxyfile
 VSCFILES = $(PROGNAME).vcxproj $(PROGNAME).sln
-EXTRAFILES = README.md COPYING $(wildcard shaders/*.?s images/*.???) $(VSCFILES)
+EXTRAFILES = COPYING README.md $(wildcard shaders/*.?s images/*.???) $(VSCFILES)
 DISTFILES = $(SOURCES) Makefile $(HEADERS) $(DOXYFILE) $(EXTRAFILES)
 # Traitements automatiques pour ajout de chemins et options (ne pas modifier)
 ifneq (,$(shell ls -d /usr/local/include 2>/dev/null | tail -n 1))
