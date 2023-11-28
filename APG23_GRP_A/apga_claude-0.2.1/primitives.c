@@ -125,11 +125,25 @@ void _abscisses(const vertex_t * p0, const vertex_t * p1, vertex_t * absc, int r
 	dy = absc[k].ye - p0->ye;
 	w = sqrt(dx * dx + dy * dy) / d;
 	cw = 1.0f - w;
+	/* TODO : Attention, block de correction de
+	   perspective. Mettre en place un booléen pour tester si
+	   nécessaire (projection perspective */
+	/* Correction de l'interpolation par rapport à la perspective, le z
+	 * joue un rôle dans les distances, il est nécessaire de le
+	 * réintégrer en modifiant les facteurs de proportion.
+	 * lien utile : https://www.scratchapixel.com/lessons/3d-basic-rendering/rasterization-practical-implementation/perspective-correct-interpolation-vertex-attributes 
+	 */
+	{ 
+	  float z = 1.0f / (cw / p0->zmod + w / p1->zmod);
+	  absc[k].zmod = cw * p0->zmod + w * p1->zmod;
+	  cw = z * cw / p0->zmod; w = z * w / p1->zmod;
+	}
 	absc[k].r = w * p1->r + cw * p0->r;
 	absc[k].g = w * p1->g + cw * p0->g;
 	absc[k].b = w * p1->b + cw * p0->b;
 	absc[k].s = w * p1->s + cw * p0->s;
 	absc[k].t = w * p1->t + cw * p0->t;
+	absc[k].d = w * p1->d + cw * p0->d;
 	if(delta < 0) {
 	  ++k;
 	  y += pasY;
@@ -148,11 +162,17 @@ void _abscisses(const vertex_t * p0, const vertex_t * p1, vertex_t * absc, int r
 	  dy = absc[k].ye - p0->ye;
 	  w = sqrt(dx * dx + dy * dy) / d;
 	  cw = 1.0f - w;
+	  { 
+	    float z = 1.0f / (cw / p0->zmod + w / p1->zmod);
+	    absc[k].zmod = cw * p0->zmod + w * p1->zmod;
+	    cw = z * cw / p0->zmod; w = z * w / p1->zmod;
+	  }
 	  absc[k].r = w * p1->r + cw * p0->r;
 	  absc[k].g = w * p1->g + cw * p0->g;
 	  absc[k].b = w * p1->b + cw * p0->b;
 	  absc[k].s = w * p1->s + cw * p0->s;
 	  absc[k].t = w * p1->t + cw * p0->t;
+	  absc[k].d = w * p1->d + cw * p0->d;
 	  done = 1;
 	}
 	if(delta < 0) {
@@ -174,11 +194,17 @@ void _abscisses(const vertex_t * p0, const vertex_t * p1, vertex_t * absc, int r
       dy = absc[k].ye - p0->ye;
       w = sqrt(dx * dx + dy * dy) / d;
       cw = 1.0f - w;
+      { 
+	float z = 1.0f / (cw / p0->zmod + w / p1->zmod);
+	absc[k].zmod = cw * p0->zmod + w * p1->zmod;
+	cw = z * cw / p0->zmod; w = z * w / p1->zmod;
+      }
       absc[k].r = w * p1->r + cw * p0->r;
       absc[k].g = w * p1->g + cw * p0->g;
       absc[k].b = w * p1->b + cw * p0->b;
       absc[k].s = w * p1->s + cw * p0->s;
       absc[k].t = w * p1->t + cw * p0->t;
+      absc[k].d = w * p1->d + cw * p0->d;
       ++k;
       if(delta < 0) {
 	x += pasX;
@@ -195,24 +221,41 @@ void _hline(vertex_t * p0, vertex_t * p1) {
   int w = get_width(), h = get_height();
   if(y < 0 || y >= h) /* pas besoin de dessiner */
     return;
+  if( (p0->d < 0.0f && p1->d < 0.0f) ||
+      (p0->d > 1.0f && p1->d > 1.0f) ) {
+    printf(".");
+    return;
+  }
   /* x le plus à gauche, x le plus à droite */
   x0 = x0 < 0 ? 0 : x0;
   x1 = x1 >= w ? w - 1 : x1;
   if(x0 >= w || x1 < 0) /* pas besoin de dessiner */
     return;
   float d = p1->xe - p0->xe;
+  if(d == 0.0f) d = CL_EPSILON;
   float ww = 0.0f, cww = 1.0f;
   uint32_t * p = get_pixels();
   float * depths = get_depths();
+  if(isnan(p0->d) || isinf(p0->d))
+    printf("%d %d -> %f\n", p0->xe, p0->ye, p0->d);
+  if(isnan(p1->d) || isinf(p1->d))
+    printf("%d %d -> %f\n", p1->xe, p1->ye, p1->d);
+  
   /* voir si mieux avec une sorte de memset */
   for(int x = x0, yw = y * w; x <= x1; ++x) {
     uint8_t r, g, b;
     int s, t;
     uint32_t tex;
     ww = (x - x0) / d; cww = 1.0f - ww;
-    float depth = (ww * p1->depth + cww * p0->depth);
+    { 
+      float z = 1.0f / (cww / p0->zmod + ww / p1->zmod);
+      //absc[k].zmod = cw * p0->zmod + w * p1->zmod;
+      cww = z * cww / p0->zmod; ww = z * ww / p1->zmod;
+    }
+    
+    float depth = (ww * p1->d + cww * p0->d);
     /* le test de profondeur */
-    if(!(depth > depths[yw + x])) continue;
+    if(depth < depths[yw + x]) continue;
     depths[yw + x] = depth; /* maj */
     r = (ww * p1->r + cww * p0->r) * (256.0f - CL_EPSILON);
     g = (ww * p1->g + cww * p0->g) * (256.0f - CL_EPSILON);
@@ -227,6 +270,9 @@ void _hline(vertex_t * p0, vertex_t * p1) {
     r *= red(tex)   / 255.0f;
     g *= green(tex) / 255.0f;
     b *= blue(tex)  / 255.0f;
+    /* r = depth * (256.0f - CL_EPSILON); */
+    /* g = depth * (256.0f - CL_EPSILON); */
+    /* b = depth * (256.0f - CL_EPSILON); */
     p[yw + x] = rgb(r, g, b);
   }  
 }

@@ -8,59 +8,102 @@
 #include "primitives.h"
 
 static void dis(void) {
-  static triangle_t t = {
-    {
-      { /* vertex 1 */
-	-1.0f, -1.0f, 0.0f, 1.0f, /* x, y, z, w */
-	1.0f, 0.0f, 0.0f, 1.0f, /* r, g, b, a */
-	0.0f, 0.0f, /* s, t */
-	0.0f, 0.0f, 1.0f, /* nx, ny */
-	0, 0 /* xe, ye */
-      },
-      { /* vertex 2 */
-	0.9f, 0.0f, 0.0f, 1.0f, /* x, y, z, w */
-	0.0f, 1.0f, 0.0f, 1.0f, /* r, g, b, a */
-	1.0f, 0.0f, /* s, t */
-	0.0f, 0.0f, 1.0f, /* nx, ny */
-	0, 0 /* xe, ye */
-      },
-      { /* vertex 3 */
-	-0.9f, 0.95f, 0.0f, 1.0f, /* x, y, z, w */
-	0.0f, 0.0f, 1.0f, 1.0f, /* r, g, b, a */
-	0.0f, 1.0f, /* s, t */
-	0.0f, 0.0f, 1.0f, /* nx, ny */
-	0, 0 /* xe, ye */
+  static triangle_t t[2] = {
+    { /* Triangle 1 */
+      {
+	{ /* vertex 1 */
+	  -1.0f, -1.0f, 0.0f, 1.0f, /* x, y, z, w */
+	  1.0f, 0.0f, 0.0f, 1.0f, /* r, g, b, a */
+	  0.0f, 0.0f, /* s, t */
+	  0.0f, 0.0f, 1.0f, /* nx, ny */
+	  0, 0 /* xe, ye */
+	},
+	{ /* vertex 2 */
+	  1.0f, -1.0f, 0.0f, 1.0f, /* x, y, z, w */
+	  0.0f, 1.0f, 0.0f, 1.0f, /* r, g, b, a */
+	  1.0f, 0.0f, /* s, t */
+	  0.0f, 0.0f, 1.0f, /* nx, ny */
+	  0, 0 /* xe, ye */
+	},
+	{ /* vertex 3 */
+	  -1.0f, 1.0f, 0.0f, 1.0f, /* x, y, z, w */
+	  0.0f, 0.0f, 1.0f, 1.0f, /* r, g, b, a */
+	  0.0f, 1.0f, /* s, t */
+	  0.0f, 0.0f, 1.0f, /* nx, ny */
+	  0, 0 /* xe, ye */
+	}
+      }
+    },
+    { /* Triangle 2 */
+      {
+	{ /* vertex 1 */
+	  -1.0f, 1.0f, 0.0f, 1.0f, /* x, y, z, w */
+	  0.0f, 0.0f, 1.0f, 1.0f, /* r, g, b, a */
+	  0.0f, 1.0f, /* s, t */
+	  0.0f, 0.0f, 1.0f, /* nx, ny */
+	  0, 0 /* xe, ye */
+	},
+	{ /* vertex 2 */
+	  1.0f, -1.0f, 0.0f, 1.0f, /* x, y, z, w */
+	  0.0f, 1.0f, 0.0f, 1.0f, /* r, g, b, a */
+	  1.0f, 0.0f, /* s, t */
+	  0.0f, 0.0f, 1.0f, /* nx, ny */
+	  0, 0 /* xe, ye */
+	},
+	{ /* vertex 3 */
+	  1.0f, 1.0f, 0.0f, 1.0f, /* x, y, z, w */
+	  1.0f, 1.0f, 0.0f, 1.0f, /* r, g, b, a */
+	  1.0f, 1.0f, /* s, t */
+	  0.0f, 0.0f, 1.0f, /* nx, ny */
+	  0, 0 /* xe, ye */
+	}
       }
     }
   };
-  triangle_t tp = { { 0 } }; /* contenu sera écrasé après transformation de t */
-  surface_t s = { 1, NULL }, sp = { 1, NULL };
-  s.triangles  = &t;
-  sp.triangles = &tp;
+  triangle_t tp[2]; /* contenu sera écrasé après transformation de t */
+  surface_t s = { 2, NULL }, sp = { 2, NULL };
+  s.triangles  = t;
+  sp.triangles = tp;
   
   mat4 projection, view, model;
   /* on teste la perspective */
   mat4identite(projection);
-  frustum(projection, -0.5f, 0.5f, -0.5f, 0.5f, 1.0f, 5.0f);
+  frustum(projection, -1.0f, 1.0f, -1.0f, 1.0f, 2.0f, 5.0f);
+  //ortho(projection, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 5.0f);
   mat4identite(view);
   mat4identite(model);
 
   /* on teste la rotation (décommentez) */
   static float a = 0.0f;
   translate(model, 0.0f, 0.0f, -3.0f);
-  rotate(model, a++, 0.0f, 1.0f, 0.0f);
-  /* TODO : il y a un bug quand on fait un rotation z, donc à trouver
-   * et à corriger */
+  //rotate(model, a += 1.0f, 0.0f, 0.0f, 1.0f);
+  rotate(model, a += 1.0f, 0.0f, 1.0f, 0.0f);
+  /* for(int i = 0; i < 4; ++i) { */
+  /*   for(int j = 0; j < 4; ++j) { */
+  /*     printf("%f ", projection[i * 4 + j]); */
+  /*   } */
+  /*   printf("\n"); */
+  /* } */
+  /* printf("\n"); */
 
   
   
   /* on transforme */
   claude_apply_transforms(model, view, projection, &s, &sp);
+  /* for(int j = 0; j < 3; ++j) { */
+  /*   printf("(%f\t%f\t%f\t%f)\n", s.triangles[0].v[j].x, s.triangles[0].v[j].y, s.triangles[0].v[j].z, s.triangles[0].v[j].w); */
+  /* } */
+  /* printf("\n"); */
+  /* for(int j = 0; j < 3; ++j) { */
+  /*   printf("(%f\t%f\t%f\t%f)\n", sp.triangles[0].v[j].x, sp.triangles[0].v[j].y, sp.triangles[0].v[j].z, sp.triangles[0].v[j].w); */
+  /* } */
+  /* printf("\n\n\n"); */
   /* on dessine un triangle */
   static const int viewport[] = { 0, 0, 960, 720};
   claude_clear();
   claude_draw(&sp, viewport);
   update_screen();
+  SDL_Delay(10);
 }
 
 /*!\brief créé la fenêtre, un screen 2D effacé en noir et lance une

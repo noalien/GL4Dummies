@@ -89,7 +89,6 @@ extern "C" {
   extern void       claude_clear(void);
   extern uint32_t   get_width(void);
   extern uint32_t   get_height(void);
-  extern void       clear_screen(void);
   extern uint32_t * get_pixels(void);
   extern float *    get_depths(void);
   extern void       update_screen(void);

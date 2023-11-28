@@ -47,6 +47,18 @@ extern "C" {
     m[0] = m[5] = m[10] = m[15] = 1.0f;
   }
 
+  /*!\brief Transposée de la matrice 4x4 \a m. */
+  static inline void transpose(float * m) {
+    float t;
+    t = m[1];  m[1]  = m[4];  m[4]  = t;
+    t = m[2];  m[2]  = m[8];  m[8]  = t;
+    t = m[3];  m[3]  = m[12]; m[12] = t;
+    t = m[6];  m[6]  = m[9];  m[9]  = t;
+    t = m[7];  m[7]  = m[13]; m[13] = t;
+    t = m[11]; m[11] = m[14]; m[14] = t;
+  }
+
+  
   /*!\brief ajoute (multiplication droite) une translation à la
    * matrice \a m */
   static inline void translate(float * m, float tx, float ty, float tz) {
@@ -57,7 +69,7 @@ extern "C" {
     mat4 cpy;
     memcpy(cpy, m, sizeof cpy);
     mat4mult(m, cpy, t);
-}
+  }
 
   /*!\brief ajoute (multiplication droite) une rotation à la matrice
    * \a m */
@@ -98,22 +110,43 @@ extern "C" {
   /*!\brief Création d'une matrice de projection en perspective selon
    * l'ancienne fonction glFrustum. */
   static inline void frustum(mat4 mat, float l, float r, float b, float t, float n, float f) {
-    (mat)[0]  = 2.0 * (n) / ((r) - (l));
-    (mat)[1]  = 0.0;			
-    (mat)[2]  = ((r) + (l)) / ((r) - (l));
-    (mat)[3]  = 0.0;			
-    (mat)[4]  = 0.0;			
-    (mat)[5]  = 2.0 * (n) / ((t) - (b));
-    (mat)[6]  = ((t) + (b)) / ((t) - (b));
-    (mat)[7]  = 0.0;			
-    (mat)[8]  = 0.0;			
-    (mat)[9]  = 0.0;			
-    (mat)[10] = -((f) + (n)) / ((f) - (n));
-    (mat)[11] = -2.0 * (f) * (n) / ((f) - (n));
-    (mat)[12] = 0.0;			
-    (mat)[13] = 0.0;			
-    (mat)[14] = -1.0;			
-    (mat)[15] = 0.0;			
+    mat[0]  = 2.0f * (n) / ((r) - (l));
+    mat[1]  = 0.0f;
+    mat[2]  = ((r) + (l)) / ((r) - (l));
+    mat[3]  = 0.0f;
+    mat[4]  = 0.0f;
+    mat[5]  = 2.0f * (n) / ((t) - (b));
+    mat[6]  = ((t) + (b)) / ((t) - (b));
+    mat[7]  = 0.0f;
+    mat[8]  = 0.0f;
+    mat[9]  = 0.0f;
+    mat[10] = -((f) + (n)) / ((f) - (n));
+    mat[11] = -2.0f * (f) * (n) / ((f) - (n));
+    mat[12] = 0.0f;
+    mat[13] = 0.0f;
+    mat[14] = -1.0f;
+    mat[15] = 0.0f;
+  }
+
+  /*!\brief Création d'une matrice de projection orthogonale selon
+   * l'ancienne fonction glOrtho. */
+  static inline void ortho(mat4 mat, float l, float r, float b, float t, float n, float f) {
+    mat[0]  = 2.0f / ((r) - (l));
+    mat[1]  = 0.0f;
+    mat[2]  = 0.0f;
+    mat[3]  = -((r) + (l)) / ((r) - (l));
+    mat[4]  = 0.0f;
+    mat[5]  = 2.0f / ((t) - (b));
+    mat[6]  = 0.0f;
+    mat[7]  = -((t) + (b)) / ((t) - (b));
+    mat[8]  = 0.0f;
+    mat[9]  = 0.0f;
+    mat[10] = -2.0f / ((f) - (n));
+    mat[11] = -((f) + (n)) / ((f) - (n));
+    mat[12] = 0.0f;
+    mat[13] = 0.0f;
+    mat[14] = 0.0f;
+    mat[15] = 1.0f;
   }
 
   

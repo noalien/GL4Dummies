@@ -59,8 +59,10 @@ int claude_init(int argc, char ** argv, const char * title, int ww, int wh, int 
   return 1;
 }
 
+/*!\brief Efface l'écran en mettant 0. */
 void claude_clear(void) {
   memset(_pixels, 0, _width * _height * sizeof *_pixels);
+  memset(_depth, 0, _width * _height * sizeof *_depth);
 }
 
 /*!\brief retourne la largeur de l'écran. */
@@ -71,12 +73,6 @@ uint32_t get_width(void) {
 /*!\brief retourne la largeur de l'écran. */
 uint32_t get_height(void) {
   return _height;
-}
-
-/*!\brief Efface l'écran en mettant 0. */
-void clear_screen(void) {
-  memset(_pixels, 0, _width * _height * sizeof *_pixels);
-  memset(_depth, 0, _width * _height * sizeof *_depth);
 }
 
 /*!\brief retourne le pointeur vers les pixels de l'écran courant. */

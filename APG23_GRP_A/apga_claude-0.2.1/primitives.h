@@ -15,7 +15,10 @@ extern "C" {
     float r, g, b, a; /* couleur du sommet */
     float s, t; /* coordonnée de texture du sommet */
     float nx, ny, nz; /* vecteur normal */
-    float depth;
+    float d; /* depth (le z dans l'espace projeté) */
+    float zmod;    /* z après modelview, sert à corriger
+		      l'interpolation par rapport à une projection en
+		      perspective */
     int xe, ye; /* coordonnée dans l’espace écran */
   };
   /*!\brief le triangle */

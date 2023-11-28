@@ -14,5 +14,12 @@
 
 * version 0.2.1
   - ~~TODO~~ : calcul de projection en perspective (frustum)
-  - TODO : finir le depth test
-  - ...
+  - ~~TODO~~ : calcul de projection orthogonale (ortho)
+  - ~~TODO~~ : finir le depth test
+  - ~~TODO~~ : correction des interpolations par rapport à une projection en perspective. (MONTRER)
+
+* version 0.2.2
+  - TODO : ajout de l'éclairage (Gouraud)
+  - TODO : faire un exemple de géométrie générée (genre sphère)
+  - TODO : créer des propriétés de surface, faire un choix sur le choix des différentes possibilités de rendu.
+

@@ -12,9 +12,9 @@ MKDIR = mkdir
 CHMOD = chmod
 CP = rsync -R
 # déclaration des options du compilateur
-CFLAGS = -Wall -O3
+CFLAGS = -Wall -O3 -fsanitize=address
 CPPFLAGS = -I.
-LDFLAGS = -lm
+LDFLAGS = -lm -fsanitize=address
 # définition des fichiers et dossiers
 PACKNAME = apga
 PROGNAME = claude
