@@ -22,7 +22,7 @@
   - ~~TODO~~ : correction des interpolations par rapport à une projection en perspective.
 
 * version 0.2.3
-  - TODO : ajout de l'éclairage (Gouraud)
+  - ~~TODO~~ : ajout de l'éclairage (Gouraud)
   - TODO : faire un exemple de géométrie générée (genre sphère)
   - TODO : créer des propriétés de surface, faire un choix sur le choix des différentes possibilités de rendu.
 

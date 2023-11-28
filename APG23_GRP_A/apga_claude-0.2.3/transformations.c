@@ -3,7 +3,7 @@
 
 /* GROS TODO, ajouter un clipping, ne serait-ce que non-optimal */
 
-static inline void _ftransform(const mat4 M, const mat4 V, const mat4 P, const float * p, float * pp, float * zmod);
+static inline void _ftransform(const mat4 M, const mat4 V, const mat4 P, const float * p, float * pp, float * zmod, float * normal, float * il);
 
 void claude_apply_transforms(const mat4 M, const mat4 V, const mat4 P, const surface_t * s, surface_t * sp) {
   /* s' doit pouvoir contenir le même nombre de triangles que s */
@@ -13,7 +13,7 @@ void claude_apply_transforms(const mat4 M, const mat4 V, const mat4 P, const sur
   memcpy(sp->triangles, s->triangles, s->n * sizeof *s->triangles);
   for(int i = 0; i < s->n; ++i) {
     for(int j = 0; j < 3; ++j) {
-      _ftransform(M, V, P, &(s->triangles[i].v[j].x), &(sp->triangles[i].v[j].x), &(sp->triangles[i].v[j].zmod));
+      _ftransform(M, V, P, &(s->triangles[i].v[j].x), &(sp->triangles[i].v[j].x), &(sp->triangles[i].v[j].zmod), &(sp->triangles[i].v[j].nx), &(sp->triangles[i].v[j].il));
     }
   }
 }
@@ -30,10 +30,14 @@ void claude_draw(surface_t * sp, const int * viewport) {
     fill_triangle(&(sp->triangles[i]));
 }
 
-void _ftransform(const mat4 M, const mat4 V, const mat4 P, const float * p, float * pp, float * zmod) {
-  mat4 mv;
+void _ftransform(const mat4 M, const mat4 V, const mat4 P, const float * p, float * pp, float * zmod, float * normal, float * il) {
+  mat4 mv, imv;
   vec4 vmod;
   mat4mult(mv, V, M);
+
+  memcpy(imv, mv, sizeof imv);
+  MMAT4INVERSE(imv);
+  
   mat4vec4mult(vmod,   mv, p);
   *zmod = vmod[2];
   mat4vec4mult(pp,   P, vmod);
@@ -41,5 +45,19 @@ void _ftransform(const mat4 M, const mat4 V, const mat4 P, const float * p, floa
   pp[1] /= pp[3];
   pp[2] /= pp[3];
   pp[3] = 1.0f;
+
+
+    /* la lumière est positionnelle et fixe dans la scène.
+       TODO : la rendre modifiable, voire aussi pouvoir la placer par
+       rapport aux objets (elle subirait la matrice modèle). */
+  const vec4 lp = { 0.0f, 0.0f, 1.0f, 1.0f };
+  vec4 ld = {lp[0] - vmod[0], lp[1] - vmod[1], lp[2] - vmod[2], lp[3] - vmod[3]};
+  vec4 n = {normal[0], normal[1], normal[2], 0.0f}, res;
+  MMAT4XVEC4(res, imv, n);
+  MVEC3NORMALIZE(res);
+  MVEC3NORMALIZE((float *)&ld);
+  *il = MVEC3DOT(res, (float *)&ld);
+  *il = MIN(MAX(0.0f, *il), 1.0f);
+  
 }
 

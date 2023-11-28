@@ -16,6 +16,7 @@ extern "C" {
     float s, t; /* coordonnée de texture du sommet */
     float nx, ny, nz; /* vecteur normal */
     float d; /* depth (le z dans l'espace projeté) */
+    float il;      /* intensité de lumière (lambertien) */
     float zmod;    /* z après modelview, sert à corriger
 		      l'interpolation par rapport à une projection en
 		      perspective */

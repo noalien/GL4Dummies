@@ -144,6 +144,7 @@ void _abscisses(const vertex_t * p0, const vertex_t * p1, vertex_t * absc, int r
 	absc[k].s = w * p1->s + cw * p0->s;
 	absc[k].t = w * p1->t + cw * p0->t;
 	absc[k].d = w * p1->d + cw * p0->d;
+	absc[k].il = w * p1->il + cw * p0->il; /* interpolation de l'incidence de la lumière */
 	if(delta < 0) {
 	  ++k;
 	  y += pasY;
@@ -173,6 +174,7 @@ void _abscisses(const vertex_t * p0, const vertex_t * p1, vertex_t * absc, int r
 	  absc[k].s = w * p1->s + cw * p0->s;
 	  absc[k].t = w * p1->t + cw * p0->t;
 	  absc[k].d = w * p1->d + cw * p0->d;
+	  absc[k].il = w * p1->il + cw * p0->il; /* interpolation de l'incidence de la lumière */
 	  done = 1;
 	}
 	if(delta < 0) {
@@ -205,6 +207,7 @@ void _abscisses(const vertex_t * p0, const vertex_t * p1, vertex_t * absc, int r
       absc[k].s = w * p1->s + cw * p0->s;
       absc[k].t = w * p1->t + cw * p0->t;
       absc[k].d = w * p1->d + cw * p0->d;
+      absc[k].il = w * p1->il + cw * p0->il; /* interpolation de l'incidence de la lumière */
       ++k;
       if(delta < 0) {
 	x += pasX;
@@ -243,6 +246,7 @@ void _hline(vertex_t * p0, vertex_t * p1) {
   
   /* voir si mieux avec une sorte de memset */
   for(int x = x0, yw = y * w; x <= x1; ++x) {
+    float il;
     uint8_t r, g, b;
     int s, t;
     uint32_t tex;
@@ -257,9 +261,10 @@ void _hline(vertex_t * p0, vertex_t * p1) {
     /* le test de profondeur */
     if(depth < depths[yw + x]) continue;
     depths[yw + x] = depth; /* maj */
-    r = (ww * p1->r + cww * p0->r) * (256.0f - CL_EPSILON);
-    g = (ww * p1->g + cww * p0->g) * (256.0f - CL_EPSILON);
-    b = (ww * p1->b + cww * p0->b) * (256.0f - CL_EPSILON);
+    il = (ww * p1->il + cww * p0->il) * 0.8f + 0.2f; /* interpolation de l'incidence de la lumière */
+    r = il * (ww * p1->r + cww * p0->r) * (256.0f - CL_EPSILON);
+    g = il * (ww * p1->g + cww * p0->g) * (256.0f - CL_EPSILON);
+    b = il * (ww * p1->b + cww * p0->b) * (256.0f - CL_EPSILON);
     s = (ww * p1->s + cww * p0->s) * (_tw - CL_EPSILON);
     t = (ww * p1->t + cww * p0->t) * (_th - CL_EPSILON);
     /* on fait un clamp */
