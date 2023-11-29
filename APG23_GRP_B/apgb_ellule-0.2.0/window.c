@@ -17,22 +17,19 @@ static void dis(void) {
 	  {-1.0f, -1.0f, 0.0f, 1.0f}, /* x, y, z, w */
 	  {1.0f, 0.0f, 0.0f, 1.0f}, /* r, g, b, a */
 	  {0.0f, 0.0f, 1.0f}, /* nx, ny, nz */
-	  {0.0f, 0.0f}, /* s, t */
-	  {0, 0} /* xe, ye */
+	  {0.0f, 0.0f} /* s, t */
 	},
 	{ /* vertex 1 */
 	  {1.0f, -1.0f, 0.0f, 1.0f}, /* x, y, z, w */
 	  {0.0f, 1.0f, 0.0f, 1.0f}, /* r, g, b, a */
 	  {0.0f, 0.0f, 1.0f}, /* nx, ny, nz */
-	  {1.0f, 0.0f}, /* s, t */
-	  {0, 0} /* xe, ye */
+	  {1.0f, 0.0f} /* s, t */
 	},
 	{ /* vertex 2 */
 	  {-1.0f, 1.0f, 0.0f, 1.0f}, /* x, y, z, w */
 	  {0.0f, 0.0f, 1.0f, 1.0f}, /* r, g, b, a */
 	  {0.0f, 0.0f, 1.0f}, /* nx, ny, nz */
-	  {0.0f, 1.0f}, /* s, t */
-	  {0, 0} /* xe, ye */
+	  {0.0f, 1.0f} /* s, t */
 	}
       }
     },
@@ -43,22 +40,19 @@ static void dis(void) {
 	  {-1.0f, 1.0f, 0.0f, 1.0f}, /* x, y, z, w */
 	  {0.0f, 0.0f, 1.0f, 1.0f}, /* r, g, b, a */
 	  {0.0f, 0.0f, 1.0f}, /* nx, ny, nz */
-	  {0.0f, 1.0f}, /* s, t */
-	  {0, 0} /* xe, ye */
+	  {0.0f, 1.0f} /* s, t */
 	},
 	{ /* vertex 1 */
 	  {1.0f, -1.0f, 0.0f, 1.0f}, /* x, y, z, w */
 	  {0.0f, 1.0f, 0.0f, 1.0f}, /* r, g, b, a */
 	  {0.0f, 0.0f, 1.0f}, /* nx, ny, nz */
-	  {1.0f, 0.0f}, /* s, t */
-	  {0, 0} /* xe, ye */
+	  {1.0f, 0.0f} /* s, t */
 	},
 	{ /* vertex 3 */
 	  {1.0f, 1.0f, 0.0f, 1.0f}, /* x, y, z, w */
 	  {1.0f, 0.0f, 0.0f, 1.0f}, /* r, g, b, a */
 	  {0.0f, 0.0f, 1.0f}, /* nx, ny, nz */
-	  {1.0f, 1.0f}, /* s, t */
-	  {0, 0} /* xe, ye */
+	  {1.0f, 1.0f} /* s, t */
 	}
       }
     }
@@ -68,13 +62,13 @@ static void dis(void) {
   surface_t s = { 2, t };
   mat4 projection, view, model;
   /* on teste les matrices */
-  _ortho2D(projection, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 5.0f);
+  _ortho2D(projection, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f);
   _mat4identite(view);
   _mat4identite(model);
 
   /* on teste la rotation (décommentez) */
   static float a = 0.0f;
-  _rotate(model, a += 1.0f, 0.0f, 0.0f, 1.0f);
+  _rotate(model, a += 1.0f, 0.0f, 1.0f, 0.0f);
 
   elTransformations(&s, model, view, projection);
   elDraw(&s);
