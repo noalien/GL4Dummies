@@ -103,7 +103,7 @@ static void dis(void) {
   claude_clear();
   claude_draw(&sp, viewport);
   update_screen();
-  SDL_Delay(10);
+  /* SDL_Delay(10); */
 }
 
 /*!\brief créé la fenêtre, un screen 2D effacé en noir et lance une

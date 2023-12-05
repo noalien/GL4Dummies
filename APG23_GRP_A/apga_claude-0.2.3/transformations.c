@@ -57,7 +57,7 @@ void _ftransform(const mat4 M, const mat4 V, const mat4 P, const float * p, floa
   MVEC3NORMALIZE(res);
   MVEC3NORMALIZE((float *)&ld);
   *il = MVEC3DOT(res, (float *)&ld);
-  *il = MIN(MAX(0.0f, *il), 1.0f);
+  *il = MIN(MAX(0.0f, *il), 1.0f) * 0.8f + 0.2f; /* 80% de diffus et 20% d'ambient */
   
 }
 

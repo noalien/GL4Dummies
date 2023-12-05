@@ -261,7 +261,7 @@ void _hline(vertex_t * p0, vertex_t * p1) {
     /* le test de profondeur */
     if(depth < depths[yw + x]) continue;
     depths[yw + x] = depth; /* maj */
-    il = (ww * p1->il + cww * p0->il) * 0.8f + 0.2f; /* interpolation de l'incidence de la lumière */
+    il = (ww * p1->il + cww * p0->il); /* interpolation de l'incidence de la lumière */
     r = il * (ww * p1->r + cww * p0->r) * (256.0f - CL_EPSILON);
     g = il * (ww * p1->g + cww * p0->g) * (256.0f - CL_EPSILON);
     b = il * (ww * p1->b + cww * p0->b) * (256.0f - CL_EPSILON);
