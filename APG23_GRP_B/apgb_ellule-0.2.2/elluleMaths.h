@@ -96,6 +96,17 @@ extern "C" {
         m[i] = tmp[i] * det;
   }
 
+  /*!\brief Transposée de la matrice 4x4 \a m. */
+  static inline void _mat4transpose(float * m) {
+    float t;
+    t = m[1];  m[1]  = m[4];  m[4]  = t;
+    t = m[2];  m[2]  = m[8];  m[8]  = t;
+    t = m[3];  m[3]  = m[12]; m[12] = t;
+    t = m[6];  m[6]  = m[9];  m[9]  = t;
+    t = m[7];  m[7]  = m[13]; m[13] = t;
+    t = m[11]; m[11] = m[14]; m[14] = t;
+  }
+  
   /*!\brief Multiplication de deux matrices 4x4. Les matrices \a a et \a
    * b sont multipliées et le résultat est stocké dans \a r. */
   static inline void _mat4mult(float * r, const float * a, const float * b) {
@@ -133,18 +144,6 @@ extern "C" {
     m[0] = m[5] = m[10] = m[15] = 1.0f;
   }
 
-  /*!\brief Transposée de la matrice 4x4 \a m. */
-  static inline void _transpose(float * m) {
-    float t;
-    t = m[1];  m[1]  = m[4];  m[4]  = t;
-    t = m[2];  m[2]  = m[8];  m[8]  = t;
-    t = m[3];  m[3]  = m[12]; m[12] = t;
-    t = m[6];  m[6]  = m[9];  m[9]  = t;
-    t = m[7];  m[7]  = m[13]; m[13] = t;
-    t = m[11]; m[11] = m[14]; m[14] = t;
-  }
-
-  
   /*!\brief ajoute (multiplication droite) une translation à la
    * matrice \a m */
   static inline void _translate(float * m, float tx, float ty, float tz) {
