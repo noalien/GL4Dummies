@@ -1,0 +1,76 @@
+* version 0.1
+  - Gestion de la rastérisation d'un triangle
+  - Puis ajout du dégradé de couleurs (interpolation bilinéaire des couleurs affectées aux sommets)
+  - Enfin ajout de l'ajout de coordonnées de texture et application de la texture (pour l'instant par multiplication avec la couleur)
+
+
+* version 0.2.0
+  - ~~TODO~~ : créer une structure surface_t à n triangles.
+  - ~~TODO~~ : ajouter/modifier le sommet : coordonnée 4D (x, y, z, w) ; couleur r, g, b, a ; texture s, t ; vecteur normal nx, ny, nz et enfin les coordonnées écran xe, ye (la depth ? le depth-buffer ? dans la v0.2.1 ?).
+  - ~~TODO~~ : un fichier (.h ?) contenant les opérations sur les matrices et vecteurs
+  - ~~TODO~~ : un transformations.c avec
+    -	 -> claude_apply_transforms(M, V, P, s, s’) -> void avec s’ transformation de s (clipping non compris ??)
+    -	 -> claude_draw(s’, viewport) -> (TODO -- clipping à faire ici ???)
+
+* version 0.2.1
+  - ~~TODO~~ : calcul de projection en perspective (frustum)
+  - ~~TODO~~ : calcul de projection orthogonale (ortho)
+  - ~~TODO~~ : finir le depth test
+  - TODO : correction des interpolations par rapport à une projection en perspective. (MONTRER que zmod peut corriger l'interpolation)
+
+* version 0.2.2
+  - ~~TODO~~ : correction des interpolations par rapport à une projection en perspective.
+
+* version 0.2.3
+  - ~~TODO~~ : ajout de l'éclairage (Gouraud)
+  - TODO : faire un exemple de géométrie générée (genre sphère)
+  - TODO : créer des propriétés de surface, faire un choix sur le choix des différentes possibilités de rendu.
+
+* version 0.2.4
+  - ~~TODO~~ : gestion dynamique des surfaces
+  - ~~TODO~~ : faire un exemple de géométrie générée (genre sphère)
+  - TODO : ajouter la géométrie d'un plan et d'un cube
+  - TODO : faire un exemple qui teste toutes les géométries qu'on a
+  - TODO : créer des propriétés de surface, faire un choix sur le choix des différentes possibilités de rendu.
+
+* version 0.2.5
+  - ~~TODO~~ : ajout de quelques autres fonctions math pour ne plus dépendre de GL4D pour ça
+  - ~~TODO~~ : faire un exemple de géométrie générée (genre sphère)
+  - ~~TODO~~ : ajouter la géométrie d'un plan
+  - ~~TODO~~ : faire un exemple qui teste toutes les géométries qu'on a (manquera le cube)
+  - TODO : ajouter la géométrie d'un cube
+  - TODO : créer des propriétés de surface, faire un choix sur le choix des différentes possibilités de rendu.
+    - TODO : commencer par gérér une texture par surface
+  - TODO/OPTIM : ajouter le cull face (ne pas rendre les faces cachées = faces arrières) ; à faire en fonction des propriétés de surfaces.
+  - TODO/OPTIM : rejeter les triangles en dehors du frustum/ortho après transformation (clipping) ; à faire en fonction des propriétés de surfaces.
+
+* version 0.2.6
+  - ~~TODO~~ : ajouter la géométrie d'un cube
+  - TODO : créer des propriétés de surface, faire un choix sur le choix des différentes possibilités de rendu.
+    - TODO : commencer par gérér une texture par surface
+    - TODO : ou plus simple, faire une fonction qui répercute une couleur sur tous les triangles d'une surface
+  - TODO/OPTIM : ajouter le cull face (ne pas rendre les faces cachées = faces arrières) ; à faire en fonction des propriétés de surfaces.
+  - TODO/OPTIM : rejeter les triangles en dehors du frustum/ortho après transformation (clipping) ; à faire en fonction des propriétés de surfaces.
+
+* version 0.2.7
+  - TODO : créer des propriétés de surface, faire un choix sur le choix des différentes possibilités de rendu.
+    - ~~TODO~~ : commencer par gérér une texture par surface
+    - ~~TODO~~ : ou plus simple, faire une fonction qui répercute une couleur sur tous les triangles d'une surface
+  - TODO/OPTIM : ajouter le cull face (ne pas rendre les faces cachées = faces arrières) ; à faire en fonction des propriétés de surfaces.
+  - TODO/OPTIM : rejeter les triangles en dehors du frustum/ortho après transformation (clipping) ; à faire en fonction des propriétés de surfaces.
+
+* version 0.2.8
+  - DONE : factorisation de code dans primitives.c
+  - DONE : ajout de l'alpha
+  - TODO/OPTIM : ajouter le cull face (ne pas rendre les faces cachées = faces arrières) ; à faire en fonction des propriétés de surfaces.
+  - TODO/OPTIM (à peine fait) : rejeter les triangles en dehors du frustum/ortho après transformation (clipping) ; à faire en fonction des propriétés de surfaces.
+  
+* version 0.2.9
+  - DONE : ajouter le cull face (ne pas rendre les faces cachées = faces arrières) ; à faire en fonction des propriétés du processus de draw.
+  - DONE : début d'activation/désactivation d'options d'affichage
+  - TODO/OPTIM (à peine fait) : rejeter les triangles en dehors du frustum/ortho après transformation (clipping) ; à faire en fonction des propriétés de surfaces.
+  
+* version 0.2.10
+  - DONE : un exemple de plateau dont les blocs bougent en fonction du temps (stable par rapport au fps)
+  - TODO/OPTIM (à peine fait) : rejeter les triangles en dehors du frustum/ortho après transformation (clipping) ; à faire en fonction des propriétés de surfaces.
+  
