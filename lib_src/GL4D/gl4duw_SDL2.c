@@ -125,6 +125,7 @@ GLboolean gl4duwCreateWindow(int argc, char ** argv, const char * title, int x, 
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, _glProfileMask);
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, _glDoubleBuffer);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, _glDepthSize);
+  SDL_GL_SetSwapInterval(1);
   if( (win = SDL_CreateWindow(title, GL4DW_POS_CENTERED, GL4DW_POS_CENTERED,
 			      width, height, GL4DW_OPENGL | wflags)) == NULL ) {
     fprintf(stderr, "%s (%d): %s:\n\tErreur lors de la creation de la fenetre SDL : %s",
