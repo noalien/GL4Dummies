@@ -60,26 +60,6 @@ out vec4 fragColor;
 uniform sampler2D permTexture;
 uniform sampler2D gradTexture;
 
-/* uniform sampler2D objTexture; */
-/* uniform sampler2D origContoursTex; */
-/* uniform sampler2D paperTexture; */
-/* uniform int width, height, useLumi4Toon, colorize, useMCMD; */
-/* uniform float time; // Used for texture animation */
-/* uniform float noiseFreq, noiseWeight, noiseNPaperProp, noiseVsPaperProp, noiseScaleY; */
-
-/* uniform int useTexture; */
-
-/* in GMaterial { */
-/*   vec4 color; */
-/*   vec3 lightDir, normal, T[5]; */
-/*   vec2 texCoord2D[3]; */
-/* } g_material; */
-
-/* flat in int g_cube; */
-
-/* layout(location = 0) out vec4 myFragColor; */
-
-
 
 /*
  * To create offsets of one texel and one half texel in the
@@ -572,15 +552,21 @@ float snoise(vec4 P) {
   return 27.0 * (n0 + n1 + n2 + n3 + n4);
 }
 
+uniform float temps;
 
 void main(void) {
-  int i;
-  float f = 1, a = 1, n = 0;
-  for(i = 0; i < 5; ++i) {
-    n += a * pow(noise(vsoTexCoord * zoom * f), 1.0);
-    a = a / 2.0;
-    f = f * 2.0;
-  }
-  /* fragColor = vec4(noise(vsoTexCoord * zoom)); */
-  fragColor = vec4(n);
+  /* int i; */
+  /* float f = 1, a = 1, n = 0; */
+  /* for(i = 0; i < 5; ++i) { */
+  /*   n += 0.05 * a * pow(noise(vsoTexCoord * zoom * f), 1.0); */
+  /*   a = a * 2.0; */
+  /*   f = f / 2.0; */
+  /* } */
+  /* fragColor = vec4(n); */
+
+  /* exemple de petit bricolage pour faire du marbre */
+  vec4 tc = vec4(vsoPos.x + sin(2.0 * 6.283 * vsoTexCoord.x), vsoPos.y + 5.0 * vsoPos.w, vsoPos.zw);
+  float no =  noise(tc * zoom);
+  no = pow(no, 0.1);
+  fragColor = vec4(pow(no, 1.8), pow(no, 1.9), pow(no, 4.0), 1.0);
 }

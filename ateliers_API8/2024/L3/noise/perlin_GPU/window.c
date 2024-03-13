@@ -27,7 +27,7 @@ static GLuint _pId = 0;
 /*!\brief arrete l'animation */
 static GLuint _pause = 0;
 /*!\brief coefficient de zoom */
-static GLfloat _zoom = 20.0;
+static GLfloat _zoom = 3.0;
 /*!\brief temps */
 static GLfloat _temps = 0.1;
 
@@ -37,7 +37,7 @@ static GLfloat _temps = 0.1;
  */
 int main(int argc, char ** argv) {
   if(!gl4duwCreateWindow(argc, argv, "DL4D-Earth", 0, 0, 
-			 800, 600, SDL_WINDOW_SHOWN))
+			 1280, 1024, SDL_WINDOW_SHOWN))
     return 1;
   init();
   atexit(quit);
@@ -52,7 +52,7 @@ static void init(void) {
   initNoiseTextures();
   glEnable(GL_DEPTH_TEST);
   glClearColor(0.0f, 0.0f, 0.1f, 0.0f);
-  glViewport(0, 0, 800, 600);
+  glViewport(0, 0, 1280, 1024);
   gl4duGenMatrix(GL_FLOAT, "modelViewMatrix");
   gl4duGenMatrix(GL_FLOAT, "projectionMatrix");
   gl4duBindMatrix("projectionMatrix");
@@ -108,8 +108,8 @@ static void draw(void) {
   unuseNoiseTextures(0);
   gl4duPopMatrix();
 
-  //if(!_pause)
-  //  _temps += dt / 50.0;
+  if(!_pause)
+    _temps += dt / 50.0;
   a0 += 360.0 * dt / (24.0 /* * 60.0 */);
 }
 
