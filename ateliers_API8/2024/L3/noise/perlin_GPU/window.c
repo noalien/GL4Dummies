@@ -6,6 +6,7 @@
  */
 #include <GL4D/gl4du.h>
 #include <GL4D/gl4dg.h>
+#include <GL4D/gl4df.h>
 #include <GL4D/gl4duw_SDL2.h>
 
 /* Prototypes des fonctions statiques contenues dans ce fichier C */
@@ -28,6 +29,7 @@ static GLuint _pId = 0;
 static GLuint _pause = 0;
 /*!\brief coefficient de zoom */
 static GLfloat _zoom = 3.0;
+static GLint _blur = 0;
 /*!\brief temps */
 static GLfloat _temps = 0.1;
 
@@ -71,6 +73,14 @@ static void keydown(int keycode) {
   case SDLK_UP:
     _zoom += 0.1;
     break;
+  case SDLK_p:
+    _blur += 1;
+    break;
+  case SDLK_m:
+    _blur -= 1;
+    if(_blur < 0)
+      _blur = 0;
+    break;
   case ' ':
     _pause = !_pause;
     break;
@@ -111,6 +121,11 @@ static void draw(void) {
   if(!_pause)
     _temps += dt / 50.0;
   a0 += 360.0 * dt / (24.0 /* * 60.0 */);
+
+  gl4dfBlur (0, 0, _blur, 1, 0, GL_FALSE);
+  /* gl4dfSobelSetResultMode(GL4DF_SOBEL_RESULT_RGB); */
+  gl4dfSobelSetMixMode(GL4DF_SOBEL_MIX_MULT);
+  gl4dfSobel (0, 0, GL_FALSE);
 }
 
 /*!\brief appelée au moment de sortir du programme (atexit), libère les éléments utilisés */
