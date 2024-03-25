@@ -47,6 +47,7 @@ int main(int argc, char ** argv) {
 
 /*!\brief initialise OpenGL parameters and data. */
 static void init(void) {
+  SDL_GL_SetSwapInterval(1);
   /* setting OpenGL clear color (for next glClear) */
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   /* loading and compiling a GLSL program composed with a vertex shader and a fragment shader */

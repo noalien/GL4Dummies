@@ -62,7 +62,7 @@ void mobileInit(int n, int w, int h) {
   for(i = 0; i < _nb_mobiles; i++) {
     _mobile[i].x = _w / 4 + gl4dmURand() * _w / 2;
     _mobile[i].y = _h / 4 + gl4dmURand() * _h / 2;
-    _mobile[i].vx = 100 + gl4dmSURand() * 500;
+    _mobile[i].vx = gl4dmSURand() * 500;
     _mobile[i].vy = 100 + gl4dmURand() * 200;
     _mobile[i].color[0] = gl4dmURand();
     _mobile[i].color[1] = gl4dmURand();
@@ -80,8 +80,12 @@ static void frottements(int i, float kx, float ky) {
 
 void mobileMove(void) {
   const double G = -300;
-  static Uint32 t0 = 0;
-  Uint32 t = SDL_GetTicks();
+  static double t0 = -1.0;
+  double t = gl4dGetElapsedTime();
+  if(t0 < 0.0) {
+    t0 = t;
+    return;
+  }
   double dt = (t - t0) / 1000.0, d;
   t0 = t;
   int i, collision_x, collision_bas;
@@ -112,5 +116,6 @@ void mobileMove(void) {
     }
     if(!collision_bas)
       _mobile[i].vy += G * dt;
+    (void)collision_x;
   }
 }
