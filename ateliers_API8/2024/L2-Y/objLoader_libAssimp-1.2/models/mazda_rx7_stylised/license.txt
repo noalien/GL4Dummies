@@ -1,0 +1,11 @@
+Model Information:
+* title:	Mazda RX7 Stylised
+* source:	https://sketchfab.com/3d-models/mazda-rx7-stylised-898e9be8c8964f6298188a2901216e80
+* author:	SheldonJ99 (https://sketchfab.com/sheldonj99)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Mazda RX7 Stylised" (https://sketchfab.com/3d-models/mazda-rx7-stylised-898e9be8c8964f6298188a2901216e80) by SheldonJ99 (https://sketchfab.com/sheldonj99) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
