@@ -7,7 +7,7 @@
  * GLUT et upgrade avec utilisation des VAO/VBO et matrices et shaders
  * GL4dummies.
  *
- * \author Vincent Boyer et Farès Belhadj {boyer, amsi}@ai.univ-paris8.fr
+ * \author Vincent Boyer et Farès Belhadj amsi@up8.edu
  * \date February 14 2017
  *
  * Modification : Faire en sorte de charger autant d'objets qu'on veut.
@@ -231,6 +231,7 @@ static void apply_material(const struct aiMaterial *mtl) {
   float shininess, strength;
   struct aiColor4D diffuse, specular, ambient, emission;
   GLint id;
+  int use_emission_as_diffuse = 0;
   glGetIntegerv(GL_CURRENT_PROGRAM, &id);
   
   set_float4(c, 0.8f, 0.8f, 0.8f, 1.0f);
@@ -238,7 +239,9 @@ static void apply_material(const struct aiMaterial *mtl) {
     color4_to_float4(&diffuse, c);
   }
   glUniform4fv(glGetUniformLocation(id, "diffuse_color"), 1, c);
-
+  if(c[0] == 0.0f && c[1] == 0.0f && c[2] == 0.0f)
+    use_emission_as_diffuse = 1;
+  
   set_float4(c, 0.0f, 0.0f, 0.0f, 1.0f);
   if (AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_SPECULAR, &specular)){
     color4_to_float4(&specular, c);
@@ -250,12 +253,15 @@ static void apply_material(const struct aiMaterial *mtl) {
     color4_to_float4(&ambient, c);
   }
   glUniform4fv(glGetUniformLocation(id, "ambient_color"), 1, c);
+  /* fprintf(stderr, "A (%f %f %f %f)\n", c[0], c[1], c[2], c[3]); */
 
   set_float4(c, 0.0f, 0.0f, 0.0f, 1.0f);
   if (AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_EMISSIVE, &emission)){
     color4_to_float4(&emission, c);
   }
   glUniform4fv(glGetUniformLocation(id, "emission_color"), 1, c);
+  if(use_emission_as_diffuse && (c[0] > 0.0f || c[1] > 0.0f || c[2] == 0.0f))
+    glUniform4fv(glGetUniformLocation(id, "diffuse_color"), 1, c);
 
   max = 1;
   if(aiGetMaterialFloatArray(mtl, AI_MATKEY_SHININESS, &shininess, &max) == AI_SUCCESS) {

@@ -35,7 +35,7 @@ endif
 OBJ = $(SSRC:.c=.o)
 DOXYFILE = documentation/Doxyfile
 VSCFILES = $(PROGNAME).vcxproj $(PROGNAME).sln
-EXTRAFILES = README.md COPYING $(wildcard shaders/*.?s images/*.png audio/* models/* models/Al/* models/fish/* models/soccer/*) $(VSCFILES)
+EXTRAFILES = README.md COPYING $(wildcard shaders/*.?s images/* audio/*) $(shell find models -type f) $(VSCFILES)
 DISTFILES = $(SOURCES) Makefile $(HEADERS) $(DOXYFILE) $(EXTRAFILES)
 # Traitements automatiques pour ajout de chemins et options (ne pas modifier)
 ifneq (,$(shell ls -d /opt/local/include 2>/dev/null | tail -n 1))
