@@ -18,6 +18,7 @@
 #include <assert.h>
 
 #include <GL4D/gl4duw_SDL2.h>
+#include <GL4D/gl4dp.h>
 #include <SDL_image.h>
 
 #include <assimp/cimport.h>
@@ -99,7 +100,7 @@ GLuint assimpGenScene(const char * filename) {
       struct aiString tfname;
       char * dir = pathOf(filename), buf[BUFSIZ];
       if (aiGetMaterialTexture(pMaterial, aiTextureType_DIFFUSE, 0, &tfname, NULL, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
-	SDL_Surface * t;
+	SDL_Surface * t, * d;
 	snprintf(buf, sizeof buf, "%s/%s", dir, tfname.data);
 
 	if(!(t = IMG_Load(buf))) { 
@@ -112,12 +113,11 @@ GLuint assimpGenScene(const char * filename) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT/* GL_CLAMP_TO_EDGE */);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT/* GL_CLAMP_TO_EDGE */);
-	//#ifdef __APPLE__
-	//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, t->w, t->h, 0, t->format->BytesPerPixel == 3 ? GL_BGR : GL_BGRA, GL_UNSIGNED_BYTE, t->pixels);
-	//#else
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, t->w, t->h, 0, t->format->BytesPerPixel == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, t->pixels);
-	//#endif
+	d = SDL_CreateRGBSurface(0, t->w, t->h, 32, R_MASK, G_MASK, B_MASK, A_MASK);
+	SDL_BlitSurface(t, NULL, d, NULL);
 	SDL_FreeSurface(t);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, d->w, d->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, d->pixels);
+	SDL_FreeSurface(d);
       }
     }
   }
