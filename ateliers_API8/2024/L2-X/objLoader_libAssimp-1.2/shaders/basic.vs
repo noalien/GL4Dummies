@@ -2,6 +2,8 @@
 
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
+uniform int sky;
+
 
 layout (location = 0) in vec3 vsiPosition;
 layout (location = 1) in vec3 vsiNormal;
@@ -15,5 +17,8 @@ void main(void) {
   vsoNormal = (transpose(inverse(modelViewMatrix)) * vec4(vsiNormal.xyz, 0.0)).xyz;
   vsoModPosition = modelViewMatrix * vec4(vsiPosition.xyz, 1.0);
   gl_Position = projectionMatrix * modelViewMatrix * vec4(vsiPosition.xyz, 1.0);
-  vsoTexCoord = vec2(vsiTexCoord.x, 1.0 - vsiTexCoord.y);
+  if(sky != 0)
+    vsoTexCoord = 2.0 * vec2(vsiTexCoord.x, vsiTexCoord.y);
+  else
+    vsoTexCoord = vec2(vsiTexCoord.x, 1.0 - vsiTexCoord.y);
 }
