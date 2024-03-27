@@ -16,13 +16,16 @@ static void draw(void);
 static void quit(void);
 
 /*!\brief largeur et hauteur de la fenêtre */
-static int _wW = 800, _wH = 600;
+static int _wW = 1280, _wH = 960;
 /*!\brief identifiant du (futur) GLSL program */
 static GLuint _pId = 0;
 /*!\brief identifiant pour une géométrie GL4D */
-static GLuint _quadId = 0;
+static GLuint _gridId = 0;
 /*!\brief identifiant pour une géométrie GL4D */
 static GLboolean _wireframe = GL_FALSE;
+/*!\brief identifiant de texture */
+static GLuint _texId = 0;
+static int _tw = 513, _th = 513;
 
 /*!\brief créé la fenêtre d'affichage, initialise GL et les données,
  * affecte les fonctions d'événements et lance la boucle principale
@@ -41,10 +44,22 @@ int main(int argc, char ** argv) {
 }
 /*!\brief initialise les paramètres OpenGL et les données. */
 static void init(void) {
+  glGenTextures(1, &_texId);
+  glBindTexture(GL_TEXTURE_2D, _texId);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+
+  GLfloat * fractales = gl4dmTriangleEdge (_tw, _th, 0.6f);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, _tw, _th, 0, GL_RED, GL_FLOAT, fractales);
+  free(fractales);
+  glBindTexture(GL_TEXTURE_2D, 0);
+  
   /* Création du programme shader (voir le dossier shader) */
   _pId = gl4duCreateProgram("<vs>shaders/basic.vs", "<fs>shaders/basic.fs", NULL);
   /* Créer un quadtrilatère */
-  _quadId = gl4dgGenGrid2df(129, 129);
+  _gridId = gl4dgGenGrid2df(_tw, _th);
   /* Set de la couleur (RGBA) d'effacement OpenGL */
   glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
   /* activation du test de profondeur afin de prendre en compte la
@@ -102,7 +117,7 @@ static void draw(void) {
   /* Composer la matrice vue courante en simulant une "caméra" à
    * l'aide de la fonction LookAt(xyz_position_cam,
    * xyz_ou_elle_regarde, xyz_son_vecteur_haut) */
-  gl4duLookAtf(0.0f, 3.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+  gl4duLookAtf(0.0f, 3.0f, 3.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
   /* lier (mettre en avant ou "courante") la matrice modèle créée dans
    * init */
   gl4duBindMatrix("modelMatrix");
@@ -113,10 +128,19 @@ static void draw(void) {
    * GL4Dummies, ici on intègre pas la rotation qui vient après */
   gl4duSendMatrices();
 
+  glUniform2f(glGetUniformLocation(_pId, "offset"), 1.0f / (_tw - 1.0f), 1.0f / (_th - 1.0f));
   glUniform1f(glGetUniformLocation(_pId, "temps"), t / 1000.0);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, _texId);
+  glUniform1i(glGetUniformLocation(_pId, "tex"), 0);
   
   /* dessiner la géométrie */
-  gl4dgDraw(_quadId);
+  gl4dgDraw(_gridId);
+
+
+  glBindTexture(GL_TEXTURE_2D, 0);
+
   /* désactiver le programme shader */
   glUseProgram(0);
 
@@ -127,6 +151,10 @@ static void draw(void) {
 /*!\brief appelée au moment de sortir du programme (atexit), elle
  *  libère les éléments OpenGL utilisés.*/
 static void quit(void) {
+  if(_texId) {
+    glDeleteTextures(1, &_texId);
+    _texId = 0;
+  }
   /* nettoyage des éléments utilisés par la bibliothèque GL4Dummies */
   gl4duClean(GL4DU_ALL);
 }
