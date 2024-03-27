@@ -1,0 +1,11 @@
+Model Information:
+* title:	Forest House
+* source:	https://sketchfab.com/3d-models/forest-house-5646e6a3c8834022a0e289465f0bbc5d
+* author:	Wesai (https://sketchfab.com/Wesai)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Forest House" (https://sketchfab.com/3d-models/forest-house-5646e6a3c8834022a0e289465f0bbc5d) by Wesai (https://sketchfab.com/Wesai) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
