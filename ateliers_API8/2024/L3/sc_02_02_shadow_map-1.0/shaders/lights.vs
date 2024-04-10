@@ -12,20 +12,10 @@ uniform mat4 view;
 
 out vec4 mvpos;
 out vec3 N;
-out vec3 T;
-out vec2 texCoord;
 out vec4 vsoSMCoord;
 
 void main() {
   N = normalize((inverse(transpose(mod)) * vec4(normal, 0)).xyz);
-  /* set des tangents, cas particulier de vecteurs à une composante non nulle */
-  /* 100 -> 010 -> 001 -> 100 */
-  T.x = normal.z;
-  T.y = normal.x;
-  T.z = normal.y;
-  T = normalize((inverse(transpose(mod)) * vec4(T, 0)).xyz);
-  /* appliquer les scales aux coordonnées de texture utilisées pour la perturbation des normales */
-  texCoord = vec2(tC.x * mod[0][0], tC.y * mod[1][1]);
   mvpos = view * mod * vec4(pos, 1.0);
   gl_Position = proj * mvpos;
 

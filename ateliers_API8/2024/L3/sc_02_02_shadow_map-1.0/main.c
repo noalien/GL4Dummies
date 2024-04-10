@@ -32,7 +32,7 @@ void init(void) {
   _quadId = gl4dgGenQuadf();
   _torusId = gl4dgGenTorusf(20, 10, 0.3);
   GLfloat * hm = gl4dmTriangleEdge(513, 513, 0.4f);
-  _terrainId = gl4dgGenGrid2dFromHeightMapf(513, 513, hm);
+  _terrainId = gl4dgGenConef(20, GL_TRUE); //gl4dgGenGrid2dFromHeightMapf(513, 513, hm);
   free(hm);
   _pId = gl4duCreateProgram("<vs>shaders/lights.vs", "<fs>shaders/lights.fs", NULL);
   _smpId  = gl4duCreateProgram("<vs>shaders/shadowMap.vs", "<fs>shaders/shadowMap.fs", NULL);
@@ -74,7 +74,7 @@ static void resize(int width, int height) {
 
 void scene(GLboolean sm, GLfloat dt) {
   static GLfloat x = 0.0f;
-  GLfloat rouge[] = {1.0f, 0, 0, 1.0f}, jaune[] = {1.0f, 1.0f, 0, 1.0f}, blanc[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  GLfloat rouge[] = {1.0f, 0.5, 0.5, 1.0f}, jaune[] = {1.0f, 1.0f, 0, 1.0f}, blanc[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   GLfloat lumpos0[] = { 0.0f, 3.5f, 1.5f, 1.0f }, lumpos[4], * mat;
   lumpos0[0] = 4.0f * sin(x);
 
@@ -125,8 +125,8 @@ void scene(GLboolean sm, GLfloat dt) {
   gl4dgDraw(_torusId);
 
   gl4duLoadIdentityf();
-  gl4duTranslatef(1.0f, 0.5f, -4.5f);
-  gl4duScalef(3.0f, 1.0f, 3.0f);
+  gl4duTranslatef(-1.0f, 0.5f, -4.5f);
+  gl4duScalef(3.0f, 3.0f, 3.0f);
   gl4duRotatef(10.0f, 1.0f, 0.0f, 0.0f);
   gl4duSendMatrices();
   gl4dgDraw(_terrainId);

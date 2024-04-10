@@ -1,9 +1,7 @@
 #version 330
 
-in vec4 mvpos;
 in vec3 N;
-in vec3 T;
-in vec2 texCoord;
+in vec4 mvpos;
 in vec4 vsoSMCoord;
 
 out vec4 fragColor;
