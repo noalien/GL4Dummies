@@ -33,6 +33,7 @@ int main(int argc, char ** argv) {
   if(!gl4duwCreateWindow(argc, argv, "GL4Dummies", 20, 20, 
 			 _wW, _wH, GL4DW_SHOWN))
     return 1;
+  SDL_GL_SetSwapInterval(1);
   init();
   atexit(quit);
   gl4duwDisplayFunc(draw);

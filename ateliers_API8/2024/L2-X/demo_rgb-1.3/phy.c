@@ -2,6 +2,7 @@
 #include <GL4D/gl4dm.h>
 #include <GL4D/gl4dg.h>
 #include <GL4D/gl4dh.h>
+#include <GL4D/gl4df.h>
 #include <SDL_image.h>
 #include "mobile.h"
 #include "audioHelper.h"
@@ -189,6 +190,10 @@ void scene(GLuint pId, float a) {
   gl4duRotatef(25.0f, 0.0f, 1.0f, 0.0f);
   mobile_draw(pId, _tore);
 
+  GLint tId;
+  glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &tId);
+  //printf("%d\n", tId); exit(0);
+  gl4dfBlur(tId, tId, 50, 1, 0, GL_FALSE);
   //return;
   /* LE CUBE */
   /* activer la transparence si désactivée */
