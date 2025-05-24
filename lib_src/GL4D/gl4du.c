@@ -687,6 +687,8 @@ int gl4duUpdateShaders(void) {
 	fn = strdup((*ptr)->filename);
 	deleteFromShadersList(ptr);
 	ptr = addInShadersList(ot, fn, NULL);
+    if (!ptr)
+        return 0;
 	for(i = 0; i < n; i++) {
 	  attachShader(p[i], *ptr);
 	  glLinkProgram(p[i]->id);
