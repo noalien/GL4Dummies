@@ -32,7 +32,7 @@ static void quit(void);
 /*!\brief nombre de bandes de fréquences stockées */
 #define FREQUENCES (ECHANTILLONS >> 2)
 /*!\brief amplitude des échantillons du signal sonore */
-static jack_default_audio_sample_t _samples[ECHANTILLONS];
+static float _samples[ECHANTILLONS];
 /*!\brief amplitude des fréquences du signal sonore */
 static Sint16 _hauteurs[FREQUENCES];
 /*!\brief dimensions de la fenêtre */
@@ -91,35 +91,43 @@ static void init(const char * clientname) {
   }
 }
 
+
+/*!\brief dessine la forme d'onde dans le contexte OpenGL actif */
+static void drawwave(void) {
+  for(int i = 0; i < ECHANTILLONS; ++i) {
+    int x0 = (i * (_wW - 1)) / (ECHANTILLONS - 1);
+    int y0 = (_samples[i] * _wH + _wH) / 2;
+
+    if(y0 > _wH) y0 = _wH - 1;
+    if(y0 < 0) y0 = 0;
+      
+    gl4dpPutPixel(x0, y0);
+  }
+}
+
+/*!\brief dessine les bandes de fréquences dans le contexte OpenGL actif */
+static void drawfftw(void) {
+  for(int i = 0; i < FREQUENCES; ++i) {
+    int x0 = (i * (_wW - 1)) / (FREQUENCES - 1);
+    int y0 = _hauteurs[i];
+
+    if(y0 > _wH) y0 = _wH - 1;
+    if(y0 < 0) y0 = 0;
+      
+    gl4dpPutPixel(x0, y0);
+  }
+}
+
 /*!\brief dessine dans le contexte OpenGL actif */
 static void draw(void) {
-  int i;
   gl4dpSetColor(RGB(255, 255, 255));
   gl4dpSetScreen(_screen);
   gl4dpClearScreen();
 
   if (waveform == 1) {
-    // affichage de la forme d'onde
-    for(i = 0; i < ECHANTILLONS; ++i) {
-      int x0 = (i * (_wW - 1)) / (ECHANTILLONS - 1);
-      int y0 = (_samples[i] * _wH + _wH) / 2;
-
-      if(y0 > _wH) y0 = _wH - 1;
-      if(y0 < 0) y0 = 0;
-      
-      gl4dpPutPixel(x0, y0);
-    }
+    drawwave();
   } else {
-    // affichage des bandes de fréquences
-    for(i = 0; i < FREQUENCES; ++i) {
-      int x0 = (i * (_wW - 1)) / (FREQUENCES - 1);
-      int y0 = _hauteurs[i];
-
-      if(y0 > _wH) y0 = _wH - 1;
-      if(y0 < 0) y0 = 0;
-      
-      gl4dpPutPixel(x0, y0);
-    }
+    drawfftw();
   }
   gl4dpUpdateScreen(NULL);
 }
@@ -143,31 +151,27 @@ static void keydown(int keycode) {
   }
 }
 
-/*!\brief fonction appellée par jack liée au client jack
- * les données d'entrée du port \ref _input sont récupérées dans
- * \a buffer. Ce buffer a une aille \a nframes
- */
-static int mixCallback(jack_nframes_t nframes, void * arg) {
+
+/*!\brief remplit un tableau '_samples' de taille fixe */
+static void fillwave(float * buffer, int nframes) {
+  if(nframes > ECHANTILLONS) {
+    for(int i = 0; i < ECHANTILLONS; ++i)
+      _samples[i] = buffer[i];
+  } else {
+    // si 'buffer' a une taille inférieur à notre tableau _samples de taille fixe,
+    // on bouge les données précédentes pour faire avancer le signal de 'nframes' échantillons
+    for(int i = nframes; i < ECHANTILLONS; ++i)
+      _samples[i - nframes] = _samples[i];
+
+    int end = ECHANTILLONS - nframes;
+    for(int i = 0; i < nframes; ++i)
+      _samples[i + end] = buffer[i];
+  }
+}
+
+/*!\brief calcule la transformée de fourier sur le tableau '_samples' */
+static void processfftw(void) {
   if(_plan4fftw) {
-    jack_default_audio_sample_t * buffer = jack_port_get_buffer((jack_port_t*)arg, nframes);
-
-    // 'buffer' peut avoir une taille variant de 16 à 4096 échantillons,
-    // donc nous stockons les données dans un tableau '_samples' de taille fixe. 
-    if(nframes > ECHANTILLONS) {
-      for(int i = 0; i < ECHANTILLONS; ++i)
-        _samples[i] = buffer[i];
-    } else {
-      // si 'buffer' a une taille inférieur à notre tableau _samples de taille fixe,
-      // on bouge les données précédentes pour faire avancer le signal de 'nframes' échantillons
-      for(int i = nframes; i < ECHANTILLONS; ++i)
-        _samples[i - nframes] = _samples[i];
-
-      int end = ECHANTILLONS - nframes;
-      for(int i = 0; i < nframes; ++i)
-        _samples[i + end] = buffer[i];
-    }
-
-    // on calcule la transformée de fourier sur le tableau '_samples' de taille fixe
     int i;
     for(i = 0; i < ECHANTILLONS; i++)
       _in4fftw[i][0] = _samples[i];
@@ -177,6 +181,17 @@ static int mixCallback(jack_nframes_t nframes, void * arg) {
     for(i = 0; i < FREQUENCES; i++)
       _hauteurs[i] = (int)(sqrt(_out4fftw[i][0] * _out4fftw[i][0] + _out4fftw[i][1] * _out4fftw[i][1]) * exp(2.0 * i / (double)(FREQUENCES)));
   }
+}
+
+/*!\brief fonction appellée par jack liée au client jack
+ * les données d'entrée du port \ref _input sont récupérées dans
+ * \a buffer. Ce buffer a une aille \a nframes
+ */
+static int mixCallback(jack_nframes_t nframes, void * arg) {
+  float * buffer = jack_port_get_buffer((jack_port_t*)arg, nframes);
+
+  fillwave(buffer, nframes);
+  processfftw();
 
   return 0;
 }
