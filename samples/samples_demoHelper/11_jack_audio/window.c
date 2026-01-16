@@ -19,19 +19,28 @@
 #include <fftw3.h>
 
 /* Prototypes des fonctions statiques contenues dans ce fichier C */
+static void keydown(int keycode);
 static void init(const char * clientname);
 static void draw(void);
 static int initJack(const char * clientname);
 static void quit(void);
 
-/*!\brief nombre d'échantillons du signal sonore */
-#define ECHANTILLONS 1024
+/*!\brief nombre d'échantillons du signal sonore
+ * plus ce nombre est grand, plus la précision de la transformée de fourier sera grande (surtout dans les graves), 
+ */
+#define ECHANTILLONS 4096
+/*!\brief nombre de bandes de fréquences stockées */
+#define FREQUENCES (ECHANTILLONS >> 2)
 /*!\brief amplitude des échantillons du signal sonore */
-static Sint16 _hauteurs[ECHANTILLONS];
+static float _samples[ECHANTILLONS];
+/*!\brief amplitude des fréquences du signal sonore */
+static Sint16 _hauteurs[FREQUENCES];
 /*!\brief dimensions de la fenêtre */
-static int _wW = ECHANTILLONS, _wH = 256;
+static int _wW = 1280, _wH = 512;
 /*!\brief id du screen à créer */
 static GLuint _screen = 0;
+/*!\brief type d'affichage */
+static int waveform = 0;
 
 
 /*!\brief données entrées/sorties pour la lib fftw */
@@ -58,6 +67,7 @@ int main(int argc, char ** argv) {
   init(argv[1]);
   atexit(quit);
   gl4duwDisplayFunc(draw);
+  gl4duwKeyDownFunc(keydown);
   gl4duwMainLoop();
   return 0;
 }
@@ -74,47 +84,114 @@ static void init(const char * clientname) {
   /* préparation GL */
   glViewport(0, 0, _wW, _wH);
   _screen = gl4dpInitScreen();
-  /* chargement de l'audio */
+  /* chargement de jack audio */
   if(initJack(clientname)) {
     printf("An error occured\n");
     exit(1);
   }
 }
 
+
+/*!\brief dessine la forme d'onde dans le contexte OpenGL actif */
+static void drawwave(void) {
+  for(int i = 0; i < ECHANTILLONS; ++i) {
+    int x0 = (i * (_wW - 1)) / (ECHANTILLONS - 1);
+    int y0 = (_samples[i] * _wH + _wH) / 2;
+
+    if(y0 > _wH) y0 = _wH - 1;
+    if(y0 < 0) y0 = 0;
+      
+    gl4dpPutPixel(x0, y0);
+  }
+}
+
+/*!\brief dessine les bandes de fréquences dans le contexte OpenGL actif */
+static void drawfftw(void) {
+  for(int i = 0; i < FREQUENCES; ++i) {
+    int x0 = (i * (_wW - 1)) / (FREQUENCES - 1);
+    int y0 = _hauteurs[i];
+
+    if(y0 > _wH) y0 = _wH - 1;
+    if(y0 < 0) y0 = 0;
+      
+    gl4dpPutPixel(x0, y0);
+  }
+}
+
 /*!\brief dessine dans le contexte OpenGL actif */
 static void draw(void) {
-  int i;
   gl4dpSetColor(RGB(255, 255, 255));
   gl4dpSetScreen(_screen);
   gl4dpClearScreen();
-  for(i = 0; i < ECHANTILLONS; ++i) {
-    int x0, y0;
-    x0 = (i * (_wW - 1)) / (ECHANTILLONS - 1);
-    y0 = _hauteurs[i];
-    gl4dpPutPixel(x0, y0);
+
+  if (waveform == 1) {
+    drawwave();
+  } else {
+    drawfftw();
   }
   gl4dpUpdateScreen(NULL);
 }
 
+/*!\brief fonction appellée par GL4Dummies' quand un événement
+ * clavier est détecté
+ * permet de changer le type de visualisation du signal
+ * waveform = 0 -> visualisation des amplitudes de fréquences
+ * waveform = 1 -> visualisation du signal audio
+ */
+static void keydown(int keycode) {
+  switch(keycode) {
+  case GL4DK_LEFT:
+    waveform = 0;
+    break;
+  case GL4DK_RIGHT:
+    waveform = 1;
+    break;
+  default:
+    break;
+  }
+}
+
+
+/*!\brief remplit un tableau '_samples' de taille fixe */
+static void fillwave(float * buffer, int nframes) {
+  if(nframes > ECHANTILLONS) {
+    for(int i = 0; i < ECHANTILLONS; ++i)
+      _samples[i] = buffer[i];
+  } else {
+    // si 'buffer' a une taille inférieur à notre tableau _samples de taille fixe,
+    // on bouge les données précédentes pour faire avancer le signal de 'nframes' échantillons
+    for(int i = nframes; i < ECHANTILLONS; ++i)
+      _samples[i - nframes] = _samples[i];
+
+    int end = ECHANTILLONS - nframes;
+    for(int i = 0; i < nframes; ++i)
+      _samples[i + end] = buffer[i];
+  }
+}
+
+/*!\brief calcule la transformée de fourier sur le tableau '_samples' */
+static void processfftw(void) {
+  if(_plan4fftw) {
+    int i;
+    for(i = 0; i < ECHANTILLONS; i++)
+      _in4fftw[i][0] = _samples[i];
+
+    fftw_execute(_plan4fftw);
+
+    for(i = 0; i < FREQUENCES; i++)
+      _hauteurs[i] = (int)(sqrt(_out4fftw[i][0] * _out4fftw[i][0] + _out4fftw[i][1] * _out4fftw[i][1]) * exp(2.0 * i / (double)(FREQUENCES)));
+  }
+}
 
 /*!\brief fonction appellée par jack liée au client jack
  * les données d'entrée du port \ref _input sont récupérées dans
  * \a buffer. Ce buffer a une aille \a nframes
  */
 static int mixCallback(jack_nframes_t nframes, void * arg) {
-  if(_plan4fftw) {
-    jack_default_audio_sample_t * buffer = jack_port_get_buffer((jack_port_t*)arg, nframes);
+  float * buffer = jack_port_get_buffer((jack_port_t*)arg, nframes);
 
-    int i, j, l = MIN(nframes, ECHANTILLONS);
-    for(i = 0; i < l; i++)
-      _in4fftw[i][0] = buffer[i];
-    fftw_execute(_plan4fftw);
-    for(i = 0; i < l >> 2; i++) {
-      _hauteurs[4 * i] = (int)(sqrt(_out4fftw[i][0] * _out4fftw[i][0] + _out4fftw[i][1] * _out4fftw[i][1]) * exp(2.0 * i / (double)(l / 4.0)));
-      for(j = 1; j < 4; j++)
-	_hauteurs[4 * i + j] = MIN(_hauteurs[4 * i], 255);
-    }
-  }
+  fillwave(buffer, nframes);
+  processfftw();
 
   return 0;
 }

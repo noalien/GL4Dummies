@@ -190,7 +190,7 @@ static void setDimensions(GLuint w, GLuint h) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, _width, _height, 0, GL_RG, GL_FLOAT, noise);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RG32F, _width, _height, 0, GL_RG, GL_FLOAT, noise);
   free(noise);
 }
 
