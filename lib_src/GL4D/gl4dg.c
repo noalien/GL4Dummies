@@ -438,7 +438,7 @@ GLuint gl4dgGenTeapotf(GLuint slices) {
   glEnableVertexAttribArray(2);
   glGenBuffers(1, &(c->buffer));
   glBindBuffer(GL_ARRAY_BUFFER, c->buffer);
-  glBufferData(GL_ARRAY_BUFFER,(392 * slices + 8) * sizeof *data, data, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, 24 * sizeof *data, data, GL_STATIC_DRAW);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)0);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(3 * sizeof *data));
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(6 * sizeof *data));
@@ -512,7 +512,7 @@ void gl4dgDraw(GLuint id) {
     break;
   case GE_TEAPOT:
     glBindVertexArray(_garray[id].vao);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 49 * (((gteapot_t *)(_garray[id].geom))->slices )+1);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);
     break;
   default:
@@ -1077,115 +1077,25 @@ static void mkGrid2dNormalsf(GLuint width, GLuint height, GLfloat * data) {
 
 static GLfloat * mkTeapotVerticesf(GLuint slices) {
   /* Vertices data */
-  static GLfloat teapot_data[][5] = {
-    /*vertx  verty  normx  normy  texCoord    lid*/
-    { 0.000, 0.394, 0.000, 1.000, 0.000000 },
-    { 0.085, 0.382, 0.825, 0.565, 0.055058 },
-    { 0.081, 0.352, 0.940,-0.335, 0.074406 },
-    { 0.049, 0.315, 0.960,-0.285, 0.105557 },
-    { 0.050, 0.281, 0.845, 0.530, 0.126978 },
-    { 0.114, 0.259, 0.260, 0.965, 0.170294 },
-    { 0.206, 0.244, 0.180, 0.985, 0.230067 },
-    { 0.289, 0.229, 0.380, 0.925, 0.283858 },
-    { 0.325, 0.206, 0.170, 0.985, 0.310912 },
-    /*vertx  verty  normx  normy  texCoord    rim*/
-    { 0.350, 0.206,-0.970,-0.255, 0.310912 },
-    { 0.345, 0.225,-0.970, 0.255, 0.323163 },
-    { 0.351, 0.231,-0.090, 1.000, 0.328592 },
-    { 0.362, 0.225, 0.680, 0.730, 0.336960 },
-    /*vertx  verty  normx  normy  texCoord    body*/
-    { 0.489,-0.081, 0.870, 0.495, 0.351323 },
-    { 0.421, 0.108, 0.915, 0.405, 0.420675 },
-    { 0.461, 0.012, 0.940, 0.335, 0.487306 },
-    { 0.489,-0.081, 0.980, 0.205, 0.549441 },
-    { 0.500,-0.169, 1.000,-0.065, 0.605798 },
-    { 0.481,-0.243, 0.900,-0.435, 0.654719 },
-    { 0.438,-0.298, 0.730,-0.685, 0.699350 },
-    { 0.395,-0.335, 0.695,-0.720, 0.735718 },
-    /*vertx  verty  normx  normy  texCoord    bottom*/
-    { 0.375,-0.356, 0.795,-0.610, 0.754156 },
-    { 0.367,-0.370, 0.625,-0.780, 0.764490 },
-    { 0.321,-0.382, 0.175,-0.985, 0.794571 },
-    { 0.209,-0.391, 0.050,-1.000, 0.866376 },
-    { 0.000,-0.394, 0.000,-1.000, 1.000000 }
+  static GLfloat teapot_data[] = {
+    -1.0f, -1.0f, 0.0f,
+    0.0f, 0.0f, 1.0f,
+    0.0f, 0.0f, 
+    1.0f, -1.0f, 0.0f,
+    0.0f, 0.0f, 1.0f,
+    1.0f, 0.0f,
+    0.0f, 1.0f, 0.0f,
+    0.0f, 0.0f, 1.0f,
+    0.5f, 1.0f
+    
   };
-  /* Initialization of variables */
-  int i, j, k = 0;
-  GLfloat * data;
-  GLdouble angle, theta = 2.0 * M_PI / slices;
-  data = malloc((392 * slices + 8) * sizeof *data);
+  GLfloat * data = malloc(sizeof teapot_data);
   assert(data);
-  /* Filling the buffer */
-  data[k++] = teapot_data[0][0];
-  data[k++] = teapot_data[0][1];
-  data[k++] = 0;
-  data[k++] = teapot_data[0][2];
-  data[k++] = teapot_data[0][3];
-  data[k++] = 0;
-  data[k++] = 0;
-  data[k++] = teapot_data[0][4];
-  for(i = 0; i < (int)slices; ++i) {
-    angle = i*theta;
-    if(i%2) {
-      for(j = 24; j > 0; --j) {
-        data[k++] = teapot_data[j][0]*cos(angle);
-        data[k++] = teapot_data[j][1];
-        data[k++] = teapot_data[j][0]*sin(angle);
-        data[k++] = teapot_data[j][2]*cos(angle);
-        data[k++] = teapot_data[j][3];
-        data[k++] = teapot_data[j][2]*sin(angle);
-        data[k++] = (angle)/(2.0*M_PI);
-        data[k++] = teapot_data[j][4];
-
-        data[k++] = teapot_data[j][0]*cos(angle+theta);
-        data[k++] = teapot_data[j][1];
-        data[k++] = teapot_data[j][0]*sin(angle+theta);
-        data[k++] = teapot_data[j][2]*cos(angle+theta);
-        data[k++] = teapot_data[j][3];
-        data[k++] = teapot_data[j][2]*sin(angle+theta);
-        data[k++] = (angle+theta)/(2.0*M_PI);
-        data[k++] = teapot_data[j][4];
-      }
-      data[k++] = teapot_data[j][0];
-      data[k++] = teapot_data[j][1];
-      data[k++] = 0.0;
-      data[k++] = teapot_data[j][2];
-      data[k++] = teapot_data[j][3];
-      data[k++] = 0.0;
-      data[k++] = (angle)/(2.0*M_PI);
-      data[k++] = teapot_data[j][4];
-    }
-    else {
-      for(j = 1; j < 25; ++j) {
-        data[k++] = teapot_data[j][0]*cos(angle);
-        data[k++] = teapot_data[j][1];
-        data[k++] = teapot_data[j][0]*sin(angle);
-        data[k++] = teapot_data[j][2]*cos(angle);
-        data[k++] = teapot_data[j][3];
-        data[k++] = teapot_data[j][2]*sin(angle);
-        data[k++] = (angle)/(2.0*M_PI);
-        data[k++] = teapot_data[j][4];
-
-        data[k++] = teapot_data[j][0]*cos(angle+theta);
-        data[k++] = teapot_data[j][1];
-        data[k++] = teapot_data[j][0]*sin(angle+theta);
-        data[k++] = teapot_data[j][2]*cos(angle+theta);
-        data[k++] = teapot_data[j][3];
-        data[k++] = teapot_data[j][2]*sin(angle+theta);
-        data[k++] = (angle+theta)/(2.0*M_PI);
-        data[k++] = teapot_data[j][4];
-      }
-      data[k++] = teapot_data[25][0];
-      data[k++] = teapot_data[25][1];
-      data[k++] = 0.0;
-      data[k++] = teapot_data[25][2];
-      data[k++] = teapot_data[25][3];
-      data[k++] = 0.0;
-      data[k++] = (angle)/(2.0*M_PI);
-      data[k++] = teapot_data[25][4];
-    }
-  }
+  memcpy(data, teapot_data, sizeof teapot_data);
+  
+	
   return data;
+  
 }
 
 static inline void triangleNormalf(GLfloat * out, GLfloat * p0, GLfloat * p1, GLfloat * p2) {
