@@ -166,6 +166,7 @@ static GLfloat       * mkDiskVerticesf(GLuint slices);
 static GLfloat       * mkTorusVerticesf(GLuint slices, GLuint stacks, GLfloat radius);
 static GLfloat       * mkGrid2dVerticesf(GLuint width, GLuint height, GLfloat * heightmap);
 static GLfloat       * mkTeapotVerticesf(GLuint slices);
+static GLfloat lerp (GLfloat v0, GLfloat v1, GLfloat t);
 static void            mkGrid2dNormalsf(GLuint width, GLuint height, GLfloat * data);
 static inline void     triangleNormalf(GLfloat * out, GLfloat * p0, GLfloat * p1, GLfloat * p2);
 static inline int      _maxi(int a, int b);
@@ -421,6 +422,13 @@ GLuint gl4dgGenGrid2dFromHeightMapf(GLuint width, GLuint height, GLfloat * heigh
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   return ++i;
 }
+
+typedef struct points {
+  GLfloat x;
+  GLfloat y;
+  GLfloat z;
+};
+
 
 GLuint gl4dgGenTeapotf(GLuint slices) {
   GLfloat * data = NULL;
@@ -1074,6 +1082,11 @@ static void mkGrid2dNormalsf(GLuint width, GLuint height, GLfloat * data) {
       data[8 * (x + zw) + 3 + i] = (n[i] + n[3 + i] + n[6 + i]) / 3.0f;
   }
 }
+
+GLfloat lerp(GLfloat a, GLfloat b, GLfloat t) {
+  return v0 + t * (v1 - v0);
+}
+
 
 static GLfloat * mkTeapotVerticesf(GLuint slices) {
   /* Vertices data */
