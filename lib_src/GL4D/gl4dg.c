@@ -1083,7 +1083,7 @@ static void mkGrid2dNormalsf(GLuint width, GLuint height, GLfloat * data) {
   }
 }
 
-GLfloat lerp(GLfloat a, GLfloat b, GLfloat t) {
+GLfloat lerp(GLfloat v0, GLfloat v1, GLfloat t) {
   return v0 + t * (v1 - v0);
 }
 
