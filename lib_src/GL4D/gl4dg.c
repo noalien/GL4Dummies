@@ -171,6 +171,7 @@ static void            mkGrid2dNormalsf(GLuint width, GLuint height, GLfloat * d
 static inline void     triangleNormalf(GLfloat * out, GLfloat * p0, GLfloat * p1, GLfloat * p2);
 static inline int      _maxi(int a, int b);
 static inline int      _mini(int a, int b);
+static inline struct points deCasteljau(struct points *p, int n, GLfloat t);
   
 void gl4dgInit(void) {
   int i;
@@ -428,6 +429,7 @@ typedef struct points {
   GLfloat y;
   GLfloat z;
 };
+
 
 
 GLuint gl4dgGenTeapotf(GLuint slices) {
@@ -1084,10 +1086,13 @@ static void mkGrid2dNormalsf(GLuint width, GLuint height, GLfloat * data) {
 }
 
 GLfloat lerp(GLfloat v0, GLfloat v1, GLfloat t) {
-  return v0 + t * (v1 - v0);
+  return (1 - t) * v0 + t * v1;
 }
 
 
+static inline struct points deCasteljau(struct points *p, int n, GLfloat t) {
+
+}
 static GLfloat * mkTeapotVerticesf(GLuint slices) {
   /* Vertices data */
   static GLfloat teapot_data[] = {
