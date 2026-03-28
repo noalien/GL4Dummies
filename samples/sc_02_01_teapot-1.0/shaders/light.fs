@@ -8,5 +8,5 @@ out vec4 fragColor;
 in vec2 vsoTexCoord;
 
 void main(void) {
-  fragColor = vec4(vsoTexCoord, 0.0, 1.0);
+  fragColor = vec4(1.0);//vec4(vsoTexCoord, 0.0, 1.0);
 }

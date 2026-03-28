@@ -72,6 +72,7 @@ typedef struct gtorus_t gtorus_t;
 typedef struct ggrid2d_t ggrid2d_t;
 typedef struct gteapot_t gteapot_t;
 typedef enum   geom_e geom_e;
+typedef struct vec3f_t vec3f_t;
 
 enum geom_e {
   GE_NONE = 0,
@@ -144,6 +145,14 @@ struct gteapot_t {
   GLuint slices;
 };
 
+struct vec3f_t {
+  GLfloat x;
+  GLfloat y;
+  GLfloat z;
+};
+
+
+
 static geom_t * _garray = NULL;
 static GLint _garray_size = 256;
 static linked_list_t * _glist = NULL;
@@ -166,13 +175,14 @@ static GLfloat       * mkDiskVerticesf(GLuint slices);
 static GLfloat       * mkTorusVerticesf(GLuint slices, GLuint stacks, GLfloat radius);
 static GLfloat       * mkGrid2dVerticesf(GLuint width, GLuint height, GLfloat * heightmap);
 static GLfloat       * mkTeapotVerticesf(GLuint slices);
-static GLfloat lerp (GLfloat v0, GLfloat v1, GLfloat t);
 static void            mkGrid2dNormalsf(GLuint width, GLuint height, GLfloat * data);
 static inline void     triangleNormalf(GLfloat * out, GLfloat * p0, GLfloat * p1, GLfloat * p2);
 static inline int      _maxi(int a, int b);
 static inline int      _mini(int a, int b);
-static inline struct points deCasteljau(struct points *p, int n, GLfloat t);
-  
+static inline vec3f_t deCasteljau(vec3f_t *p, int n, GLfloat t);
+
+static const int _teapot_N = 42;
+
 void gl4dgInit(void) {
   int i;
   if(_hasInit) return;
@@ -424,11 +434,6 @@ GLuint gl4dgGenGrid2dFromHeightMapf(GLuint width, GLuint height, GLfloat * heigh
   return ++i;
 }
 
-typedef struct points {
-  GLfloat x;
-  GLfloat y;
-  GLfloat z;
-};
 
 
 
@@ -448,7 +453,7 @@ GLuint gl4dgGenTeapotf(GLuint slices) {
   glEnableVertexAttribArray(2);
   glGenBuffers(1, &(c->buffer));
   glBindBuffer(GL_ARRAY_BUFFER, c->buffer);
-  glBufferData(GL_ARRAY_BUFFER, 24 * sizeof *data, data, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, (8 * _teapot_N) * sizeof *data, data, GL_STATIC_DRAW);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)0);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(3 * sizeof *data));
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(6 * sizeof *data));
@@ -522,7 +527,8 @@ void gl4dgDraw(GLuint id) {
     break;
   case GE_TEAPOT:
     glBindVertexArray(_garray[id].vao);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    //glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawArrays(GL_LINES, 0, _teapot_N);
     glBindVertexArray(0);
     break;
   default:
@@ -1085,31 +1091,49 @@ static void mkGrid2dNormalsf(GLuint width, GLuint height, GLfloat * data) {
   }
 }
 
-GLfloat lerp(GLfloat v0, GLfloat v1, GLfloat t) {
-  return (1 - t) * v0 + t * v1;
+static inline vec3f_t lerp(vec3f_t a, vec3f_t b, GLfloat t) {
+  vec3f_t m;
+  m.x = (1.0f - t) * a.x + t * b.x;
+  m.y = (1.0f - t) * a.y + t * b.y;
+  m.z = (1.0f - t) * a.z + t * b.z;
+  return m;
+}  
+
+static inline vec3f_t deCasteljau(vec3f_t *p, int n, GLfloat t) {
+  assert(n > 0);
+  if (n == 1) /* si ne reste qu'un, c'est lui */
+    return p[0];
+  vec3f_t *np = malloc((n - 1) * sizeof *np);
+  assert(np);
+  for (int i = 0; i < n - 1; i++) {
+    np[i] = lerp(p[i], p[i + 1], t);
+  }
+  vec3f_t f = deCasteljau(np, n - 1, t);
+  free(np);
+  return f;
 }
 
-
-static inline struct points deCasteljau(struct points *p, int n, GLfloat t) {
-
-}
 static GLfloat * mkTeapotVerticesf(GLuint slices) {
-  /* Vertices data */
-  static GLfloat teapot_data[] = {
-    -1.0f, -1.0f, 0.0f,
-    0.0f, 0.0f, 1.0f,
-    0.0f, 0.0f, 
-    1.0f, -1.0f, 0.0f,
-    0.0f, 0.0f, 1.0f,
-    1.0f, 0.0f,
-    0.0f, 1.0f, 0.0f,
-    0.0f, 0.0f, 1.0f,
-    0.5f, 1.0f
-    
+  /* le bec ? */
+  vec3f_t cp_bec[] = {
+    { -0.76f, -0.91f,  0.0f },
+    {  0.122f, -0.873f,  0.0f },
+    { -0.09f, -0.006f,   0.0f },
+    { -0.403f,  0.891f,  0.0f },
+    {  0.437f,  0.993f,  0.0f }
   };
-  GLfloat * data = malloc(sizeof teapot_data);
+  /* Vertices data */
+  GLfloat * data = calloc(_teapot_N, sizeof *data);
   assert(data);
-  memcpy(data, teapot_data, sizeof teapot_data);
+  GLfloat t;
+  int i;
+  GLfloat dt = 1.0f/(_teapot_N - 1.0f);
+  for(t = 0.0f, i=0; t <= 1.0f; t+= dt, ++i) {
+    vec3f_t p = deCasteljau(cp_bec, sizeof cp_bec / sizeof *cp_bec, t);
+    data[8*i + 0] = p.x;
+    data[8*i +1] = p.y;
+    data[8*i +2] = p.z;
+  }
   
 	
   return data;
