@@ -528,7 +528,7 @@ void gl4dgDraw(GLuint id) {
   case GE_TEAPOT:
     glBindVertexArray(_garray[id].vao);
     //glDrawArrays(GL_TRIANGLES, 0, 3);
-    glDrawArrays(GL_LINES, 0, _teapot_N);
+    glDrawArrays(GL_LINE_STRIP, 0, _teapot_N);
     glBindVertexArray(0);
     break;
   default:
