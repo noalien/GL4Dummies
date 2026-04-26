@@ -4,7 +4,7 @@
  * \date February 02 2025
  */
 
-#include "GL4D/gl4dg.h"
+#include <GL4D/gl4dg.h>
 #include <GL4D/gl4du.h>
 #include <GL4D/gl4duw_SDL2.h>
 

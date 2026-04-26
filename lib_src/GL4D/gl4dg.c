@@ -453,7 +453,7 @@ GLuint gl4dgGenTeapotf(GLuint slices) {
   glEnableVertexAttribArray(2);
   glGenBuffers(1, &(c->buffer));
   glBindBuffer(GL_ARRAY_BUFFER, c->buffer);
-  glBufferData(GL_ARRAY_BUFFER, (8 * _teapot_N) * sizeof *data, data, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, (4 * 8 * _teapot_N) * sizeof *data, data, GL_STATIC_DRAW);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)0);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(3 * sizeof *data));
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(6 * sizeof *data));
@@ -527,8 +527,14 @@ void gl4dgDraw(GLuint id) {
     break;
   case GE_TEAPOT:
     glBindVertexArray(_garray[id].vao);
-    //glDrawArrays(GL_TRIANGLES, 0, 3);
+    //bec
     glDrawArrays(GL_LINE_STRIP, 0, _teapot_N);
+    //corps
+    glDrawArrays(GL_LINE_STRIP, _teapot_N, _teapot_N);
+    //anse
+    glDrawArrays(GL_LINE_STRIP, 2 * _teapot_N, _teapot_N);
+    //couvercle
+    glDrawArrays(GL_LINE_STRIP, 3 * _teapot_N, _teapot_N);
     glBindVertexArray(0);
     break;
   default:
@@ -1116,20 +1122,67 @@ static inline vec3f_t deCasteljau(vec3f_t *p, int n, GLfloat t) {
 static GLfloat * mkTeapotVerticesf(GLuint slices) {
   /* le bec ? */
   vec3f_t cp_bec[] = {
-    { -0.76f, -0.91f,  0.0f },
-    {  0.122f, -0.873f,  0.0f },
-    { -0.09f, -0.006f,   0.0f },
-    { -0.403f,  0.891f,  0.0f },
-    {  0.437f,  0.993f,  0.0f }
+    { 0.789f, -0.552f,  0.0f },
+    { 1.130f, -0.503f,  0.0f },
+    { 0.750f, -0.100f,  0.0f },
+    { 0.900f,  0.440f,  0.0f }
+  };
+
+  vec3f_t cp_corps[] = {
+    { 0.535f,   0.440f,  0.0f },
+    { 0.103f,  -0.099f, 0.0f },
+    { 1.346f,  -0.289f, 0.0f },
+    { 0.470f,  -1.000f, 0.0f }
+  };
+
+  vec3f_t cp_anse[] = {
+    { -0.453f,   0.200f,  0.0f },
+    { -0.625f,   0.052f, 0.0f },
+    { -0.530f,   0.840f, 0.0f },
+    { -1.207f,   0.420f, 0.0f },
+    { -1.193f,   0.016f, 0.0f },
+    { -0.780f,  -0.600f, 0.0f }
+  };
+  vec3f_t cp_couvercle[] = {
+    { 0.000f, 1.000f, 0.000f },
+    { 0.049f, 0.994f, 0.000f },
+    { 0.211f, 0.948f, 0.000f },
+    {-0.199f, 0.967f, 0.000f },
+    { 0.011f, 0.923f, 0.000f },
+    { 0.126f, 0.899f, 0.000f },
+    {-0.162f, 0.489f, 0.000f },
+    { 0.179f, 0.911f, 0.000f },
+    { 0.379f, 0.870f, 0.000f },
+    { 0.429f, 0.581f, 0.000f },
+    { 0.261f, 0.606f, 0.000f },
+    { 0.535f, 0.440f, 0.000f }
   };
   /* Vertices data */
-  GLfloat * data = calloc(_teapot_N, sizeof *data);
+  GLfloat * data = calloc(4 * 8 * _teapot_N, sizeof *data);
   assert(data);
   GLfloat t;
   int i;
   GLfloat dt = 1.0f/(_teapot_N - 1.0f);
   for(t = 0.0f, i=0; t <= 1.0f; t+= dt, ++i) {
     vec3f_t p = deCasteljau(cp_bec, sizeof cp_bec / sizeof *cp_bec, t);
+    data[8*i + 0] = p.x;
+    data[8*i +1] = p.y;
+    data[8*i +2] = p.z;
+  }
+  for(t = 0.0f; t <= 1.0f; t+= dt, ++i) {
+    vec3f_t p = deCasteljau(cp_corps, sizeof cp_corps / sizeof *cp_corps, t);
+    data[8*i + 0] = p.x;
+    data[8*i +1] = p.y;
+    data[8*i +2] = p.z;
+  }
+  for(t = 0.0f; t <= 1.0f; t+= dt, ++i) {
+    vec3f_t p = deCasteljau(cp_anse, sizeof cp_anse / sizeof *cp_anse, t);
+    data[8*i + 0] = p.x;
+    data[8*i +1] = p.y;
+    data[8*i +2] = p.z;
+  }
+  for(t = 0.0f; t <= 1.0f; t+= dt, ++i) {
+    vec3f_t p = deCasteljau(cp_couvercle, sizeof cp_couvercle / sizeof *cp_couvercle, t);
     data[8*i + 0] = p.x;
     data[8*i +1] = p.y;
     data[8*i +2] = p.z;
@@ -1159,4 +1212,3 @@ static inline int _maxi(int a, int b) {
 static inline int _mini(int a, int b) {
   return a < b ? a : b;
 }
-
