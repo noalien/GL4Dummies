@@ -55,7 +55,7 @@ void init(void) {
 }
 /*!\brief Cette fonction dessine dans le contexte OpenGL actif. */
 void draw(void) {
-  //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   static GLfloat angle = 0.0f;
   static double t0 = 0.0;
   double t = gl4dGetElapsedTime(), dt = (t - t0) / 1000.0;

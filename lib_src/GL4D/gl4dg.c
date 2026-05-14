@@ -187,7 +187,7 @@ static inline void    _y_revolution(GLfloat * to_rev, int m);
 static const int _teapot_N = 42;
 static const int _teapot_M = 42;
 /* tpss = nombre de TeaPot Sub Surfaces */
-static const int _nb_tpss = 1;
+static const int _nb_tpss = 2;
 
 void gl4dgInit(void) {
   int i;
@@ -459,7 +459,7 @@ GLuint gl4dgGenTeapotf(GLuint slices) {
   glEnableVertexAttribArray(2);
   glGenBuffers(1, &(c->buffer));
   glBindBuffer(GL_ARRAY_BUFFER, c->buffer);
-  glBufferData(GL_ARRAY_BUFFER, (_nb_tpss * 8 * _teapot_N * _teapot_M) * sizeof *data, data, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, (_nb_tpss * 8 * 2* (_teapot_N) * _teapot_M) * sizeof *data, data, GL_STATIC_DRAW);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)0);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(3 * sizeof *data));
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(6 * sizeof *data));
@@ -535,7 +535,7 @@ void gl4dgDraw(GLuint id) {
     glBindVertexArray(_garray[id].vao);
     /* corps puis couvercle puis bec puis anse */
     for(int i = 0; i < _nb_tpss; i++)
-      glDrawArrays(GL_LINE_STRIP, i * _teapot_N * _teapot_M, _teapot_N * _teapot_M);
+      glDrawArrays(GL_TRIANGLE_STRIP, 2 * i * (_teapot_N) * _teapot_M, 2 * (_teapot_N) * _teapot_M);
     glBindVertexArray(0);
     break;
   default:
@@ -1157,25 +1157,37 @@ GLfloat * mkTeapotVerticesf(GLuint slices) {
     { -0.780f,  -0.600f, 0.0f }
   };
   /* Vertices data */
-  GLfloat * data = calloc(_nb_tpss * 8 * _teapot_N * _teapot_M, sizeof *data);
+  GLfloat * data = calloc(_nb_tpss * 8 *2* (_teapot_N) * _teapot_M, sizeof *data);
   assert(data);
   GLfloat t;
   int i = 0;
-  GLfloat dt = 1.0f/(_teapot_N - 1.0f);
-  for(t = 0.0f; t <= 1.0f; t+= dt, ++i) {
+  GLfloat dt = 1.0f/(_teapot_N);
+  for(t = 0.0f; t < 1.0f; t+= dt, ++i) {
     vec3f_t p = deCasteljau(cp_corps, sizeof cp_corps / sizeof *cp_corps, t);
-    data[8*_teapot_M*i + 0] = p.x;
-    data[8*_teapot_M*i +1] = p.y;
-    data[8*_teapot_M*i +2] = p.z;
-    _y_revolution(&data[8*_teapot_M*i + 0], _teapot_M);
+    data[8*2*_teapot_M*i + 0] = p.x;
+    data[8*2*_teapot_M*i +1] = p.y;
+    data[8*2*_teapot_M*i +2] = p.z;
+    _y_revolution(&data[8*2*_teapot_M*i + 0], _teapot_M);
+    p = deCasteljau(cp_corps, sizeof cp_corps / sizeof *cp_corps, t + dt);
+    data[8*2*_teapot_M*i + 8] = p.x;
+    data[8*2*_teapot_M*i +9] = p.y;
+    data[8*2*_teapot_M*i +10] = p.z;
+    _y_revolution(&data[8*2*_teapot_M*i + 8], _teapot_M);
   }
   if (_nb_tpss == 1)
     return data;
-  for(t = 0.0f; t <= 1.0f; t+= dt, ++i) {
+  fprintf(stderr, "%f %f\n", t, t+dt);
+  for(t = 0.0f; t < 1.0f; t+= dt, ++i) {
     vec3f_t p = deCasteljau(cp_couvercle, sizeof cp_couvercle / sizeof *cp_couvercle, t);
-    data[8*i + 0] = p.x;
-    data[8*i +1] = p.y;
-    data[8*i +2] = p.z;
+    data[8* 2*_teapot_M * i + 0] = p.x;
+    data[8* 2*_teapot_M* i +1] = p.y;
+    data[8*2*_teapot_M* i +2] = p.z;
+    _y_revolution(&data[8*2*_teapot_M*i + 0], _teapot_M);
+    p = deCasteljau(cp_couvercle, sizeof cp_couvercle / sizeof *cp_couvercle, t+dt);
+    data[8* 2*_teapot_M * i + 8] = p.x;
+    data[8* 2*_teapot_M* i +9] = p.y;
+    data[8*2*_teapot_M* i +10] = p.z;
+    _y_revolution(&data[8*2*_teapot_M*i + 8], _teapot_M);
   }
   if (_nb_tpss == 2)
     return data;
@@ -1220,8 +1232,8 @@ void _y_revolution(GLfloat * to_rev, int m) {
   GLfloat radius = sqrt(to_rev[0] * to_rev[0] + to_rev[2] * to_rev[2]);
   for (int i = 0; i < m; ++i) {
     GLfloat phi = (i * 2 * M_PI) / (m-1);
-    to_rev[8*i + 0] = cos(phi)  * radius;
-    to_rev[8*i + 1] = to_rev[1]; 
-    to_rev[8*i + 2] = -sin(phi)  * radius; 
+    to_rev[8*2*i + 0] = cos(phi)  * radius;
+    to_rev[8*2*i + 1] = to_rev[1]; 
+    to_rev[8*2*i + 2] = -sin(phi)  * radius; 
   }
 }
