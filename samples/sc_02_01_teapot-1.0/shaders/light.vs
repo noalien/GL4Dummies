@@ -9,7 +9,8 @@ layout (location = 2) in vec2 vsiTexCoord;
 uniform mat4 projectionMatrix, viewMatrix, modelMatrix;
 
 out vec2 vsoTexCoord;
-
+out vec3 vsoModPos;
+out vec3 vsoModNormal;
 
 void main(void) {
   /* gl_Position, nom réservé produisant un sommet GL */
@@ -17,6 +18,8 @@ void main(void) {
    * w = 1.0 ; elle est multipliée à gauche par une matrice de
    * modélisation puis vue puis projection (lire de droite à gauche à
    * partir du sommet) */
-  gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vsiPosition, 1.0);
+  vsoModPos = (modelMatrix * vec4(vsiPosition, 1.0)).xyz;
+  gl_Position = projectionMatrix * viewMatrix * vec4(vsoModPos, 1.0);
   vsoTexCoord = vsiTexCoord;
+  vsoModNormal = (transpose(inverse(modelMatrix)) * vec4(vsiNormal, 0.0)).xyz;
 }

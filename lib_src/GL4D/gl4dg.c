@@ -182,7 +182,7 @@ static inline void     triangleNormalf(GLfloat * out, GLfloat * p0, GLfloat * p1
 static inline int      _maxi(int a, int b);
 static inline int      _mini(int a, int b);
 static inline vec3f_t deCasteljau(vec3f_t *p, int n, GLfloat t);
-static inline void    _y_revolution(GLfloat * to_rev, int m);
+static inline void    _y_revolution(GLfloat * to_rev, int m, GLfloat ny);
 
 static const int _teapot_N = 42;
 static const int _teapot_M = 42;
@@ -1161,18 +1161,21 @@ GLfloat * mkTeapotVerticesf(GLuint slices) {
   assert(data);
   GLfloat t;
   int i = 0;
-  GLfloat dt = 1.0f/(_teapot_N);
+  GLfloat dt = 1.0f/(_teapot_N), ny;
   for(t = 0.0f; t < 1.0f; t+= dt, ++i) {
     vec3f_t p = deCasteljau(cp_corps, sizeof cp_corps / sizeof *cp_corps, t);
     data[8*2*_teapot_M*i + 0] = p.x;
     data[8*2*_teapot_M*i +1] = p.y;
     data[8*2*_teapot_M*i +2] = p.z;
-    _y_revolution(&data[8*2*_teapot_M*i + 0], _teapot_M);
-    p = deCasteljau(cp_corps, sizeof cp_corps / sizeof *cp_corps, t + dt);
-    data[8*2*_teapot_M*i + 8] = p.x;
-    data[8*2*_teapot_M*i +9] = p.y;
-    data[8*2*_teapot_M*i +10] = p.z;
-    _y_revolution(&data[8*2*_teapot_M*i + 8], _teapot_M);
+    vec3f_t pf = deCasteljau(cp_corps, sizeof cp_corps / sizeof *cp_corps, t + dt);
+    ny = (pf.x - p.x) / dt;
+    _y_revolution(&data[8*2*_teapot_M*i + 0], _teapot_M, ny);
+    data[8*2*_teapot_M*i + 8] = pf.x;
+    data[8*2*_teapot_M*i +9] = pf.y;
+    data[8*2*_teapot_M*i +10] = pf.z;
+    vec3f_t pff = deCasteljau(cp_corps, sizeof cp_corps / sizeof *cp_corps, t + dt + dt);
+    ny = (pff.x - pf.x) / dt;
+    _y_revolution(&data[8*2*_teapot_M*i + 8], _teapot_M, ny);
   }
   if (_nb_tpss == 1)
     return data;
@@ -1182,12 +1185,15 @@ GLfloat * mkTeapotVerticesf(GLuint slices) {
     data[8* 2*_teapot_M * i + 0] = p.x;
     data[8* 2*_teapot_M* i +1] = p.y;
     data[8*2*_teapot_M* i +2] = p.z;
-    _y_revolution(&data[8*2*_teapot_M*i + 0], _teapot_M);
-    p = deCasteljau(cp_couvercle, sizeof cp_couvercle / sizeof *cp_couvercle, t+dt);
-    data[8* 2*_teapot_M * i + 8] = p.x;
-    data[8* 2*_teapot_M* i +9] = p.y;
-    data[8*2*_teapot_M* i +10] = p.z;
-    _y_revolution(&data[8*2*_teapot_M*i + 8], _teapot_M);
+    vec3f_t pf = deCasteljau(cp_couvercle, sizeof cp_couvercle / sizeof *cp_couvercle, t+dt);
+    ny = (pf.x - p.x) / dt;
+    _y_revolution(&data[8*2*_teapot_M*i + 0], _teapot_M, ny);
+    data[8* 2*_teapot_M * i + 8] = pf.x;
+    data[8* 2*_teapot_M* i +9] = pf.y;
+    data[8*2*_teapot_M* i +10] = pf.z;
+    vec3f_t pff = deCasteljau(cp_couvercle, sizeof cp_couvercle / sizeof *cp_couvercle, t+dt+dt);
+    ny = (pff.x - pf.x) / dt;
+    _y_revolution(&data[8*2*_teapot_M*i + 8], _teapot_M, ny);
   }
   if (_nb_tpss == 2)
     return data;
@@ -1228,12 +1234,19 @@ int _mini(int a, int b) {
   return a < b ? a : b;
 }
 
-void _y_revolution(GLfloat * to_rev, int m) {
+void _y_revolution(GLfloat * to_rev, int m, GLfloat ny) {
   GLfloat radius = sqrt(to_rev[0] * to_rev[0] + to_rev[2] * to_rev[2]);
+  GLfloat nx, nz;
   for (int i = 0; i < m; ++i) {
     GLfloat phi = (i * 2 * M_PI) / (m-1);
-    to_rev[8*2*i + 0] = cos(phi)  * radius;
+    to_rev[8*2*i + 0] = (nx = cos(phi))  * radius;
     to_rev[8*2*i + 1] = to_rev[1]; 
-    to_rev[8*2*i + 2] = -sin(phi)  * radius; 
+    to_rev[8*2*i + 2] = (nz = -sin(phi))  * radius; 
+    to_rev[8*2*i + 3] = nx;
+    to_rev[8*2*i + 4] = ny;
+    to_rev[8*2*i + 5] = nz;
+    /* six-seven !! */
+    to_rev[8*2*i + 6] = phi / (2.0f * M_PI);
+    to_rev[8*2*i + 7] = (to_rev[1] + 1.0f) / 2.0f;
   }
 }

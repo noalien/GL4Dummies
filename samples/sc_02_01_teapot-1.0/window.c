@@ -7,6 +7,7 @@
 #include <GL4D/gl4dg.h>
 #include <GL4D/gl4du.h>
 #include <GL4D/gl4duw_SDL2.h>
+#include <SDL_opengl.h>
 
 /* Prototypes des fonctions statiques contenues dans ce fichier C */
 static void init(void);
@@ -20,6 +21,8 @@ static int _ww = 800, _wh = 600;
 static GLuint _pId = 0;
 /*!\brief identifiant pour une géométrie GL4D */
 static GLuint _tpotId = 0;
+
+static GLuint _texId = 0;
 
 /*!\brief créé la fenêtre d'affichage, initialise GL et les données,
  * affecte les fonctions d'événements et lance la boucle principale
@@ -52,10 +55,17 @@ void init(void) {
   gl4duGenMatrix(GL_FLOAT, "modelMatrix");
   gl4duGenMatrix(GL_FLOAT, "viewMatrix");
   resize(_ww, _wh);
+  glGenTextures(1, &_texId);
+  glBindTexture(GL_TEXTURE_2D, _texId);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  GLuint pixels[] = {0, -1, -1, 0};
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 /*!\brief Cette fonction dessine dans le contexte OpenGL actif. */
 void draw(void) {
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
   static GLfloat angle = 0.0f;
   static double t0 = 0.0;
   double t = gl4dGetElapsedTime(), dt = (t - t0) / 1000.0;
@@ -91,8 +101,11 @@ void draw(void) {
 
   glUniform1f(glGetUniformLocation(_pId, "temps"), t / 1000.0f);
   
+  glBindTexture(GL_TEXTURE_2D, _texId);
+  glUniform1i(glGetUniformLocation(_pId, "tex"), 0);  
   /* dessiner la géométrie */
   gl4dgDraw(_tpotId);
+  glBindTexture(GL_TEXTURE_2D, 0);
   /* désactiver le programme shader */
   glUseProgram(0);
   /* un demi-tour par seconde */
