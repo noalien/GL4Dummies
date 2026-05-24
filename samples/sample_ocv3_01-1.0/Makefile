@@ -18,13 +18,12 @@ SDL_CFLAGS = $(shell sdl2-config --cflags)
 SDL_LDFLAGS = $(shell sdl2-config --libs)
 CPPFLAGS = -I. $(SDL_CFLAGS)
 CFLAGS = -Wall -O3
-LDFLAGS = -lm -lGL4Dummies $(SDL_LDFLAGS) -lopencv_highgui -lopencv_videoio -lopencv_core
-# éventuellement en plus -lopencv_imgproc -lopencv_objdetect -lopencv_imgcodecs
+LDFLAGS = -lm -lGL4Dummies $(SDL_LDFLAGS) -L/opt/local/lib/opencv3 -lopencv_highgui -lopencv_videoio -lopencv_core -lopencv_imgproc -lopencv_objdetect -lopencv_imgcodecs
 
 UNAME := $(shell uname)
 ifeq ($(UNAME),Darwin)
 	MACOSX_DEPLOYMENT_TARGET = 11.0
-        CFLAGS += -I/usr/X11R6/include -I/opt/local/include/ -I/opt/local/include/opencv2
+        CFLAGS += -I/usr/X11R6/include -I/opt/local/include/ -I/opt/local/include/opencv3
         -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
         LDFLAGS += -framework OpenGL -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET) -lc++ 
 else

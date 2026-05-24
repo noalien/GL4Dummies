@@ -32,7 +32,7 @@ static void draw(void);
 static void quit(void);
 
 /*!\brief dimensions de la fenêtre */
-static GLfloat _dim[] = {640, 480};
+static GLfloat _dim[] = {1920,1080};
 /*!\brief pointeur vers la (future) fenêtre SDL */
 static SDL_Window * _win = NULL;
 /*!\brief pointeur vers le (futur) contexte OpenGL */
@@ -54,6 +54,9 @@ static VideoCapture * _cap = NULL;
  * lance la boucle (infinie) principale.
  */
 int main(int argc, char ** argv) {
+
+
+  
   if(SDL_Init(SDL_INIT_VIDEO) < 0) {
     fprintf(stderr, "Erreur lors de l'initialisation de SDL :  %s", SDL_GetError());
     return -1;
@@ -239,17 +242,20 @@ static void draw(void) {
   Mat ci;
   const GLfloat blanc[] = {1.0f, 1.0f, 1.0f, 1.0f};
   const GLfloat bleu[]  = {0.5f, 0.5f, 1.0f, 1.0f};
+  double temps = gl4dGetElapsedTime();  
+  
   glBindTexture(GL_TEXTURE_2D, _tId);
   *_cap >> ci;
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ci.cols, ci.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, ci.data);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glUseProgram(_pId);
+  glUniform1f(glGetUniformLocation(_pId, "temps"), (GLfloat)temps);
   glEnable(GL_DEPTH_TEST);
-  glUniform1i(glGetUniformLocation(_pId, "myTexture"), 0);
+  /*  glUniform1i(glGetUniformLocation(_pId, "myTexture"), 0);
   glUniform1f(glGetUniformLocation(_pId, "width"), _dim[0]);
-  glUniform1f(glGetUniformLocation(_pId, "height"), _dim[1]);
+  glUniform1f(glGetUniformLocation(_pId, "height"), _dim[1]);*/
   /* streaming au fond */
-  gl4duBindMatrix("modelviewMatrix");
+  //  gl4duBindMatrix("modelviewMatrix");
   gl4duPushMatrix(); /* sauver modelview */
   gl4duLoadIdentityf();
   gl4duTranslatef(0, 0, 0.9999f);
@@ -264,7 +270,7 @@ static void draw(void) {
   gl4duBindMatrix("modelviewMatrix");
   gl4duPopMatrix(); /* restaurer modelview */
   /* streaming tournant */
-  gl4duRotatef(5, 0, 1, 0); /* ajouter 5 degres selon l'axe y à la matrice modelview en cours */
+  //  gl4duRotatef(5, 0, 1, 0); /* ajouter 5 degres selon l'axe y à la matrice modelview en cours */
   gl4duSendMatrices(); /* envoyer les matrices */
   glUniform4fv(glGetUniformLocation(_pId, "couleur"), 1, bleu); /* envoyer une couleur */
   glBindVertexArray(_vao);
