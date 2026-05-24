@@ -183,11 +183,12 @@ static inline int      _maxi(int a, int b);
 static inline int      _mini(int a, int b);
 static inline vec3f_t deCasteljau(vec3f_t *p, int n, GLfloat t);
 static inline void    _y_revolution(GLfloat * to_rev, int m, GLfloat ny);
+static inline void    _xyz_revolution(GLfloat * to_rev, int m, vec3f_t *p, vec3f_t *T, GLfloat r);
 
 static const int _teapot_N = 42;
 static const int _teapot_M = 42;
 /* tpss = nombre de TeaPot Sub Surfaces */
-static const int _nb_tpss = 2;
+static const int _nb_tpss = 4;
 
 void gl4dgInit(void) {
   int i;
@@ -459,7 +460,9 @@ GLuint gl4dgGenTeapotf(GLuint slices) {
   glEnableVertexAttribArray(2);
   glGenBuffers(1, &(c->buffer));
   glBindBuffer(GL_ARRAY_BUFFER, c->buffer);
-  glBufferData(GL_ARRAY_BUFFER, (_nb_tpss * 8 * 2* (_teapot_N) * _teapot_M) * sizeof *data, data, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER,
+	       (_nb_tpss * 8 * 2* (_teapot_N) * _teapot_M + /*la base*/8 * (_teapot_M + 1)) * sizeof *data,
+	       data, GL_STATIC_DRAW);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)0);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(3 * sizeof *data));
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (8 * sizeof *data), (const void *)(6 * sizeof *data));
@@ -536,6 +539,9 @@ void gl4dgDraw(GLuint id) {
     /* corps puis couvercle puis bec puis anse */
     for(int i = 0; i < _nb_tpss; i++)
       glDrawArrays(GL_TRIANGLE_STRIP, 2 * i * (_teapot_N) * _teapot_M, 2 * (_teapot_N) * _teapot_M);
+    /*la base*/
+    if(_nb_tpss == 4)
+      glDrawArrays(GL_TRIANGLE_FAN, 2 * 4 * (_teapot_N) * _teapot_M, _teapot_M + 1);
     glBindVertexArray(0);
     break;
   default:
@@ -1143,7 +1149,7 @@ GLfloat * mkTeapotVerticesf(GLuint slices) {
     { 0.535f, 0.440f, 0.000f }
   };
   vec3f_t cp_bec[] = {
-    { 0.789f, -0.552f,  0.0f },
+    { 0.779f, -0.552f,  0.0f },
     { 1.130f, -0.503f,  0.0f },
     { 0.750f, -0.100f,  0.0f },
     { 0.900f,  0.440f,  0.0f }
@@ -1154,10 +1160,10 @@ GLfloat * mkTeapotVerticesf(GLuint slices) {
     { -0.530f,   0.840f, 0.0f },
     { -1.207f,   0.420f, 0.0f },
     { -1.193f,   0.016f, 0.0f },
-    { -0.780f,  -0.600f, 0.0f }
+    { -0.720f,  -0.600f, 0.0f }
   };
   /* Vertices data */
-  GLfloat * data = calloc(_nb_tpss * 8 *2* (_teapot_N) * _teapot_M, sizeof *data);
+  GLfloat * data = calloc(_nb_tpss * 8 *2* (_teapot_N) * _teapot_M + /*la base*/8 * (_teapot_M + 1), sizeof *data);
   assert(data);
   GLfloat t;
   int i = 0;
@@ -1168,49 +1174,76 @@ GLfloat * mkTeapotVerticesf(GLuint slices) {
     data[8*2*_teapot_M*i +1] = p.y;
     data[8*2*_teapot_M*i +2] = p.z;
     vec3f_t pf = deCasteljau(cp_corps, sizeof cp_corps / sizeof *cp_corps, t + dt);
-    ny = (pf.x - p.x) / dt;
+    ny = (pf.x - p.x) / dt; /* y de la normale c'est le x de la tangeante */
     _y_revolution(&data[8*2*_teapot_M*i + 0], _teapot_M, ny);
     data[8*2*_teapot_M*i + 8] = pf.x;
     data[8*2*_teapot_M*i +9] = pf.y;
     data[8*2*_teapot_M*i +10] = pf.z;
     vec3f_t pff = deCasteljau(cp_corps, sizeof cp_corps / sizeof *cp_corps, t + dt + dt);
-    ny = (pff.x - pf.x) / dt;
+    ny = (pff.x - pf.x) / dt; /* y de la normale c'est le x de la tangeante */
     _y_revolution(&data[8*2*_teapot_M*i + 8], _teapot_M, ny);
   }
   if (_nb_tpss == 1)
     return data;
-  fprintf(stderr, "%f %f\n", t, t+dt);
   for(t = 0.0f; t < 1.0f; t+= dt, ++i) {
     vec3f_t p = deCasteljau(cp_couvercle, sizeof cp_couvercle / sizeof *cp_couvercle, t);
     data[8* 2*_teapot_M * i + 0] = p.x;
     data[8* 2*_teapot_M* i +1] = p.y;
     data[8*2*_teapot_M* i +2] = p.z;
     vec3f_t pf = deCasteljau(cp_couvercle, sizeof cp_couvercle / sizeof *cp_couvercle, t+dt);
-    ny = (pf.x - p.x) / dt;
+    ny = (pf.x - p.x) / dt; /* y de la normale c'est le x de la tangeante */
     _y_revolution(&data[8*2*_teapot_M*i + 0], _teapot_M, ny);
     data[8* 2*_teapot_M * i + 8] = pf.x;
     data[8* 2*_teapot_M* i +9] = pf.y;
     data[8*2*_teapot_M* i +10] = pf.z;
     vec3f_t pff = deCasteljau(cp_couvercle, sizeof cp_couvercle / sizeof *cp_couvercle, t+dt+dt);
-    ny = (pff.x - pf.x) / dt;
+    ny = (pff.x - pf.x) / dt; /* y de la normale c'est le x de la tangeante */
     _y_revolution(&data[8*2*_teapot_M*i + 8], _teapot_M, ny);
   }
   if (_nb_tpss == 2)
     return data;
-  for(t = 0.0f; t <= 1.0f; t+= dt, ++i) {
+  for(t = 0.0f; t < 1.0f; t+= dt, ++i) {
     vec3f_t p = deCasteljau(cp_bec, sizeof cp_bec / sizeof *cp_bec, t);
-    data[8*i + 0] = p.x;
-    data[8*i +1] = p.y;
-    data[8*i +2] = p.z;
+    vec3f_t pf = deCasteljau(cp_bec, sizeof cp_bec / sizeof *cp_bec, t + dt);
+    vec3f_t T = { (pf.x - p.x) / dt, (pf.y - p.y) / dt, (pf.z - p.z) / dt };
+    _xyz_revolution(&data[8*2*_teapot_M*i + 0], _teapot_M, &p, &T, 0.05f);
+    vec3f_t pff = deCasteljau(cp_bec, sizeof cp_bec / sizeof *cp_bec, t + dt + dt);
+    vec3f_t Tf = { (pff.x - pf.x) / dt, (pff.y - pf.y) / dt, (pff.z - pf.z) / dt };
+    _xyz_revolution(&data[8*2*_teapot_M*i + 8], _teapot_M, &pf, &Tf, 0.05f);
   }
   if (_nb_tpss == 3)
     return data;
-  for(t = 0.0f; t <= 1.0f; t+= dt, ++i) {
+  for(t = 0.0f; t < 1.0f; t+= dt, ++i) {
     vec3f_t p = deCasteljau(cp_anse, sizeof cp_anse / sizeof *cp_anse, t);
-    data[8*i + 0] = p.x;
-    data[8*i +1] = p.y;
-    data[8*i +2] = p.z;
-  }	
+    vec3f_t pf = deCasteljau(cp_anse, sizeof cp_anse / sizeof *cp_anse, t + dt);
+    vec3f_t T = { (pf.x - p.x) / dt, (pf.y - p.y) / dt, (pf.z - p.z) / dt };
+    _xyz_revolution(&data[8*2*_teapot_M*i + 0], _teapot_M, &p, &T, 0.02f);
+    vec3f_t pff = deCasteljau(cp_anse, sizeof cp_anse / sizeof *cp_anse, t + dt + dt);
+    vec3f_t Tf = { (pff.x - pf.x) / dt, (pff.y - pf.y) / dt, (pff.z - pf.z) / dt };
+    _xyz_revolution(&data[8*2*_teapot_M*i + 8], _teapot_M, &pf, &Tf, 0.02f);
+  }
+  /* base de la teapot */
+  int base_i = 8* 2*_teapot_M * i;
+  data[base_i + 0] = 0.0f;
+  data[base_i + 1] = -1.0f;
+  data[base_i + 2] = 0.0f;
+  data[base_i + 3] = 0.0f;
+  data[base_i + 4] = -1.0f;
+  data[base_i + 5] = 0.0f;
+  data[base_i + 6] = 0.5f;
+  data[base_i + 7] = 0.0f;
+  for (int j = 1; j < _teapot_M + 1; ++j) {
+    GLfloat phi = ((j - 1) * 2 * M_PI) / (_teapot_M - 1);
+    data[base_i + 8*j + 0] = cp_corps[3].x * cos(phi);
+    data[base_i + 8*j + 1] = -1.0; 
+    data[base_i + 8*j + 2] = -cp_corps[3].x * sin(phi);
+    data[base_i + 8*j + 3] = 0.0f;
+    data[base_i + 8*j + 4] = -1.0f;
+    data[base_i + 8*j + 5] = 0.0f;
+    /* six-seven !! */
+    data[base_i + 8*j + 6] = phi / (2.0f * M_PI);
+    data[base_i + 8*j + 7] = 0.0f;
+  }
   return data;  
 }
 
@@ -1248,5 +1281,31 @@ void _y_revolution(GLfloat * to_rev, int m, GLfloat ny) {
     /* six-seven !! */
     to_rev[8*2*i + 6] = phi / (2.0f * M_PI);
     to_rev[8*2*i + 7] = (to_rev[1] + 1.0f) / 2.0f;
+  }
+}
+
+
+void _xyz_revolution(GLfloat * to_rev, int m, vec3f_t *p, vec3f_t *T, GLfloat r) {
+  const vec3f_t k = {0.0f, 0.0f, 1.0f};
+  vec3f_t n;
+  MVEC3CROSS((GLfloat *)&n, (GLfloat *)T, (GLfloat *)&k);
+  for (int i = 0; i < m; ++i) {
+    GLfloat phi = i * ((2 * M_PI) / (m-1));
+    GLfloat rcos = r * cos(phi), rsin = r * sin(phi);
+    vec3f_t translate = {
+      rcos * k.x + rsin * n.x,
+      rcos * k.y + rsin * n.y,
+      rcos * k.z + rsin * n.z
+    };
+    to_rev[8*2*i + 0] = p->x + translate.x;
+    to_rev[8*2*i + 1] = p->y + translate.y;
+    to_rev[8*2*i + 2] = p->z + translate.z;
+    MVEC3NORMALIZE((GLfloat *)&translate);
+    to_rev[8*2*i + 3] = translate.x;
+    to_rev[8*2*i + 4] = translate.y;
+    to_rev[8*2*i + 5] = translate.z;
+    /* six-seven !! */
+    to_rev[8*2*i + 6] = phi / (2.0f * M_PI);
+    to_rev[8*2*i + 7] = 0.0f;
   }
 }

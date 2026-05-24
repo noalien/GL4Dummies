@@ -95,6 +95,8 @@ void draw(void) {
   gl4duLoadIdentityf();
   /* composer la matrice modèle avec une rotation */
   gl4duRotatef(angle, 0.0f, 1.0f, 0.0f);
+  /* composer la matrice modèle avec une rotation */
+  gl4duRotatef(angle / 2.0f, 1.0f, 0.0f, 0.0f);
   /* Envoyer, au shader courant, toutes les matrices connues dans
    * GL4Dummies, ici on intègre pas la rotation qui vient après */
   gl4duSendMatrices();
@@ -109,7 +111,7 @@ void draw(void) {
   /* désactiver le programme shader */
   glUseProgram(0);
   /* un demi-tour par seconde */
-  angle += 180.0f * dt;
+  angle += 90.0f * dt;
 }
 /*!\brief appelée au moment du resize de la fenêtre.*/
 void resize(int w, int h) {
