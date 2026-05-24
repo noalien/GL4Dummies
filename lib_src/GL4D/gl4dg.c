@@ -6,7 +6,6 @@
  * \date February 22, 2016
  */
 
-#include <_static_assert.h>
 #if defined(_MSC_VER)
 #  define _USE_MATH_DEFINES
 #endif
