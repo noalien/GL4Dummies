@@ -33,6 +33,10 @@
 #  include <limits.h>
 #endif
 
+#if defined(__APPLE__)
+#include <mach-o/dyld.h>
+#endif
+
 typedef struct shader_t shader_t;
 typedef struct program_t program_t;
 /*!\brief type de données lié à la structure struct _GL4DUMatrix. */
